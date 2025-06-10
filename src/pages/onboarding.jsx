@@ -2,16 +2,16 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 // Imagens de ondas
-import onda1 from "../../assets/ondas1.svg";
-import onda2 from "../../assets/ondas2.svg";
-import onda3 from "../../assets/ondas3.svg";
+import onda1 from "../assets/ondas1.svg";
+import onda2 from "../assets/ondas2.svg";
+import onda3 from "../assets/ondas3.svg";
 
 // Imagens de pessoas
-import pessoa1 from "../../assets/pessoa1.svg";
-import pessoa2 from "../../assets/pessoa2.svg";
-import pessoa3 from "../../assets/pessoa3.svg";
+import pessoa1 from "../assets/pessoa1.svg";
+import pessoa2 from "../assets/pessoa2.svg";
+import pessoa3 from "../assets/pessoa3.svg";
 
-import voltarIcon from "../../assets/voltar.svg";
+import voltarIcon from "../assets/voltar.svg";
 
 const slides = [
   {

@@ -1,0 +1,82 @@
+import React from 'react';
+
+export default function Main() {
+  return (
+    <main className="bg-white">
+      {/* Seção: O que é o EspaçoSenai? */}
+      <img src="src/assets/ondaLandinpage.svg" alt="Onda landingpage" className="w-full" />
+      <section className="flex justify-between items-center py-12 px-6 md:px-12 relative z-10">
+        <div className="max-w-xl pr-6 relative" style={{ top: '-70px' }}>
+          <h2 className="text-4xl font-medium">
+            <span className="text-black">O que é o </span>
+            <span className="text-[#AE0000]">EspaçoSenai</span>
+            <span className="text-black">?</span>
+          </h2>
+          <p className="text-lg text-gray-700 mb-6">
+            <br />
+            Criado para facilitar a organização de atividades acadêmicas e administrativas, o sistema permite reservar salas, laboratórios, áreas de lazer e muito mais de forma prática e rápida.
+            <br /><br />
+            <span>Ele centraliza as informações, reduz burocracias e garante mais organização no dia a dia, tanto para quem utiliza os espaços quanto para quem os administra.</span>
+            <br /> <br />
+            <span>Precisa de um espaço para organizar a aula, fazer um projeto ou organizar um evento? Agora ficou fácil!</span>
+          </p>
+        </div>
+        <img src="src/assets/mulher.svg" alt="Ilustração EspaçoSenai" className="relative" style={{ top: '-170px' }} />
+      </section>
+
+      {/* Linha Separadora */}
+      <div className="border-t-2 border-gray-300 mx-8 mt-[-110px]"></div> 
+
+      {/* Seção: Como Funciona */}
+      <section className="bg-white py-12 px-6 md:px-12">
+      
+        <h2 className="text-[#AE0000] text-4xl font-medium mb-9 relative">
+        <div className="absolute top-2 left-[-10px] w-1 h-7 bg-[#AE0000] rounded-full"></div>
+          Como <span className='text-black'> Funciona?</span>
+        </h2>
+        <div className="flex flex-col md:flex-row justify-between items-center">
+          <div className="w-full md:w-1/3 text-center md:text-left mb-6 md:mb-0">
+            <ol className="list-none pl-6 space-y-4 text-lg text-gray-700">
+              <li className="flex items-center space-x-3 relative">
+                <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[#AE0000] text-white font-bold text-sm z-[1]" >1</span>
+                <span>Faça login com seu usuário SENAI</span>
+                <div className="absolute left-1 transform -translate-x-1/2 top-2 w-px h-16 bg-[#C5C5C5] z-[0]"></div> {/* Linha conectando */}
+              </li>
+              <li className="flex items-center space-x-3 relative">
+                <span className="flex items-center justify-center w-9 h-8 rounded-full bg-[#AE0000] text-white font-bold text-sm z-[1]">2</span>
+                <span>Use os filtros para encontrar o espaço ideal</span>
+                <div className="absolute left-1 transform -translate-x-1/2 top-4 w-px h-16 bg-[#C5C5C5] z-[0]"></div> {/* Linha conectando */}
+              </li>
+              <li className="flex items-center space-x-3 relative top-[-5px]">
+                <span className="flex items-center justify-center w-10 h-8 rounded-full bg-[#AE0000] text-white font-bold text-sm z-[1]">3</span>
+                <span>Consulte os horários disponíveis com facilidade</span>
+              </li>
+            </ol>
+          </div>
+        </div>
+
+        {/* Aqui começa o conteúdo que você quer que fique embaixo */}
+        <div className="w-full text-center mt-8">
+          <p className="text-2xl font-semibold text-black mb-4">
+            Aqui você terá a <span className="text-[#AE0000]">melhor</span> experiência!
+          </p>
+          <div className="flex justify-center gap-4">
+            <button className="px-7 py-3 bg-white border-2 border-[#AE0000] text-[#AE0000] text-left mr-10 hover:bg-[#AE0000] hover:text-white hover:border-[#AE0000] transition-all duration-300">
+              Busca por <br /> 
+              Espaços
+            </button>
+            <button className="px-6 py-3 bg-white border-2 border-[#AE0000] text-[#AE0000] text-left mr-10 hover:bg-[#AE0000] hover:text-white hover:border-[#AE0000] transition-all duration-300">
+              Horários <br /> 
+              Disponíveis
+            </button>
+            <button className="px-6 py-3 bg-white border-2 border-[#AE0000] text-[#AE0000] text-left hover:bg-[#AE0000] hover:text-white  hover:border-[#AE0000] transition-all duration-300">
+              Ajuda e <br /> 
+              Suporte
+            </button>
+          </div>
+        </div>
+      </section>
+      <div className="border-t-2 border-gray-300 mx-8 mt-[0px] mb-3"></div> 
+    </main>
+  );
+}
