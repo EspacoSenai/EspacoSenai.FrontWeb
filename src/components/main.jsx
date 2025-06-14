@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function Main() {
   return (
-    <main className="bg-white dark:bg-[#1a1a1a] scroll-smooth">
+    <main className="bg-white dark:bg-[#0B0B0B] scroll-smooth">
       {/* Seção: O que é o EspaçoSenai? */}
       <img src="src/assets/ondaLandinpage.svg" alt="Onda landingpage" className="w-full" />
 
@@ -28,7 +28,7 @@ export default function Main() {
       <div className="border-t-2 border-gray-300 dark:border-gray-600 mx-8 mt-[-50px]"></div>
 
       {/* Seção: Como Funciona */}
-      <section id="comoFunciona" className="bg-white dark:bg-[#1a1a1a] py-12 px-6 md:px-12">
+      <section id="comoFunciona" className="bg-white dark:bg-[#0B0B0B] py-12 px-6 md:px-12">
         <h2 className="text-[#AE0000] text-4xl font-medium mb-9 relative">
           <div className="absolute top-2 left-[-10px] w-1 h-7 bg-[#AE0000] rounded-full"></div>
           Como <span className='text-black dark:text-white'> Funciona?</span>
@@ -79,7 +79,7 @@ export default function Main() {
       <div className="border-t-2 border-gray-300 dark:border-gray-600 mx-8 mt-[0px] mb-3"></div>
 
       {/* Seção: Perguntas Frequentes */}
-      <section id="faq" className="px-6 md:px-12 py-16 bg-white dark:bg-[#1a1a1a] relative z-10">
+      <section id="faq" className="px-6 md:px-12 py-16 bg-white dark:bg-[#0B0B0B] relative z-10">
         <h2 className="text-2xl md:text-3xl font-semibold mb-6 relative">
           <div className="absolute top-2 left-[-10px] w-1 h-7 bg-[#AE0000] rounded-full z-0"></div>
           <span className="pl-2 text-black dark:text-white">

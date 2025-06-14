@@ -4,14 +4,14 @@ export default function Footer() {
   return (
     <>
       {/* Retângulo branco superior com logo e links */}
-      <div className="bg-[#757575] mt-[230px] w-[90%] max-w-[650px] h-16 rounded-md mx-auto -mb-8 relative z-20 flex justify-center items-center gap-6 px-6">
-        <a href="#" className="text-white text-xs hover:underline hover:text-white">POLÍTICA DE PRIVACIDADE</a>
+      <div className="bg-[#FFFFFF] mt-[230px] w-[90%] max-w-[650px] h-16 rounded-md mx-auto -mb-8 relative z-20 flex justify-center items-center gap-6 px-6">
+        <a href="#" className="text-black text-xs hover:underline hover:text-black">POLÍTICA DE PRIVACIDADE</a>
         <img src="src/assets/EspacoSenai.svg" alt="Logo EspaçoSenai" className="w-[80px]" />
-        <a href="#" className="text-white text-xs hover:underline hover:text-white">TERMOS DE USO</a>
+        <a href="#" className="text-black text-xs hover:underline hover:text-black">TERMOS DE USO</a>
       </div>
 
       {/* Rodapé principal */}
-      <footer className="bg-[#1E1E1E] text-white pt-32 lg:pt-28  relative z-10">
+      <footer className="bg-black text-white pt-32 lg:pt-28  relative z-10">
         <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
 
           {/* INFORMAÇÕES */}

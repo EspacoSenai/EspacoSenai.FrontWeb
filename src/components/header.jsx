@@ -16,7 +16,7 @@ export default function Header() {
   };
 
   return (
-    <header className="w-full flex justify-center px-6 py-4 bg-white dark:bg-[#1a1a1a] transition-colors duration-300">
+    <header className="w-full flex justify-center px-6 py-4 bg-white dark:bg-[#0B0B0B] transition-colors duration-300">
       <div className="w-full max-w-7xl flex justify-between items-center border-b border-[#A6A3A3] dark:border-[#444]">
         {/* Logo */}
         <div className="flex items-center gap-2">
