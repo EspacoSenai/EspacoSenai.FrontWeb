@@ -20,9 +20,9 @@ const slides = [
     text: "Organize seus eventos, reuniões, treinamentos e atividades com praticidade e agilidade! Esse é o primeiro site desenvolvido para facilitar o reserva dos espaços disponíveis na unidade do SENAI Suíço-Brasileira.",
     onda: onda1,
     imagem: pessoa1,
-    titleClass: "px-[130px] text-left",
-    subtitleClass: "text-[20px] font-normal block mt-[-4px]",
-    textClass: "mt-[75px]",
+    titleClass: "px-[20px] md:px-[130px] text-left",
+    subtitleClass: "text-[18px] md:text-[20px] font-normal block mt-[-4px]",
+    textClass: "mt-[40px] md:mt-[75px]",
     layoutClass: "md:flex-row-reverse",
     imageClass: "-mt-6",
   },
@@ -32,9 +32,9 @@ const slides = [
     text: "Através da plataforma, é possível realizar reservas de salas, laboratórios, equipamentos e outros recursos de maneira simples e rápida. O uso do EspaçoSenai é uma solução que traz diversos benefícios para alunos, professores e colaboradores da instituição.",
     onda: onda2,
     imagem: pessoa2,
-    titleClass: "px-[270px] text-left",
-    subtitleClass: "text-[20px] font-normal block mt-[-4px]",
-    textClass: "text-[30px] mt-[-50px]",
+    titleClass: "px-[20px] md:px-[270px] text-left",
+    subtitleClass: "text-[18px] md:text-[20px] font-normal block mt-[-4px]",
+    textClass: "text-[18px] md:text-[30px] mt-[20px] md:mt-[-50px]",
     layoutClass: "md:flex-row",
     imageClass: "-mt-6",
   },
@@ -44,9 +44,9 @@ const slides = [
     text: "As reservas são feitas em poucos passos e você pode acompanhá-las tudo em um painel com suas solicitações. O sistema também envia notificações, permite edições e oferece suporte completo para tirar dúvidas e garantir uma boa experiência.",
     onda: onda3,
     imagem: pessoa3,
-    titleClass: "px-[150px] text-left",
-    subtitleClass: "text-[24px] font-normal block mt-[-4px]",
-    textClass: "mt-[40px]",
+    titleClass: "px-[20px] md:px-[150px] text-left",
+    subtitleClass: "text-[18px] md:text-[24px] font-normal block mt-[-4px]",
+    textClass: "mt-[20px] md:mt-[40px]",
     layoutClass: "md:flex-row",
     imageClass: "mt-[20px]",
   },
@@ -96,7 +96,7 @@ export default function Onboarding() {
 
       {/* Título */}
       <div className={`pt-[10px] z-10 ${titleClass}`}>
-        <h2 className="text-[32px] font-bold leading-snug text-gray-900">
+        <h2 className="text-[28px] md:text-[32px] font-bold leading-snug text-gray-900">
           {title}
           <br />
           <span className={subtitleClass}>{subtitle}</span>
@@ -111,14 +111,14 @@ export default function Onboarding() {
       >
         {/* Ilustração */}
         <div
-          className={`flex ml-16 px-16 justify-center md:justify-start w-full md:w-1/2 ${imageClass}`}
+          className={`flex px-6 md:px-16 justify-center md:justify-start w-full md:w-1/2 ${imageClass}`}
         >
-          <img src={imagem} alt="Ilustração" className="w-[300px] h-auto" />
+          <img src={imagem} alt="Ilustração" className="w-[250px] md:w-[300px] h-auto" />
         </div>
 
         {/* Texto */}
         <div className={`w-full md:w-1/2 ${textClass}`}>
-          <p className="text-[18px] text-gray-700 max-w-xl">{text}</p>
+          <p className="text-[16px] md:text-[18px] text-gray-700 max-w-xl">{text}</p>
         </div>
       </div>
 
@@ -160,7 +160,7 @@ export default function Onboarding() {
             onClick={skip}
             className="border border-[#c41212] hover:border-[#c41212] bg-white text-black px-6 py-2 rounded-lg font-medium"
           >
-            Pular
+            {index === slides.length - 1 ? "Avançar" : "Pular"}
           </button>
         </div>
       </div>

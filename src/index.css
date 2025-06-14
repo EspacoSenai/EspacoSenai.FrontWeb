@@ -1,7 +1,6 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import "@fontsource/poppins";
 
 
 :root {
@@ -18,7 +17,14 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+.dark body {
+  background-color: #1a1a1a;
+  color: white;
+}
 
+html {
+  scroll-behavior: smooth;
+}
 a {
   font-weight: 500;
   color: #646cff;

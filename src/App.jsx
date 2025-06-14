@@ -1,10 +1,15 @@
-// src/app.jsx
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import LandingPage from './pages/landingPage';
 import Onboarding from './pages/onboarding';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 
 export default function App() {
+  useEffect(() => {
+    AOS.init({ duration: 800 });
+  }, []);
+
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />

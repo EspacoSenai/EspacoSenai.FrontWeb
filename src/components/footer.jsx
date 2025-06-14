@@ -3,76 +3,50 @@ import React from 'react';
 export default function Footer() {
   return (
     <>
-      {/* Retângulo com a logo colada no footer */}
-    <div className="bg-[#757575] top-[210px] w-[80%] h-20 relative z-20 py-8 mb-[-10px] mx-auto">
-        <div className="container mx-auto text-center">
-            <img src="src/assets/EspacoSenai.svg" alt="Logo EspaçoSenai" className="w-20 rounded-full  mx-auto" />
-        </div>
-    </div>
+      {/* Retângulo branco superior com logo e links */}
+      <div className="bg-[#757575] mt-[230px] w-[90%] max-w-[650px] h-16 rounded-md mx-auto -mb-8 relative z-20 flex justify-center items-center gap-6 px-6">
+        <a href="#" className="text-white text-xs hover:underline hover:text-white">POLÍTICA DE PRIVACIDADE</a>
+        <img src="src/assets/EspacoSenai.svg" alt="Logo EspaçoSenai" className="w-[80px]" />
+        <a href="#" className="text-white text-xs hover:underline hover:text-white">TERMOS DE USO</a>
+      </div>
 
+      {/* Rodapé principal */}
+      <footer className="bg-[#1E1E1E] text-white pt-32 lg:pt-28  relative z-10">
+        <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
 
-      {/* Rodapé */}
-      <footer className="bg-[#333333] text-white py-8 bottom-[-200px] mt-[-10px] relative z-10">
-        <div className="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center">
-          {/* Colunas do Rodapé */}
-          <div className="flex flex-col md:flex-row gap-12 text-center md:text-left justify-between items-center md:items-start">
-            {/* Coluna: INFORMAÇÕES */}
-            <div>
-              <h4 className="font-semibold text-center mb-4">INFORMAÇÕES</h4>
-              <ul className="space-y-2 text-center">
-                <li>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.
-                </li>
-              </ul>
-              <div className="flex justify-center gap-4 mt-4">
-                {/* Espaço para redes sociais (SVGs) */}
-                <a href="#" className="hover:text-gray-300">
-                  <i className="fab fa-facebook"></i>
-                </a>
-                <a href="#" className="hover:text-gray-300">
-                  <i className="fab fa-instagram"></i>
-                </a>
-                <a href="#" className="hover:text-gray-300">
-                  <i className="fab fa-linkedin"></i>
-                </a>
-              </div>
+          {/* INFORMAÇÕES */}
+          <div>
+            <h4 className="font-semibold text-base mb-4">INFORMAÇÕES</h4>
+            <p className="text-[#ccc] mb-4">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.
+            </p>
+            <div className="flex gap-4">
+              <img src="src/assets/instagram.svg" alt="Instagram" className="w-5 h-5" />
+              <img src="src/assets/github.svg" alt="GitHub" className="w-5 h-5" />
+              <img src="src/assets/linkedin.svg" alt="LinkedIn" className="w-5 h-5" />
             </div>
+          </div>
 
-            {/* Coluna: NAVEGAÇÃO */}
-            <div>
-              <h4 className="font-semibold mb-4">NAVEGAÇÃO</h4>
-              <ul className="space-y-3 text-center">
-                <li>
-                  <a href="#" className="hover:text-gray-300">O que é o EspaçoSenai</a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-gray-300">Como Funciona</a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-gray-300">Perguntas Frequentes</a>
-                </li>
-              </ul>
-            </div>
+          {/* NAVEGAÇÃO */}
+          <div>
+            <h4 className="font-semibold text-base mb-4">NAVEGAÇÃO</h4>
+            <ul className="space-y-2">
+              <li><a href="#espacoSenai" className="text-white border-b border-white hover:text-gray-300">O que é EspaçoSenai</a></li>
+              <li><a href="#comoFunciona" className="text-white border-b border-white hover:text-gray-300">Como Funciona</a></li>
+              <li><a href="#faq" className="text-white border-b border-white hover:text-gray-300">Perguntas Frequentes</a></li>
+            </ul>
+          </div>
 
-            {/* Coluna: CONTATO */}
-            <div>
-              <h4 className="font-semibold mb-4">CONTATO</h4>
-              <ul className="space-y-2 text-center">
-                <li>
-                  <a href="mailto:contato@espacosenai.com" className="hover:text-gray-300 border-b-2 border-white">Email</a>
-                </li>
-                <li>
-                  <a href="tel:+1123456789" className="hover:text-gray-300 border-b-2 border-white">Telefone</a>
-                </li>
-              </ul>
-            </div>
+          {/* CONTATO */}
+          <div>
+            <h4 className="font-semibold text-base mb-4">CONTATO</h4>
+            <p className="text-[#ccc]">(11) 3322-0050 (Telefone / WhatsApp)</p>
           </div>
         </div>
 
-        {/* Links de Política de Privacidade e Termos de Uso */}
-        <div className="text-center py-4">
-          <a href="#" className="text-gray-300 hover:text-white mr-4">Política de Privacidade</a>
-          <a href="#" className="text-gray-300 hover:text-white">Termos de Uso</a>
+        {/* Rodapé inferior */}
+        <div className="w-full mx-auto mt-12 h-10 bg-[#D9D9D9] rounded-t-[80px] flex items-center justify-center text-xs text-black">
+          Copyright 2025 © Todos os direitos reservados.
         </div>
       </footer>
     </>
