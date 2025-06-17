@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function Header() {
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return localStorage.getItem('theme') === 'dark';
+  });
 
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
     } else {
       document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
     }
   }, [isDarkMode]);
 
@@ -53,13 +58,18 @@ export default function Header() {
             ></div>
           </button>
 
-          {/* Navegação */}
-          <button className="px-4 py-2 text-sm font-medium text-white bg-red-600 dark:bg-red-700">
+          {/* Botão Entrar */}
+          <button className="px-4 py-2 text-sm font-medium text-white bg-red-600 dark:bg-red-700 rounded-md">
             Entrar
           </button>
-          <button className="px-4 py-2 text-sm font-medium border border-red-600 dark:border-red-700 transition-all duration-300 bg-white text-black dark:text-black hover:bg-red-600 hover:text-white dark:hover:bg-red-700 dark:hover:text-white">
+
+          {/* Botão Cadastrar-se */}
+          <Link
+            to="/cadastro"
+            className="px-4 py-2 text-sm font-medium border border-red-600 dark:border-red-700 transition-all duration-300 bg-white text-black dark:text-black hover:bg-red-600 hover:text-white dark:hover:bg-red-700 dark:hover:text-white rounded-md"
+          >
             Cadastrar-se
-          </button>
+          </Link>
         </div>
       </div>
     </header>
