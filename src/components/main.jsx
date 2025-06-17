@@ -8,6 +8,7 @@ export default function Main() {
 
       <section id="espacoSenai" className="flex justify-between items-center py-12 px-6 md:px-12 relative z-10">
         <div className="max-w-xl pr-6">
+        <div className="relative top-9 left-[-10px] w-1 h-7 bg-[#AE0000] rounded-full"></div>
           <h2 className="text-4xl font-medium">
             <span className="text-black dark:text-white">O que é o </span>
             <span className="text-[#AE0000]">EspaçoSenai</span>

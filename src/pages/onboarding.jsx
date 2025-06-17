@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 // Imagens de ondas
@@ -56,6 +56,13 @@ export default function Onboarding() {
   const [index, setIndex] = useState(0);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const jaViu = localStorage.getItem("onboardingVisto");
+    if (jaViu === "true") {
+      navigate("/", { replace: true });
+    }
+  }, [navigate]);
+
   const nextSlide = () => {
     if (index < slides.length - 1) {
       setIndex(index + 1);
@@ -69,7 +76,8 @@ export default function Onboarding() {
   };
 
   const skip = () => {
-    navigate("/");
+    localStorage.setItem("onboardingVisto", "true");
+    navigate("/", { replace: true });
   };
 
   const {
