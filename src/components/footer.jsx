@@ -4,7 +4,7 @@ export default function Footer() {
   return (
     <>
       {/* Retângulo branco superior com logo e links */}
-      <div className="bg-[#FFFFFF] mt-[230px] w-[90%] max-w-[650px] h-16 rounded-md mx-auto -mb-8 relative z-20 flex justify-center items-center gap-6 px-6">
+      <div className="bg-[#757575] dark:bg-[#FFFFFF] mt-[230px] w-[90%] max-w-[650px] h-16 rounded-md mx-auto -mb-8 relative z-20 flex justify-center items-center gap-6 px-6">
         <a href="#" className="text-black text-xs hover:underline hover:text-black">POLÍTICA DE PRIVACIDADE</a>
         <img src="src/assets/EspacoSenai.svg" alt="Logo EspaçoSenai" className="w-[80px]" />
         <a href="#" className="text-black text-xs hover:underline hover:text-black">TERMOS DE USO</a>
@@ -16,9 +16,9 @@ export default function Footer() {
 
           {/* INFORMAÇÕES */}
           <div>
-            <h4 className="font-semibold text-base mb-4">INFORMAÇÕES</h4>
+            <h4 className="font-semibold text-base mb-3">INFORMAÇÕES</h4>
             <p className="text-[#ccc] mb-4">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.
+              Este site permite que alunos e colaboradores reservem salas, laboratórios e outros ambientes disponíveis na unidade SENAI Suíço-Brasileira.
             </p>
             <div className="flex gap-4">
               <img src="src/assets/instagram.svg" alt="Instagram" className="w-5 h-5" />

@@ -32,14 +32,13 @@ export default function Header() {
           />
         </div>
 
-        {/* Ações */}
         <div className="flex items-center gap-4">
           {/* Toggle Dark Mode */}
           <button
             aria-label="Alternar modo"
             onClick={toggleDarkMode}
-            className="w-[50px] h-7 flex items-center justify-between rounded-full p-1 transition-all duration-300 relative"
-            style={{ backgroundColor: isDarkMode ? '#fff' : '#333' }}
+            className="w-[53px] h-7 flex items-center justify-between rounded-full p-1 transition-all duration-300 relative"
+            style={{ backgroundColor: isDarkMode ? '#fff' : '#333' }} 
           >
             <img
               src="src/assets/noite.svg"
