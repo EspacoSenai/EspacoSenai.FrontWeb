@@ -10,10 +10,9 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-[#f8f8f8] flex items-center justify-center relative overflow-hidden dark:bg-black">
-      {/* Curva vermelha */}
+      {/* imagem da Onda */}
       <img src={onda} alt="Onda" className="absolute top-5 left-0 w-full h-auto z-0" />
 
-      {/* Logo */}
           <>
           {/* Logo clara (padrão) */}
            <img
@@ -68,7 +67,7 @@ export default function Login() {
 
           <div className="text-right text-sm">
             <a href="#" className="text-red-600 text-xs hover:underline">
-              forgot password?
+              Esqueceu a senha?
             </a>
           </div>
 

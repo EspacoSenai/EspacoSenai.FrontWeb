@@ -5,13 +5,13 @@ export default function Footer() {
     <>
       {/* Retângulo branco superior com logo e links */}
       <div className="bg-[#757575] dark:bg-[#FFFFFF] mt-[230px] w-[90%] max-w-[650px] h-16 rounded-md mx-auto -mb-8 relative z-20 flex justify-center items-center gap-6 px-6">
-        <a href="#" className="text-black text-xs hover:underline hover:text-black">POLÍTICA DE PRIVACIDADE</a>
+        <a href="#" className="text-white text-xs hover:underline hover:text-white dark:text-black">POLÍTICA DE PRIVACIDADE</a>
         <img src="src/assets/EspacoSenai.svg" alt="Logo EspaçoSenai" className="w-[80px]" />
-        <a href="#" className="text-black text-xs hover:underline hover:text-black">TERMOS DE USO</a>
+        <a href="#" className="text-white text-xs hover:underline hover:text-white dark:text-black">TERMOS DE USO</a>
       </div>
 
       {/* Rodapé principal */}
-      <footer className="bg-black text-white pt-32 lg:pt-28  relative z-10">
+      <footer className="bg-black text-white pt-32 lg:pt-28 relative z-10">
         <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 text-sm">
 
           {/* INFORMAÇÕES */}
@@ -45,8 +45,8 @@ export default function Footer() {
         </div>
 
         {/* Rodapé inferior */}
-        <div className="w-full mx-auto mt-12 h-10 bg-[#D9D9D9] rounded-t-[80px] flex items-center justify-center text-xs text-black">
-          Copyright 2025 © Todos os direitos reservados.
+        <div className="w-full mt-16 h-8 bg-[#D9D9D9] rounded-t-[100%] flex items-center justify-center text-xs text-black">
+          <p>Copyright 2025 © Todos os direitos reservados.</p>
         </div>
       </footer>
     </>

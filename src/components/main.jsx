@@ -34,18 +34,18 @@ export default function Main() {
           <div className="absolute top-2 left-[-10px] w-1 h-7 bg-[#AE0000] rounded-full"></div>
           Como <span className='text-black dark:text-white'> Funciona?</span>
         </h2>
-        <div className="flex flex-col md:flex-row justify-between items-center">
+        <div className="flex flex-col md:flex-row justify-between items-center ">
           <div className="w-full md:w-1/3 text-center md:text-left mb-6 md:mb-0">
             <ol className="list-none pl-6 space-y-4 text-lg text-gray-700 dark:text-gray-300">
               <li className="flex items-center space-x-3 relative">
                 <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[#AE0000] text-white font-bold text-sm z-[1]" >1</span>
                 <span>Faça login com seu usuário SENAI</span>
-                <div className="absolute left-1 transform -translate-x-1/2 top-2 w-px h-16 bg-[#C5C5C5] dark:bg-[#555] z-[0]"></div>
+                <div className="absolute left-1 transform -translate-x-1/2 top-2 w-px h-16 bg-[#C5C5C5] dark:bg-white z-[0]"></div>
               </li>
               <li className="flex items-center space-x-3 relative">
                 <span className="flex items-center justify-center w-9 h-8 rounded-full bg-[#AE0000] text-white font-bold text-sm z-[1]">2</span>
                 <span>Use os filtros para encontrar o espaço ideal</span>
-                <div className="absolute left-1 transform -translate-x-1/2 top-4 w-px h-16 bg-[#C5C5C5] dark:bg-[#555] z-[0]"></div>
+                <div className="absolute left-1 transform -translate-x-1/2 top-4 w-px h-16 bg-[#C5C5C5] dark:bg-white z-[0]"></div>
               </li>
               <li className="flex items-center space-x-3 relative top-[-5px]">
                 <span className="flex items-center justify-center w-10 h-8 rounded-full bg-[#AE0000] text-white font-bold text-sm z-[1]">3</span>
@@ -60,18 +60,18 @@ export default function Main() {
             Aqui você terá a <span className="text-[#AE0000]">melhor</span> experiência!
           </p>
           <div className="flex justify-center gap-4">
-            <button className="px-7 py-3 bg-white dark:bg-[#2a2a2a] border-2 border-[#AE0000] text-[#AE0000] text-left mr-10 hover:bg-[#AE0000] hover:text-white hover:border-[#AE0000] transition-all duration-300">
+            <div className="rounded-[8px] px-7 py-3 bg-white dark:bg-[#2a2a2a] border-2 border-[#AE0000] text-[#AE0000] text-left mr-10 hover:bg-[#AE0000] hover:text-white hover:border-[#AE0000] transition-all duration-300 dark:border-white dark:text-white dark:transition-all dark:duration-300 dark:hover:bg-black">
               Busca por <br />
               Espaços
-            </button>
-            <button className="px-6 py-3 bg-white dark:bg-[#2a2a2a] border-2 border-[#AE0000] text-[#AE0000] text-left mr-10 hover:bg-[#AE0000] hover:text-white hover:border-[#AE0000] transition-all duration-300">
+            </div>
+            <div className="rounded-[8px] px-6 py-3 bg-white dark:bg-[#2a2a2a] border-2 border-[#AE0000] text-[#AE0000] text-left mr-10 hover:bg-[#AE0000] hover:text-white hover:border-[#AE0000] transition-all duration-300 dark:border-white dark:text-white dark:border-white dark:text-white dark:transition-all dark:duration-300 dark:hover:bg-black">
               Horários <br />
               Disponíveis
-            </button>
-            <button className="px-6 py-3 bg-white dark:bg-[#2a2a2a] border-2 border-[#AE0000] text-[#AE0000] text-left hover:bg-[#AE0000] hover:text-white  hover:border-[#AE0000] transition-all duration-300">
+            </div>
+            <div className="rounded-[8px] px-6 py-3 bg-white dark:bg-[#2a2a2a] border-2 border-[#AE0000] text-[#AE0000] text-left hover:bg-[#AE0000] hover:text-white  hover:border-[#AE0000] transition-all duration-300 dark:border-white dark:text-white dark:border-white dark:text-white dark:transition-all dark:duration-300 dark:hover:bg-black">
               Ajuda e <br />
               Suporte
-            </button>
+            </div>
           </div>
         </div>
       </section>
@@ -90,7 +90,7 @@ export default function Main() {
 
         <div className="space-y-20 max-w-3xl">
           <div>
-            <p className="border border-[#AE0000] text-black dark:text-white rounded-lg inline-block px-4 py-2 font-medium mb-2">
+            <p className="border border-[#AE0000] text-black dark:border-white dark:text-white rounded-lg inline-block px-4 py-2 font-medium mb-2">
               Consigo cancelar ou editar uma reserva?
             </p>
             <p className="ml-2 border-b-4 text-black dark:text-white border-[#AE0000] pb-1">
@@ -98,7 +98,7 @@ export default function Main() {
             </p>
           </div>
           <div>
-            <p className="border border-[#AE0000] text-black dark:text-white rounded-lg inline-block px-4 py-2 font-medium mb-2">
+            <p className="border border-[#AE0000] text-black dark:text-white dark:border-white rounded-lg inline-block px-4 py-2 font-medium mb-2">
               E se eu tiver dúvidas?
             </p>
             <p className="ml-2 border-b-4 border-[#AE0000] text-black dark:text-white pb-1">
@@ -106,7 +106,7 @@ export default function Main() {
             </p>
           </div>
           <div>
-            <p className="border border-[#AE0000] text-black dark:text-white rounded-lg inline-block px-4 py-2 font-medium mb-2">
+            <p className="border border-[#AE0000] dark:border-white text-black dark:text-white rounded-lg inline-block px-4 py-2 font-medium mb-2">
               E se eu me esquecer da reserva?
             </p>
             <p className="ml-2 border-b-4 border-[#AE0000] text-black dark:text-white pb-1">
@@ -115,7 +115,7 @@ export default function Main() {
           </div>
         </div>
 
-        {/* Onda dentro da própria section, no final */}
+        {/* Onda na section */}
         <img
           src="src/assets/ondaPrincipal.svg"
           alt="Onda rodapé"
