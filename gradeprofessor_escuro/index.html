@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade de Professor - TecHub</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="/src/assets/images/logobranca.png" alt="Logo TecHub">
+            <p1>TechHub</p1>
+            <h1>Grade de Professor</h1>
+        </div>
+        <div class="filters">
+            <button class="filter-button">Filtrar</button>
+            <div class="select-group">
+                <select class="filter-select">
+                    <option value="">Semana</option>
+                    <option value="1">Semana 1</option>
+                    <option value="2">Semana 2</option>
+                </select>
+            </div>
+            <div class="select-group">
+                <select class="filter-select">
+                    <option value="">Professor</option>
+                    <option value="todos">Todos os Professores</option>
+                    <option value="lima">Lima</option>
+                </select>
+            </div>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Horário</th>
+                    <th>Segunda</th>
+                    <th>Terça</th>
+                    <th>Quarta</th>
+                    <th>Quinta</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>08:00 - 10:00</td>
+                    <td>Back-End<br>Sala 09</td>
+                    <td>Lima<br>Sala 10</td>
+                    <td>Libras<br>Sala 07</td>
+                    <td>Back-End<br>Sala 09</td>
+                </tr>
+                <tr>
+                    <td>10:00 - 12:45</td>
+                    <td>Lima<br>Sala 10</td>
+                    <td>Libras<br>Sala 07</td>
+                    <td>Back-End<br>Sala 09</td>
+                    <td>Lima<br>Sala 10</td>
+                </tr>
+                <tr>
+                    <td>13:15 - 15:00</td>
+                    <td>Libras<br>Sala 07</td>
+                    <td>Back-End<br>Sala 09</td>
+                    <td>Lima<br>Sala 10</td>
+                    <td>Libras<br>Sala 07</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

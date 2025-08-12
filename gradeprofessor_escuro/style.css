@@ -1,0 +1,104 @@
+@import url(../style/global.css);
+
+body {
+    font-family: Inter;
+    background-color: #2A2727;
+    margin: 0;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.header img {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 30px;
+    height: 30px;
+
+}
+
+p1 {
+    position: absolute;
+    top: 20px;
+    left: 60px;
+    width: 200px;
+    color: white;
+    font-weight: bold;
+    font-size: 25px;
+
+}
+
+.header h1 {
+    font-size: 24px; 
+    font-weight: bold; 
+    color: white;
+    margin: 0;
+    margin-left: 500px;
+}
+
+.filters {
+    display: flex;
+    justify-content: left;
+    margin-bottom: 20px;
+    
+}
+
+.filter-button, .filter-select {
+    padding: 10px 15px;
+    margin-right: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 30px; 
+}
+
+.filter-button {
+    padding: 10px 20px;
+    background-color: #5E5E5E; 
+    color: #fff; 
+    border: none;
+    border-radius: 10px;
+    width: 120px;
+    height: 40px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.filter-select {
+    padding: 10px 20px;
+    background-color: #D5D5D5; 
+    color: #333; 
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+table {
+    width: 100%;
+     border-collapse: collapse; /*isso serva para que o topo da grade (os titulos), fiquem juntos */
+}
+
+th, td {
+    padding: 10px;
+    color: white;
+    text-align: center;
+    border-bottom: 1px solid #363636; 
+ 
+}
+
+th {
+    background-color: #AD0B12;
+    color: white;
+}

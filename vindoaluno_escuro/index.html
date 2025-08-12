@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendamento de Salas - TecHub</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="/src/assets/images/logobranca.png" alt="Logo TecHub">
+            <p1>TecHub</p1>
+            <h1>Bem-vindo, Aluno(a)</h1>
+        </div>
+        <div class="filters">
+            <button class="filter-button">Filtrar</button>
+            <select class="filter-select">
+                <option value="">Semana</option>
+                <option value="1">Semana 1</option>
+                <option value="2">Semana 2</option>
+            </select>
+        </div>
+        <div class="title-bar">
+            <h2>Salas e Turnos Disponíveis</h2>
+        </div>
+        <table>
+            <tbody>
+                <tr>
+                    <td>Biblioteca(PS5)</td>
+                    <td><input type="radio" name="biblioteca" value="manha"> Manhã(intervalo)</td>
+                    <td><input type="radio" name="biblioteca" value="tarde"> Tarde(intervalo)</td>
+                    <td><input type="radio" name="biblioteca" value="noite"> Noite(intervalo)</td>
+                </tr>
+                <tr>
+                    <td>Sala Maker</td>
+                    <td><input type="radio" name="maker" value="manha"> Manhã(intervalo)</td>
+                    <td><input type="radio" name="maker" value="tarde"> Tarde(intervalo)</td>
+                    <td><input type="radio" name="maker" value="noite"> Noite(intervalo)</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="obs">
+            <span class="obs-icon"></span>
+            <p>OBS: Os PC’s da biblioteca estarão disponíveis para uso pedagógico.</p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
