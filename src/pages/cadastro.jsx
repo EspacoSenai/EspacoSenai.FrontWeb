@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import logo from "../assets/EspacoSenai.svg";
 import onda from "../assets/ondaCadastro.svg";
 import olhoAberto from "../assets/olhoFechado.svg";
@@ -49,7 +50,7 @@ export default function Cadastro() {
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center relative overflow-hidden dark:bg-black">
-      {/* Onda de fundo */}
+  
       <img src={onda} alt="Onda" className="absolute top-10 left-0 w-full h-auto z-0" />
 
       <>
@@ -69,8 +70,8 @@ export default function Cadastro() {
 
       {/* Card branco */}
       <div className="bg-white bg-opacity-90 rounded-lg shadow-lg px-6 py-8 w-full max-w-sm z-10">
-        <h2 className="text-xl font-semibold text-center mb-5 leading-tight text-black">
-          Bem-Vindo(a) ao <br /> <span className="text-[#000]">EspaçoSenai!</span>
+        <h2 className="text-xl font-medium text-center mb-5 leading-tight text-black">
+          Bem-Vindo(a) ao <br /> <span className="text-[#000] font-medium">EspaçoSenai!</span>
         </h2>
 
         <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
@@ -197,11 +198,11 @@ export default function Cadastro() {
             )}
           </div>
 
-          <div className="text-sm text-black mt-1">
+          <div className="text-xs text-black mt-1">
             Já tem uma conta?{" "}
-            <a href="/login" className="text-blue underline">
+            <Link to="/login" className="text-blue underline">
               Entre aqui
-            </a>
+            </Link>
           </div>
 
           <button

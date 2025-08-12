@@ -16,21 +16,29 @@ export default function Footer() {
 
           {/* INFORMAÇÕES */}
           <div>
-            <h4 className="font-semibold text-base mb-3">INFORMAÇÕES</h4>
+            <h4 className="font-regular text-base mb-3">INFORMAÇÕES</h4>
             <p className="text-[#ccc] mb-4">
               Este site permite que alunos e colaboradores reservem salas, laboratórios e outros ambientes disponíveis na unidade SENAI Suíço-Brasileira.
             </p>
-            <div className="flex gap-4">
-              <img src="src/assets/instagram.svg" alt="Instagram" className="w-5 h-5" />
+          <div className="flex gap-4">
+            <a href="https://www.instagram.com/_.vitinho07/"> 
+             <img src="src/assets/instagram.svg" alt="Instagram" className="w-5 h-5" />
+            </a>
+
+            <a href="https://github.com/VitorAguiiar">
               <img src="src/assets/github.svg" alt="GitHub" className="w-5 h-5" />
+            </a>
+
+            <a href="">
               <img src="src/assets/linkedin.svg" alt="LinkedIn" className="w-5 h-5" />
+            </a>
             </div>
           </div>
 
           {/* NAVEGAÇÃO */}
           <div>
-            <h4 className="font-semibold text-base mb-4">NAVEGAÇÃO</h4>
-            <ul className="space-y-2">
+            <h4 className="font-regular text-base mb-4 flex items-center justify-center">NAVEGAÇÃO</h4>
+            <ul className="space-y-2 space-x-2 text-center">
               <li><a href="#espacoSenai" className="text-white border-b border-white hover:text-gray-300">O que é EspaçoSenai</a></li>
               <li><a href="#comoFunciona" className="text-white border-b border-white hover:text-gray-300">Como Funciona</a></li>
               <li><a href="#faq" className="text-white border-b border-white hover:text-gray-300">Perguntas Frequentes</a></li>
@@ -39,7 +47,7 @@ export default function Footer() {
 
           {/* CONTATO */}
           <div>
-            <h4 className="font-semibold text-base mb-4">CONTATO</h4>
+            <h4 className="font-regular text-base mb-4">CONTATO</h4>
             <p className="text-[#ccc]">(11) 3322-0050 (Telefone / WhatsApp)</p>
           </div>
         </div>

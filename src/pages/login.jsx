@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import logo from "../assets/EspacoSenai.svg";
 import onda from "../assets/ondasLogin.svg";
 import olhoAberto from "../assets/olhoFechado.svg";
@@ -31,7 +32,7 @@ export default function Login() {
 
       {/* Card de Login */}
       <div className="bg-white bg-opacity-90 rounded-xl shadow-md px-6 py-10 w-full max-w-sm z-10">
-        <h2 className="text-2xl font-semibold text-center text-black">
+        <h2 className="text-2xl font-medium text-center text-black">
           Bem-Vindo(a)
         </h2>
         <h3 className="text-xl font-medium text-center text-black mb-6">
@@ -93,11 +94,11 @@ export default function Login() {
           </button>
         </form>
 
-        <div className="text-xs text-center text-black mt-4">
+        <div className="text-xs text-center text-black dark:text-black mt-4">
           Não tem uma conta?{" "}
-          <a href="/cadastro" className="text-blue-600 underline">
-            Cadastre-se
-          </a>
+            <Link to="/cadastro" className="text-blue-600 underline hover:no-underline">
+              Cadastre-se
+            </Link>
         </div>
       </div>
     </div>

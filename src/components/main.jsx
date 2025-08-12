@@ -8,8 +8,8 @@ export default function Main() {
 
       <section id="espacoSenai" className="flex justify-between items-center py-12 px-6 md:px-12 relative z-10">
         <div className="max-w-xl pr-6">
-        <div className="relative top-9 left-[-10px] w-1 h-7 bg-[#AE0000] rounded-full"></div>
-          <h2 className="text-4xl font-medium">
+        <div className="relative top-8 left-[-10px] w-1 h-7 bg-[#AE0000] rounded-full"></div>
+          <h2 className="text-3xl pl-2 font-medium">
             <span className="text-black dark:text-white">O que é o </span>
             <span className="text-[#AE0000]">EspaçoSenai</span>
             <span className="text-black dark:text-white">?</span>
@@ -30,8 +30,8 @@ export default function Main() {
 
       {/* Seção: Como Funciona */}
       <section id="comoFunciona" className="bg-white dark:bg-[#0B0B0B] py-12 px-6 md:px-12">
-        <h2 className="text-[#AE0000] text-4xl font-medium mb-9 relative">
-          <div className="absolute top-2 left-[-10px] w-1 h-7 bg-[#AE0000] rounded-full"></div>
+        <h2 className="text-[#AE0000] pl-2 text-3xl font-medium mb-9 relative">
+          <div className="absolute top-1 left-[-10px] w-1 h-7 bg-[#AE0000] rounded-full"></div>
           Como <span className='text-black dark:text-white'> Funciona?</span>
         </h2>
         <div className="flex flex-col md:flex-row justify-between items-center ">
@@ -56,7 +56,7 @@ export default function Main() {
         </div>
 
         <div className="w-full text-center mt-8 relative z-50">
-          <p className="text-2xl font-semibold text-black dark:text-white mb-4">
+          <p className="text-2xl font-regular text-black dark:text-white mb-4">
             Aqui você terá a <span className="text-[#AE0000]">melhor</span> experiência!
           </p>
           <div className="flex justify-center gap-4">
@@ -82,8 +82,8 @@ export default function Main() {
       {/* Seção: Perguntas Frequentes */}
       <section id="faq" className="px-6 md:px-12 py-16 bg-white dark:bg-[#0B0B0B] relative z-10">
         <h2 className="text-2xl md:text-3xl font-semibold mb-6 relative">
-          <div className="absolute top-2 left-[-10px] w-1 h-7 bg-[#AE0000] rounded-full z-0"></div>
-          <span className="pl-2 text-black dark:text-white">
+          <div className="absolute top-1 left-[-10px] w-1 h-7 bg-[#AE0000] rounded-full z-0"></div>
+          <span className="pl-2 text-black font-medium dark:text-white">
             Perguntas <span className="text-[#AE0000]">Frequentes</span>
           </span>
         </h2>

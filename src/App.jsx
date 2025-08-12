@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useLayoutEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
 import LandingPage from './pages/landingPage';
@@ -12,12 +12,21 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 
 export default function App() {
+  // deixa o tema salvo mesmo quando não tem o header na tela 
+  useLayoutEffect(() => {
+    try {
+      const saved = localStorage.getItem('theme') || 'light';
+      if (saved === 'dark') document.documentElement.classList.add('dark');
+      else document.documentElement.classList.remove('dark');
+    } catch {}
+  }, []);
+
   useEffect(() => {
     AOS.init({ duration: 800 });
   }, []);
 
   return (
-    <Routes>      
+    <Routes>
       <Route path="/" element={<Index />} />
 
       <Route path="/onboarding" element={<Onboarding />} />
