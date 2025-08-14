@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
 
-import LandingPage from './pages/landingPage';
+import LandingPage from './pages/landpage/landingPage';
 import Onboarding from './pages/onboarding';
 import Cadastro from './pages/cadastro';
 import Login from './pages/login';
