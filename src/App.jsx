@@ -1,23 +1,22 @@
-import React, { useEffect, useLayoutEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import React, { useEffect, useLayoutEffect } from "react";
+import { Routes, Route } from "react-router-dom";
+import LandingPage from "./pages/landingPage";
+import Onboarding from "./pages/onboarding";
+import Cadastro from "./pages/cadastro";
+import Login from "./pages/login";
+import Index from "./navigation/index";
+import AgendamentoQuadra from "./pages/agendamentoQuadra"; 
 
-import LandingPage from './pages/landingPage';
-import Onboarding from './pages/onboarding';
-import Cadastro from './pages/cadastro';
-import Login from './pages/login';
-import Index from './navigation/index';
-
-
-import AOS from 'aos';
-import 'aos/dist/aos.css';
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 export default function App() {
-  // deixa o tema salvo mesmo quando não tem o header na tela 
+  // mantém o tema salvo mesmo sem o Header na tela
   useLayoutEffect(() => {
     try {
-      const saved = localStorage.getItem('theme') || 'light';
-      if (saved === 'dark') document.documentElement.classList.add('dark');
-      else document.documentElement.classList.remove('dark');
+      const salvo = localStorage.getItem("theme") || "light";
+      if (salvo === "dark") document.documentElement.classList.add("dark");
+      else document.documentElement.classList.remove("dark");
     } catch {}
   }, []);
 
@@ -33,6 +32,8 @@ export default function App() {
       <Route path="/landing" element={<LandingPage />} />
       <Route path="/cadastro" element={<Cadastro />} />
       <Route path="/login" element={<Login />} />
+
+      <Route path="/agendamento-quadra" element={<AgendamentoQuadra />} />
     </Routes>
   );
 }
