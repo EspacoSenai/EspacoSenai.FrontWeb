@@ -1,4 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+
+import sucessoIcon from "../assets/sucesso.svg";
 
 const COR_VERMELHO = "#AE0000";
 const TAMANHO_CODIGO = 5;
@@ -20,14 +22,20 @@ function pegarSegundaFeira(dataAtual = new Date()) {
 function montarDiasSemana(semanaAdiante = 0) {
   const segunda = pegarSegundaFeira();
   segunda.setDate(segunda.getDate() + semanaAdiante * 7);
-  const diasSemana = ["S", "T", "Q", "Q", "S", "S", "D"];
-  return [...Array(7)].map((_, i) => {
+
+  const hoje = new Date();
+  hoje.setHours(0, 0, 0, 0);
+
+  const diasSemana = ["S", "T", "Q", "Q", "S", "S"]; // seg..sáb
+  return [...Array(6)].map((_, i) => {
     const d = new Date(segunda);
     d.setDate(segunda.getDate() + i);
+    const desabilitado = semanaAdiante === 0 ? d < hoje : false;
     return {
       diaSemana: diasSemana[i],
       numeroDia: String(d.getDate()).padStart(2, "0"),
       dataCompleta: d,
+      desabilitado,
     };
   });
 }
@@ -40,23 +48,85 @@ export default function AgendamentoQuadra() {
   const [diaSelecionado, setDiaSelecionado] = useState(0);
   const [horaInicio, setHoraInicio] = useState(null);
   const [horaTermino, setHoraTermino] = useState(null);
-
-
   const [convidados, setConvidados] = useState([Array(TAMANHO_CODIGO).fill("")]);
+
+  // Modal
+  const [modal, setModal] = useState({
+    aberto: false,
+    tipo: "success",
+    titulo: "",
+    mensagem: "",
+  });
+  const modalBtnRef = useRef(null);
+
+  const inputsRef = useRef([]);
+
+  useEffect(() => {
+    inputsRef.current = convidados.map(
+      (codigo, i) => inputsRef.current[i] || Array(TAMANHO_CODIGO).fill(null)
+    );
+  }, [convidados]);
 
   const diasDaSemana = useMemo(
     () => montarDiasSemana(semanaSelecionada === "essa" ? 0 : 1),
     [semanaSelecionada]
   );
 
+  // so pode selecionar dia válido
+  useEffect(() => {
+    const idxValido = diasDaSemana.findIndex((d) => !d.desabilitado);
+    if (idxValido === -1 && semanaSelecionada === "essa") {
+      setSemanaSelecionada("proxima");
+      setDiaSelecionado(0);
+    } else if (idxValido !== -1 && diasDaSemana[diaSelecionado]?.desabilitado) {
+      setDiaSelecionado(idxValido);
+    }
+  }, [diasDaSemana, diaSelecionado, semanaSelecionada]);
+
+  // ESC fecha modal
+  useEffect(() => {
+    const onEsc = (e) => e.key === "Escape" && fecharModal();
+    window.addEventListener("keydown", onEsc);
+    return () => window.removeEventListener("keydown", onEsc);
+  }, []);
+  useEffect(() => {
+    if (modal.aberto) {
+      setTimeout(() => modalBtnRef.current?.focus(), 0);
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+  }, [modal.aberto]);
+
+  function abrirModal(tipo, titulo, mensagem) {
+    setModal({ aberto: true, tipo, titulo, mensagem });
+  }
+  function fecharModal() {
+    setModal((m) => ({ ...m, aberto: false }));
+  }
+
   function adicionarConvidado() {
     if (convidados.length < MAX_CONVIDADOS) {
       setConvidados((lista) => [...lista, Array(TAMANHO_CODIGO).fill("")]);
+    } else {
+      abrirModal(
+        "warning",
+        "Limite de convidados atingido",
+        `O máximo é de ${MAX_CONVIDADOS} convidados.`
+      );
     }
   }
 
+  function removerConvidado(indConvidado) {
+    setConvidados((lista) => lista.filter((_, i) => i !== indConvidado));
+  }
+
+  function normalizaChar(v) {
+    const char = v.slice(-1);
+    return char.replace(/[^0-9A-Za-z]/g, "").toUpperCase();
+  }
   function mudarDigito(indConvidado, indDigito, valor) {
-    const char = valor.slice(-1);
+    const char = normalizaChar(valor);
     setConvidados((lista) =>
       lista.map((cod, i) =>
         i === indConvidado
@@ -64,6 +134,61 @@ export default function AgendamentoQuadra() {
           : cod
       )
     );
+  }
+
+  // auto avanco quando digita no codigo de convidado e copiar e colar
+  function handleChange(iConvidado, iDig, e) {
+    const v = e.target.value;
+
+    if (v.length > 1) {
+      const chars = v.replace(/[^0-9A-Za-z]/g, "").toUpperCase().split("");
+      if (chars.length) {
+        setConvidados((lista) =>
+          lista.map((cod, i) => {
+            if (i !== iConvidado) return cod;
+            const novo = [...cod];
+            let k = iDig;
+            for (const c of chars) {
+              if (k >= TAMANHO_CODIGO) break;
+              novo[k] = c;
+              k++;
+            }
+            return novo;
+          })
+        );
+        const next = Math.min(iDig + chars.length, TAMANHO_CODIGO - 1);
+        inputsRef.current[iConvidado][next]?.focus();
+      }
+      return;
+    }
+
+    mudarDigito(iConvidado, iDig, v);
+    if (v && v.trim() !== "" && iDig < TAMANHO_CODIGO - 1) {
+      inputsRef.current[iConvidado][iDig + 1]?.focus();
+    }
+  }
+
+  function handleKeyDown(iConvidado, iDig, e) {
+    if (e.key === "Backspace") {
+      const valor = convidados[iConvidado][iDig];
+      if (!valor && iDig > 0) {
+        const prev = iDig - 1;
+        inputsRef.current[iConvidado][prev]?.focus();
+        setConvidados((lista) =>
+          lista.map((cod, i) =>
+            i === iConvidado
+              ? cod.map((d, j) => (j === prev ? "" : d))
+              : cod
+          )
+        );
+      }
+    }
+    if (e.key === "ArrowLeft" && iDig > 0) {
+      inputsRef.current[iConvidado][iDig - 1]?.focus();
+    }
+    if (e.key === "ArrowRight" && iDig < TAMANHO_CODIGO - 1) {
+      inputsRef.current[iConvidado][iDig + 1]?.focus();
+    }
   }
 
   function cancelar() {
@@ -75,7 +200,20 @@ export default function AgendamentoQuadra() {
 
   function confirmar() {
     if (!horaInicio || !horaTermino) {
-      alert("Selecione o horário de início e término.");
+      abrirModal(
+        "error",
+        "Selecione os horários",
+        "Escolha o horário de início e o de término para continuar."
+      );
+      return;
+    }
+    const dia = diasDaSemana[diaSelecionado];
+    if (!dia || dia.desabilitado) {
+      abrirModal(
+        "error",
+        "Data inválida",
+        "Selecione uma data válida para agendar."
+      );
       return;
     }
     const paraMinutos = (t) => {
@@ -83,7 +221,11 @@ export default function AgendamentoQuadra() {
       return h * 60 + m;
     };
     if (paraMinutos(horaTermino) <= paraMinutos(horaInicio)) {
-      alert("O horário de término deve ser depois do início.");
+      abrirModal(
+        "error",
+        "Horários inconsistentes",
+        "O término precisa ser depois do início."
+      );
       return;
     }
 
@@ -91,20 +233,55 @@ export default function AgendamentoQuadra() {
     const dados = {
       local: "Quadra",
       semana: semanaSelecionada === "essa" ? "Essa semana" : "Próxima semana",
-      data: diasDaSemana[diaSelecionado].dataCompleta.toISOString(),
+      data: dia.dataCompleta.toISOString(),
       inicio: horaInicio,
       termino: horaTermino,
       codigosConvidados,
       qtdeConvidados: convidados.length,
     };
     console.log("Agendamento:", dados);
-    alert("Agendamento pronto! Veja no console.");
+
+    abrirModal(
+      "success",
+      "Reserva realizada com sucesso!",
+      "Sua solicitação foi enviada e está aguardando aprovação."
+    );
   }
 
   const estiloBotaoSemana =
     "px-5 py-3 rounded-md text-sm md:text-base select-none transition-colors duration-150 outline-none focus:ring-0";
   const estiloBotaoHorario =
     "min-w-[96px] text-center px-4 py-3 rounded-md text-sm md:text-base outline-none focus:ring-0 transition-colors duration-150";
+
+  // visual dos modal
+  const iconsByType = {
+    success: {
+      bg: "bg-green-100",
+      color: "text-green-600",
+      // svg não será usado no success (usa sua imagem), mas mantemos a estrutura
+      svg: null,
+    },
+    error: {
+      bg: "bg-red-100",
+      color: "text-red-600",
+      svg: (
+        <>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </>
+      ),
+    },
+    warning: {
+      bg: "bg-yellow-100",
+      color: "text-yellow-600",
+      svg: (
+        <>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </>
+      ),
+    },
+  };
+
+  const ic = iconsByType[modal.tipo];
 
   return (
     <div className="w-full min-h-screen bg-white dark:bg-[#0B0B0B] flex justify-center">
@@ -154,22 +331,30 @@ export default function AgendamentoQuadra() {
           <div className="flex md:justify-end items-center gap-2 text-black dark:text-white">
             <span className="font-medium mr-1">Data:</span>
             <div className="flex gap-2">
-              {diasDaSemana.map((d, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => setDiaSelecionado(idx)}
-                  className={juntarClasses(
-                    "flex flex-col items-center justify-center w-12 h-12 rounded-md text-xs outline-none focus:ring-0 transition-colors duration-150",
-                    diaSelecionado === idx
-                      ? "bg-[#AE0000] text-white"
-                      : "bg-[#F6F6F6] text-gray-700 hover:bg-[#AE0000] hover:text-white"
-                  )}
-                >
-                  <span className="text-[11px]">{d.diaSemana}</span>
-                  <span className="text-sm font-medium">{d.numeroDia}</span>
-                </button>
-              ))}
+              {diasDaSemana.map((d, idx) => {
+                const selecionado = diaSelecionado === idx;
+                const baseClasse =
+                  "flex flex-col items-center justify-center w-12 h-12 rounded-md text-xs outline-none focus:ring-0 transition-colors duration-150";
+                const classeVisual = d.desabilitado
+                  ? "bg-[#E5E5E5] text-gray-400 cursor-not-allowed opacity-70"
+                  : selecionado
+                  ? "bg-[#AE0000] text-white"
+                  : "bg-[#F6F6F6] text-gray-700 hover:bg-[#AE0000] hover:text-white";
+
+                return (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => !d.desabilitado && setDiaSelecionado(idx)}
+                    className={juntarClasses(baseClasse, classeVisual)}
+                    disabled={d.desabilitado}
+                    title={d.desabilitado ? "Dia indisponível (já passou)" : "Selecionar data"}
+                  >
+                    <span className="text-[11px]">{d.diaSemana}</span>
+                    <span className="text-sm font-medium">{d.numeroDia}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -210,15 +395,31 @@ export default function AgendamentoQuadra() {
                     key={iConvidado}
                     className="flex items-center gap-2 flex-wrap"
                   >
+                    {/* Toggle de exclusão */}
+                    <input
+                      type="checkbox"
+                      onChange={(e) => e.target.checked && removerConvidado(iConvidado)}
+                      className="appearance-none w-5 h-5 rounded-md border border-gray-300 bg-white shadow-sm cursor-pointer
+                                 checked:bg-[#AE0000] checked:border-[#AE0000]
+                                 focus:outline-none focus:ring-0"
+                      title="Marcar para remover"
+                    />
+
+                    {/* Inputs do código com auto-avance/colar */}
                     {codigo.map((dig, iDig) => (
                       <input
                         key={iDig}
+                        ref={(el) => {
+                          if (!inputsRef.current[iConvidado]) inputsRef.current[iConvidado] = [];
+                          inputsRef.current[iConvidado][iDig] = el;
+                        }}
                         value={dig}
-                        onChange={(e) =>
-                          mudarDigito(iConvidado, iDig, e.target.value)
-                        }
+                        onChange={(e) => handleChange(iConvidado, iDig, e)}
+                        onKeyDown={(e) => handleKeyDown(iConvidado, iDig, e)}
                         className="w-12 h-12 border bg-white text-black border-gray-300 rounded-md text-center text-lg outline-none focus:ring-0 focus:border-gray-400"
-                        maxLength={1}
+                        maxLength={TAMANHO_CODIGO} // Limita a 5 caracteres
+                        inputMode="text"
+                        autoComplete="off"
                       />
                     ))}
                     <span className="ml-1 text-sm text-gray-600 dark:text-white">
@@ -227,7 +428,7 @@ export default function AgendamentoQuadra() {
                   </div>
                 ))}
 
-                {/* Botão para adicionar outro convidado */}
+                {/* Adicionar convidado */}
                 <button
                   type="button"
                   onClick={adicionarConvidado}
@@ -291,6 +492,56 @@ export default function AgendamentoQuadra() {
           </button>
         </div>
       </div>
+
+      {/* MODAL */}
+      {modal.aberto && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true">
+         
+          <div className="absolute inset-0 bg-black/60" onClick={fecharModal} />
+          
+          <div className="relative z-10 w-[92%] max-w-md rounded-xl bg-white dark:bg-[#111] shadow-2xl p-8 text-center">
+            {/* Ícone */}
+            <div
+              className={juntarClasses(
+                "mx-auto mb-4 h-16 w-16 rounded-full flex items-center justify-center",
+                ic.bg
+              )}
+            >
+              {modal.tipo === "success" ? (
+                <img src={sucessoIcon} alt="Sucesso" className="h-9 w-9" />
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className={juntarClasses("h-9 w-9", ic.color)}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  {ic.svg}
+                </svg>
+              )}
+            </div>
+
+            <h2 className="text-lg font-semibold text-black dark:text-white">
+              {modal.titulo}
+            </h2>
+            {modal.mensagem && (
+              <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                {modal.mensagem}
+              </p>
+            )}
+            <button
+              ref={modalBtnRef}
+              onClick={fecharModal}
+              className="mt-6 inline-flex items-center justify-center rounded-md px-6 py-3 text-white"
+              style={{ backgroundColor: COR_VERMELHO }}
+            >
+              Ok, entendi
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
