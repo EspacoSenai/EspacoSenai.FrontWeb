@@ -38,6 +38,15 @@ export function EsqueciSenha({ buttonWidth = 180, buttonHeight = 36 } = {}) {
           opacity: 0.9
         }}
       />
+      {/* Onda decorativa inferior esquerda */}
+      <div className="absolute left-0 bottom-0 w-1/2 h-1/3 z-0 overflow-hidden">
+        <img
+          src={ondaMenorImg}
+          alt="Onda decorativa menor"
+          className="h-full w-full object-cover object-left transform scale-150 md:scale-100"
+        />
+      </div>
+      
   {/* Logo no canto superior esquerdo */}
       <div className="absolute top-4 left-4 z-10">
         <img
@@ -46,6 +55,7 @@ export function EsqueciSenha({ buttonWidth = 180, buttonHeight = 36 } = {}) {
           className="h-12 sm:h-16 w-auto object-contain drop-shadow"
         />
       </div>
+
   {/* Container principal - Responsivo */}
       <div className="w-full max-w-[90%] sm:max-w-md px-4 sm:px-6 py-4 sm:py-8 z-10 flex flex-col items-center justify-center">
   {/* Card branco - Responsivo */}

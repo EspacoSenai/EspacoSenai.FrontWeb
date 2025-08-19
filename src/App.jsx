@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 
 
 import LandingPage from './pages/landpage/landingPage';
+import NovaSenha from './pages/novasenha';
 import Onboarding from './pages/onboarding';
 import Cadastro from './pages/cadastro';
 import Login from './pages/login';
@@ -28,8 +29,9 @@ export default function App() {
       <Route path="/cadastro" element={<Cadastro />} />
       <Route path="/login" element={<Login />} />
       <Route path="/esqueci-senha" element={<EsqueciSenha />} />
-  <Route path="/selecao-perfil" element={<SelecaoPerfil />} />
-  <Route path="/códigoderec" element={<CodigoDeRec />} />
+      <Route path="/selecao-perfil" element={<SelecaoPerfil />} />
+      <Route path="/códigoderec" element={<CodigoDeRec />} />
+      <Route path="/novasenha" element={<NovaSenha />} />
     </Routes>
   );
 }

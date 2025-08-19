@@ -27,7 +27,7 @@ const SelecaoPerfil = () => {
       {/* Container principal */}
       <div
         className="relative z-10 mx-auto bg-white flex flex-col border border-gray-200 shadow-[0_8px_32px_0_rgba(31,38,135,0.10)] text-center"
-        style={{ width: '450px', height: '550px', borderRadius: '10px', padding: '10px 82px' }}
+        style={{ width: '440px', height: '525px', borderRadius: '10px', padding: '10px 82px' }}
       >
         {/* Texto extra no topo */}
         <h2
@@ -35,7 +35,7 @@ const SelecaoPerfil = () => {
           style={{
             fontFamily: 'Poppins, sans-serif',
             fontWeight: 560,
-            fontSize: '30px',
+            fontSize: '28px',
             lineHeight: '40px',
             color: '#000',
             margin: 0,
@@ -43,11 +43,11 @@ const SelecaoPerfil = () => {
             
           }}
         >
-          Selecione um perfil para acessar!
+          Selecione um perfil <br /> para acessar!
         </h2>
 
         {/* Botões de perfil */}
-        <div className="space-y-5 w-full mt-14 flex flex-col items-center">
+  <div className="space-y-5 w-full mt-14 flex flex-col items-center justify-center" style={{alignItems: 'center', justifyContent: 'center', display: 'flex'}}>
           <button
             className="flex items-center justify-between mx-auto text-gray-800 hover:bg-red-50 transition-colors font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-red-200 border border-red-600"
             style={{ width: '295px', height: '57px', borderRadius: '10px', borderWidth: '1px', padding: '0 24px', fontSize: '20px' }}
