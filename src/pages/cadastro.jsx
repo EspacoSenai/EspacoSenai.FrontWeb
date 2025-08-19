@@ -78,13 +78,20 @@ export default function Cadastro() {
           <input
             type="text"
             placeholder="Nome"
-            className="p-2 rounded-md shadow-sm border bg-white placeholder-black text-black focus:outline-none"
+            className="p-2 rounded-md shadow-sm border bg-white placeholder-black text-black focus:outline-none placeholder-[#898787]"
             required
           />
           <input
+            type="text"
+            placeholder="Apelido"
+            className="p-2 rounded-md shadow-sm border bg-white placeholder-black text-black focus:outline-none placeholder-[#898787]"
+            required
+          />
+          
+          <input
             type="email"
             placeholder="Email"
-            className="p-2 rounded-md shadow-sm border bg-white placeholder-black text-black focus:outline-none"
+            className="p-2 rounded-md shadow-sm border bg-white placeholder-black text-black focus:outline-none placeholder-[#898787]"
             required
           />
 
@@ -96,7 +103,7 @@ export default function Cadastro() {
             const somenteNumeros = e.target.value.replace(/\D/g, "");
             e.target.value = somenteNumeros;
             }}
-            className="p-2 rounded-md shadow-sm border bg-white placeholder-black text-black focus:outline-none"
+            className="p-2 rounded-md shadow-sm border bg-white placeholder-black text-black focus:outline-none placeholder-[#898787]"
             required
             />
 
@@ -110,7 +117,7 @@ export default function Cadastro() {
                 setSenha(e.target.value);
                 setForcaSenha(getForcaSenha(e.target.value));
               }}
-              className={`p-2 rounded-md shadow-sm w-full pr-10 text-black bg-white placeholder-black focus:outline-none border ${erro ? "border-red-500" : "border-gray-300"}`}
+              className={`p-2 rounded-md shadow-sm w-full pr-10 text-black bg-white placeholder-[#898787] focus:outline-none border ${erro ? "border-red-500" : "border-gray-300"}`}
               required
             />
             <span
@@ -178,7 +185,7 @@ export default function Cadastro() {
               placeholder="Confirmar senha"
               value={confirmarSenha}
               onChange={(e) => setConfirmarSenha(e.target.value)}
-              className={`p-2 rounded-md shadow-sm w-full pr-10 text-black bg-white placeholder-black focus:outline-none border ${erro ? "border-red-500" : "border-gray-300"}`}
+              className={`p-2 rounded-md shadow-sm w-full pr-10 text-black bg-white placeholder-[#898787] focus:outline-none border ${erro ? "border-red-500" : "border-gray-300"}`}
               required
             />
             <span

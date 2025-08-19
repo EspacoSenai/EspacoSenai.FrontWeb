@@ -249,7 +249,7 @@ export default function AgendamentoQuadra() {
   }
 
   const estiloBotaoSemana =
-    "px-5 py-3 rounded-md text-sm md:text-base select-none transition-colors duration-150 outline-none focus:ring-0";
+    "px-5 py-3 rounded-md text-sm md:text-base select-none transition-colors duration-150 outline-none focus:ring-0 whitespace-nowrap";
   const estiloBotaoHorario =
     "min-w-[96px] text-center px-4 py-3 rounded-md text-sm md:text-base outline-none focus:ring-0 transition-colors duration-150";
 
@@ -258,7 +258,6 @@ export default function AgendamentoQuadra() {
     success: {
       bg: "bg-green-100",
       color: "text-green-600",
-      // svg não será usado no success (usa sua imagem), mas mantemos a estrutura
       svg: null,
     },
     error: {
@@ -291,9 +290,9 @@ export default function AgendamentoQuadra() {
           className="w-full rounded-md text-white px-6 py-5 mb-6 text-center"
           style={{ backgroundColor: COR_VERMELHO }}
         >
-          <h1 className="text-xl md:text-2xl font-medium">
+          <h1 className="text-xl md:text-2xl font-regular font-sans">
             Agendamento <span className="opacity-70">–</span>{" "}
-            <span className="font-semibold">Quadra</span>
+            <span className="font-medium font-sans">Quadra</span>
           </h1>
         </div>
 
@@ -348,7 +347,7 @@ export default function AgendamentoQuadra() {
                     onClick={() => !d.desabilitado && setDiaSelecionado(idx)}
                     className={juntarClasses(baseClasse, classeVisual)}
                     disabled={d.desabilitado}
-                    title={d.desabilitado ? "Dia indisponível (já passou)" : "Selecionar data"}
+                    title={d.desabilitado ? "Dia indisponível" : "Selecionar data"}
                   >
                     <span className="text-[11px]">{d.diaSemana}</span>
                     <span className="text-sm font-medium">{d.numeroDia}</span>
@@ -365,7 +364,7 @@ export default function AgendamentoQuadra() {
           <section>
             <h3 className="font-medium mb-3 text-black dark:text-white">Horário de início:</h3>
             <div className="bg-[#F3F3F3] rounded-md p-4">
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-3 ">
                 {HORARIOS_INICIO.map((t) => (
                   <button
                     key={t}
@@ -443,7 +442,7 @@ export default function AgendamentoQuadra() {
               <p className="text-[12px] mt-2 text-black dark:text-white">
                 <span className="text-[#AE0000] font-semibold">OBS:</span>{" "}
                 Você poderá convidar seus amigos para aproveitar a reserva. O
-                máximo é de {MAX_CONVIDADOS} convidados.
+                máximo é de <span className="text-[#AE0000] font-semibold">nove</span> convidados.
               </p>
             </div>
           </section>
@@ -474,7 +473,7 @@ export default function AgendamentoQuadra() {
         </div>
 
         {/* Botões */}
-        <div className="mt-8 flex flex-col md:flex-row gap-4 md:justify-end">
+        <div className="-mt-11 flex flex-col md:flex-row gap-4 md:justify-end">
           <button
             type="button"
             onClick={cancelar}

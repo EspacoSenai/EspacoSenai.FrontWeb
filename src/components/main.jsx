@@ -60,18 +60,18 @@ export default function Main() {
             Aqui você terá a <span className="text-[#AE0000]">melhor</span> experiência!
           </p>
           <div className="flex justify-center gap-4">
-            <div className="rounded-[8px] px-7 py-3 bg-white dark:bg-[#2a2a2a] border-2 border-[#AE0000] text-[#AE0000] text-left mr-10 hover:bg-[#AE0000] hover:text-white hover:border-[#AE0000] transition-all duration-300 dark:border-white dark:text-white dark:transition-all dark:duration-300 dark:hover:bg-black">
+            <span className="rounded-[8px] px-7 py-3 bg-white dark:bg-[#2a2a2a] border-2 border-[#AE0000] text-[#AE0000] text-left mr-10  dark:border-white dark:text-white  dark:hover:bg-black">
               Busca por <br />
               Espaços
-            </div>
-            <div className="rounded-[8px] px-6 py-3 bg-white dark:bg-[#2a2a2a] border-2 border-[#AE0000] text-[#AE0000] text-left mr-10 hover:bg-[#AE0000] hover:text-white hover:border-[#AE0000] transition-all duration-300 dark:border-white dark:text-white dark:border-white dark:text-white dark:transition-all dark:duration-300 dark:hover:bg-black">
+            </span>
+            <span className="rounded-[8px] px-6 py-3 bg-white dark:bg-[#2a2a2a] border-2 border-[#AE0000] text-[#AE0000] text-left mr-10  dark:border-white dark:text-white dark:border-white dark:text-white   dark:hover:bg-black">
               Horários <br />
               Disponíveis
-            </div>
-            <div className="rounded-[8px] px-6 py-3 bg-white dark:bg-[#2a2a2a] border-2 border-[#AE0000] text-[#AE0000] text-left hover:bg-[#AE0000] hover:text-white  hover:border-[#AE0000] transition-all duration-300 dark:border-white dark:text-white dark:border-white dark:text-white dark:transition-all dark:duration-300 dark:hover:bg-black">
+            </span>
+            <span className="rounded-[8px] px-6 py-3 bg-white dark:bg-[#2a2a2a] border-2 border-[#AE0000] text-[#AE0000] text-left dark:border-white dark:text-white dark:border-white dark:text-white dark:hover:bg-black">
               Ajuda e <br />
               Suporte
-            </div>
+            </span>
           </div>
         </div>
       </section>
