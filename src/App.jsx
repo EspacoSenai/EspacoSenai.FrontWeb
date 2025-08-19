@@ -8,6 +8,7 @@ import Cadastro from './pages/cadastro';
 import Login from './pages/login';
 import SelecaoPerfil from './pages/selecaoPerfil';
 import EsqueciSenha from './pages/esqueciSenha';
+import CodigoDeRec from './pages/códigoderec';
 import Index from './navigation/index';
 
 
@@ -27,7 +28,8 @@ export default function App() {
       <Route path="/cadastro" element={<Cadastro />} />
       <Route path="/login" element={<Login />} />
       <Route path="/esqueci-senha" element={<EsqueciSenha />} />
-      <Route path="/selecao-perfil" element={<SelecaoPerfil />} />
+  <Route path="/selecao-perfil" element={<SelecaoPerfil />} />
+  <Route path="/códigoderec" element={<CodigoDeRec />} />
     </Routes>
   );
 }
