@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import logo from "../assets/EspacoSenai.svg";
-import onda from "../assets/ondasLogin.svg";
-import olhoAberto from "../assets/olhoFechado.svg";
-import olhoFechado from "../assets/olhoAberto.svg";
-import googleIcon from "../assets/Google.svg";
+import logo from "../../assets/EspacoSenai.svg";
+import onda from "../../assets/ondasLogin.svg";
+import olhoAberto from "../../assets/olhoFechado.svg";
+import olhoFechado from "../../assets/olhoAberto.svg";
+import googleIcon from "../../assets/Google.svg";
 
 export default function Login() {
   const [showSenha, setShowSenha] = useState(false);

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import logo from "../assets/EspacoSenai.svg";
-import onda from "../assets/ondaCadastro.svg";
-import olhoAberto from "../assets/olhoFechado.svg";
-import olhoFechado from "../assets/olhoAberto.svg";
+import logo from "../../assets/EspacoSenai.svg";
+import onda from "../../assets/ondaCadastro.svg";
+import olhoAberto from "../../assets/olhoFechado.svg";
+import olhoFechado from "../../assets/olhoAberto.svg";
 
 // Função para verificar força da senha
 const getForcaSenha = (senha) => {

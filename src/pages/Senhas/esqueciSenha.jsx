@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import logoImg from '../assets/EspacoSenai.svg';
-import ondaLateralImg from '../assets/onda lateral.svg';
-import ondaMenorImg from '../assets/onde menor.svg';
+import logoImg from '../../assets/EspacoSenai.svg';
+import ondaLateralImg from '../../assets/onda lateral.svg';
+import ondaMenorImg from '../../assets/onde menor.svg';
 
 export function EsqueciSenha({ buttonWidth = 180, buttonHeight = 36 } = {}) {
   // Garantir cor vermelha ao iniciar

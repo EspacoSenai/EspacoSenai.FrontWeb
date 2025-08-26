@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
-import logoImg from '../assets/EspacoSenai.svg';
-import ondaLateralImg from '../assets/onda lateral.svg';
-import ondaMenorImg from '../assets/onde menor.svg';
+import logoImg from '../../assets/EspacoSenai.svg';
+import ondaLateralImg from '../../assets/onda lateral.svg';
+import ondaMenorImg from '../../assets/onde menor.svg';
 
 export default function CodigoDeRec() {
 	const inputsRef = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];

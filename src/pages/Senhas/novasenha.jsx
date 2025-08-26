@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import logoImg from '../assets/EspacoSenai.svg';
-import ondaMeioImg from '../assets/ondadomeio.svg';
+import logoImg from '../../assets/EspacoSenai.svg';
+import ondaMeioImg from '../../assets/ondadomeio.svg';
 
 export default function NovaSenha() {
 	const [senha, setSenha] = useState('');
