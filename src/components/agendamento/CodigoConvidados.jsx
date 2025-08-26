@@ -116,7 +116,7 @@ export default function CodigoConvidados({
       <div className="flex flex-col gap-3 sm:gap-4">
         {convidados.map((codigo, iConvidado) => (
           <div key={iConvidado} className="flex flex-wrap items-center gap-2 sm:gap-3">
-            {/* Checkbox custom responsivo (quadrado vermelho quando marcado) */}
+            {/* Checkbox estilo “alvo” (anel vermelho + ponto vermelho) */}
             <label
               className="relative inline-flex items-center cursor-pointer select-none"
               title="Selecionar para remover"
@@ -128,10 +128,22 @@ export default function CodigoConvidados({
                 className="sr-only peer"
                 aria-label={`Selecionar convidado ${iConvidado + 1} para remover`}
               />
+
               <span
-                className="w-6 h-6 md:w-5 md:h-5 rounded-full border border-white bg-[#EEEEEE] shadow-sm
-                           peer-checked:bg-[#AE0000]
-                           peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-[#AE0000]"
+                className="
+                    relative rounded-full shadow-sm
+                    w-5 h-5 md:w-4 md:h-4         
+                    bg-white border-2 border-gray-300
+                    transition-colors duration-150
+                    peer-checked:border-[#AE0000]
+                    peer-focus:outline-none peer-focus-visible:ring-2 peer-focus-visible:ring-[#AE0000]
+
+                    after:content-[''] after:absolute
+                    after:left-1/2 after:top-1/2 after:-translate-x-1/2 after:-translate-y-1/2
+                    after:w-2.5 after:h-2.5 md:after:w-2 md:after:h-2  /* ↓ tamanho do ponto central */
+                    after:rounded-full after:bg-transparent
+                    peer-checked:after:bg-[#AE0000]
+                    "
                 aria-hidden="true"
               />
             </label>
@@ -171,12 +183,16 @@ export default function CodigoConvidados({
             onClick={adicionarConvidado}
             className="w-10 h-10 sm:w-9 sm:h-9 md:w-8 md:h-8 flex items-center justify-center
                        border border-gray-300 bg-white text-black rounded-md text-lg md:text-base
-                       outline-none hover:bg-[#AE0000] hover:text-white transition-colors duration-150 disabled:opacity-40"
+                       outline-none hover:bg-[#AE0000] hover:text-white transition-colors duração-150 disabled:opacity-40"
             disabled={convidados.length >= maxConvidados}
             title="Adicionar convidado"
             aria-label="Adicionar convidado"
           >
-            +
+            <span className="pointer-events-none">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 md:w-4 md:h-4" aria-hidden="true">
+                <path d="M11 5v6H5v2h6v6h2v-6h6v-2h-6V5z" />
+              </svg>
+            </span>
           </button>
 
           <button
@@ -188,10 +204,10 @@ export default function CodigoConvidados({
                        border border-gray-300 bg-white rounded-md outline-none
                        transition-colors duration-150 hover:bg-[#AE0000] focus-visible:ring-2 focus-visible:ring-[#AE0000]"
           >
-          
+            {/* Ícone inline (herda a cor via currentColor) */}
             <span className="text-black group-hover:text-white">
               <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 md:w-4 md:h-4" aria-hidden="true">
-                <path d="M9 3v1H4v2h1v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1V4h-5V3H9Zm-2 3h10v13H7V6Zm2 2v9h2V8H9Zm4 0v9h2V8h-2Z"/>
+                <path d="M9 3v1H4v2h1v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1V4h-5V3H9Zm-2 3h10v13H7V6Zm2 2v9h2V8H9Zm4 0v9h2V8h-2Z" />
               </svg>
             </span>
           </button>
