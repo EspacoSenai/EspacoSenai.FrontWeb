@@ -1,14 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import lixeira from "../../assets/lixeira.svg";
 
-/**
- * Props:
- * - convidados: string[][]
- * - setConvidados: (updater) => void
- * - tamanhoCodigo?: number (default 5)
- * - maxConvidados?: number (default 9)
- * - onAviso?: (tipo, titulo, msg) => void
- */
 export default function CodigoConvidados({
   convidados,
   setConvidados,
@@ -98,7 +89,6 @@ export default function CodigoConvidados({
     if (e.key === "ArrowLeft" && iDig > 0) inputsRef.current[iConvidado][iDig - 1]?.focus();
     if (e.key === "ArrowRight" && iDig < tamanhoCodigo - 1) inputsRef.current[iConvidado][iDig + 1]?.focus();
   }
-  // ===========================================
 
   function adicionarConvidado() {
     if (convidados.length >= maxConvidados) {
@@ -119,80 +109,96 @@ export default function CodigoConvidados({
 
   return (
     <section className="mt-6">
-      <h3 className="font-medium mb-2 text-black dark:text-white">Código de convidado:</h3>
+      <h3 className="font-medium mb-2 text-black dark:text-white text-base sm:text-lg">
+        Código de convidado:
+      </h3>
 
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-3 sm:gap-4">
         {convidados.map((codigo, iConvidado) => (
-          <div key={iConvidado} className="flex items-center gap-2 flex-wrap">
-            {/* Checkbox: seleciona/deseleciona para remoção */}
-            <input
-              type="checkbox"
-              checked={selecionados.has(iConvidado)}
-              onChange={() => alternarSelecionado(iConvidado)}
-              className="appearance-none w-5 h-5 rounded-md border border-gray-300 bg-white shadow-sm cursor-pointer
-                         checked:bg-[#AE0000] checked:border-[#AE0000]
-                         focus:outline-none focus:ring-0"
+          <div key={iConvidado} className="flex flex-wrap items-center gap-2 sm:gap-3">
+            {/* Checkbox custom responsivo (quadrado vermelho quando marcado) */}
+            <label
+              className="relative inline-flex items-center cursor-pointer select-none"
               title="Selecionar para remover"
-            />
-
-            {/* Inputs do código com auto-avance/colar */}
-            {codigo.map((dig, iDig) => (
+            >
               <input
-                key={iDig}
-                ref={(el) => {
-                  if (!inputsRef.current[iConvidado]) inputsRef.current[iConvidado] = [];
-                  inputsRef.current[iConvidado][iDig] = el;
-                }}
-                value={dig}
-                onChange={(e) => handleChange(iConvidado, iDig, e)}
-                onKeyDown={(e) => handleKeyDown(iConvidado, iDig, e)}
-                className="w-12 h-12 border bg-white text-black border-gray-300 rounded-md text-center text-lg outline-none focus:ring-0 focus:border-gray-400"
-                maxLength={tamanhoCodigo}
-                inputMode="text"
-                autoComplete="off"
+                type="checkbox"
+                checked={selecionados.has(iConvidado)}
+                onChange={() => alternarSelecionado(iConvidado)}
+                className="sr-only peer"
+                aria-label={`Selecionar convidado ${iConvidado + 1} para remover`}
               />
-            ))}
+              <span
+                className="w-6 h-6 md:w-5 md:h-5 rounded-full border border-white bg-[#EEEEEE] shadow-sm
+                           peer-checked:bg-[#AE0000]
+                           peer-focus:outline-none peer-focus:ring-1 peer-focus:ring-[#AE0000]"
+                aria-hidden="true"
+              />
+            </label>
 
-            <span className="ml-1 text-sm text-gray-600 dark:text-white">
+            {/* Inputs do código com auto-avance/colar (responsivo) */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              {codigo.map((dig, iDig) => (
+                <input
+                  key={iDig}
+                  ref={(el) => {
+                    if (!inputsRef.current[iConvidado]) inputsRef.current[iConvidado] = [];
+                    inputsRef.current[iConvidado][iDig] = el;
+                  }}
+                  value={dig}
+                  onChange={(e) => handleChange(iConvidado, iDig, e)}
+                  onKeyDown={(e) => handleKeyDown(iConvidado, iDig, e)}
+                  className="w-10 h-10 sm:w-11 sm:h-11 md:w-12 md:h-12 border bg-white text-black border-gray-300 rounded-md
+                             text-base sm:text-lg text-center outline-none focus:ring-0 focus:border-gray-400"
+                  maxLength={tamanhoCodigo}
+                  inputMode="text"
+                  autoComplete="off"
+                  aria-label={`Dígito ${iDig + 1} do convidado ${iConvidado + 1}`}
+                />
+              ))}
+            </div>
+
+            <span className="ml-1 text-sm sm:text-[15px] text-gray-600 dark:text-white">
               Convidado {iConvidado + 1}
             </span>
           </div>
         ))}
 
-        {/* Ações: adicionar e lixeira */}
-        <div className="flex items-center gap-2">
+        {/* Ações: adicionar e lixeira (tamanhos maiores no mobile) */}
+        <div className="flex items-center gap-3">
           <button
             type="button"
             onClick={adicionarConvidado}
-            className="w-8 h-8 flex items-center justify-center border border-gray-300 bg-white text-black rounded-md text-base outline-none hover:bg-[#AE0000] hover:text-white transition-colors duration-150 disabled:opacity-40"
+            className="w-10 h-10 sm:w-9 sm:h-9 md:w-8 md:h-8 flex items-center justify-center
+                       border border-gray-300 bg-white text-black rounded-md text-lg md:text-base
+                       outline-none hover:bg-[#AE0000] hover:text-white transition-colors duration-150 disabled:opacity-40"
             disabled={convidados.length >= maxConvidados}
             title="Adicionar convidado"
+            aria-label="Adicionar convidado"
           >
             +
           </button>
 
-          {/* Lixeira */}
           <button
             type="button"
             onClick={removerSelecionados}
             aria-label={selecionados.size === 0 ? "Selecione para remover" : "Remover selecionados"}
             title={selecionados.size === 0 ? "Selecione para remover" : "Remover selecionados"}
-            className="group w-8 h-8 flex items-center justify-center border border-gray-300 bg-white rounded-md outline-none
+            className="group w-10 h-10 sm:w-9 sm:h-9 md:w-8 md:h-8 flex items-center justify-center
+                       border border-gray-300 bg-white rounded-md outline-none
                        transition-colors duration-150 hover:bg-[#AE0000] focus-visible:ring-2 focus-visible:ring-[#AE0000]"
           >
-            <img
-              src={lixeira}
-              alt="Excluir"
-              draggable={false}
-              className="w-4 h-4 pointer-events-none
-                         filter invert brightness-0                      
-                         group-hover:invert-0 group-hover:brightness-100"
-            />
+          
+            <span className="text-black group-hover:text-white">
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 md:w-4 md:h-4" aria-hidden="true">
+                <path d="M9 3v1H4v2h1v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1V4h-5V3H9Zm-2 3h10v13H7V6Zm2 2v9h2V8H9Zm4 0v9h2V8h-2Z"/>
+              </svg>
+            </span>
           </button>
         </div>
       </div>
 
-      <p className="text-[12px] mt-2 text-black dark:text-white">
+      <p className="text-xs sm:text-[13px] mt-2 text-black dark:text-white leading-relaxed">
         <span className="text-[#AE0000] font-semibold">OBS:</span>{" "}
         Você poderá convidar seus amigos para aproveitar a reserva. O máximo é de{" "}
         <span className="text-[#AE0000] font-semibold">nove</span> convidados.

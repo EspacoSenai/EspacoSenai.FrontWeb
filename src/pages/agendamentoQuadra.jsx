@@ -106,17 +106,20 @@ export default function AgendamentoQuadra() {
 
   return (
     <div className="w-full min-h-screen bg-white dark:bg-[#0B0B0B] flex justify-center">
-      <div className="w-full max-w-5xl px-4 md:px-8 py-8">
+      <div className="w-full max-w-5xl px-3 sm:px-4 md:px-8 py-6 sm:py-8">
         {/* Cabeçalho */}
-        <div className="w-full rounded-md text-white px-6 py-5 mb-6 text-center" style={{ backgroundColor: COR_VERMELHO }}>
-          <h1 className="text-xl md:text-2xl font-regular font-sans">
+        <div
+          className="w-full rounded-md text-white px-4 sm:px-6 py-4 sm:py-5 mb-5 sm:mb-6 text-center"
+          style={{ backgroundColor: COR_VERMELHO }}
+        >
+          <h1 className="text-lg sm:text-xl md:text-2xl font-regular font-sans">
             Agendamento <span className="opacity-70">–</span>{" "}
             <span className="font-medium font-sans">Quadra</span>
           </h1>
         </div>
 
         {/* Seleção semana e data */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start mb-5 sm:mb-6">
           <TrocaSemana value={semanaSelecionada} onChange={setSemanaSelecionada} />
           <div className="hidden md:block" />
           <div className="flex md:justify-end items-center gap-2 text-black dark:text-white">
@@ -126,7 +129,7 @@ export default function AgendamentoQuadra() {
         </div>
 
         {/* Conteúdo */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
           <GradeHorarios
             titulo="Horário de início:"
             opcoes={HORARIOS_INICIO_QUADRA}
@@ -152,18 +155,18 @@ export default function AgendamentoQuadra() {
         </div>
 
         {/* Botões */}
-        <div className="-mt-11 flex flex-col md:flex-row gap-4 md:justify-end">
+        <div className="mt-6 md:mt-4 flex flex-col sm:flex-row gap-3 sm:gap-4 sm:justify-end">
           <button
             type="button"
             onClick={cancelar}
-            className="px-6 py-3 rounded-md bg-[#EDEDED] text-[#1E1E1E] outline-none focus:ring-0 hover:bg-[#AE0000] hover:text-white transition-colors duration-150"
+            className="w-full sm:w-auto px-6 py-3 rounded-md bg-[#EDEDED] text-[#1E1E1E] outline-none focus:ring-0 hover:bg-[#AE0000] hover:text-white transition-colors duration-150"
           >
             Cancelar
           </button>
           <button
             type="button"
             onClick={confirmar}
-            className="px-6 py-3 rounded-md text-white outline-none focus:ring-0 transition-colors duration-150"
+            className="w-full sm:w-auto px-6 py-3 rounded-md text-white outline-none focus:ring-0 transition-colors duration-150"
             style={{ backgroundColor: COR_VERMELHO }}
           >
             Confirmar

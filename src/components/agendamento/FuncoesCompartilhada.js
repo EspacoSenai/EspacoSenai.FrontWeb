@@ -1,20 +1,17 @@
-// Tudo que é comum às telas de agendamento fica aqui.
-// Importa apenas o que precisar em cada tela.
-
 export const COR_VERMELHO = "#AE0000";
 export const TAMANHO_CODIGO = 5;
 export const MAX_CONVIDADOS = 9;
 
-// Horários por recurso (adicione SALA/LAB depois, se precisar)
+
 export const HORARIOS_INICIO_QUADRA = ["11:50", "13:30", "14:30", "15:30", "16:00", "16:50"];
 export const HORARIOS_TERMINO_QUADRA = ["14:50", "13:00", "16:00", "16:30", "17:00", "17:30"];
 
-// Helper de classes (sem depender de lib)
+
 export function juntarClasses(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-// Semana de agendamento: seg..sáb, bloqueia dias passados só na semana atual
+
 export function pegarSegundaFeira(dataAtual = new Date()) {
   const data = new Date(dataAtual);
   const diaSemana = data.getDay();
@@ -45,7 +42,7 @@ export function montarDiasSemana(semanaAdiante = 0) {
   });
 }
 
-// Tempo
+
 export function paraMinutos(hhmm) {
   const [h, m] = String(hhmm || "").split(":").map(Number);
   return h * 60 + m;
@@ -56,7 +53,6 @@ export function validaIntervalo(inicio, termino) {
   return paraMinutos(termino) > paraMinutos(inicio);
 }
 
-// Código de convidado 
 export function normalizaCodigoChar(v) {
   return String(v).slice(-1).replace(/[^0-9A-Za-z]/g, "").toUpperCase();
 }
