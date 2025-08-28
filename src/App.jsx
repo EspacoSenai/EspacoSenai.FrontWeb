@@ -5,7 +5,8 @@ import Onboarding from "./pages/onboarding";
 import Cadastro from "./pages/cadastro";
 import Login from "./pages/login";
 import Index from "./navigation/index";
-import AgendamentoQuadra from "./pages/agendamentoQuadra"; 
+import AgendamentoQuadra from "./pages/agendamentoQuadra";
+import AgendamentoComputadores from "./pages/AgendamentoComputadores";
 
 import AOS from "aos";
 import "aos/dist/aos.css";
@@ -34,6 +35,7 @@ export default function App() {
       <Route path="/login" element={<Login />} />
 
       <Route path="/agendamento-quadra" element={<AgendamentoQuadra />} />
+      <Route path="/agendamento-computadores" element={<AgendamentoComputadores />} />
     </Routes>
   );
 }
