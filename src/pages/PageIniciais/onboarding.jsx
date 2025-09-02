@@ -11,7 +11,7 @@ import pessoa1 from "../../assets/pessoa1.svg";
 import pessoa2 from "../../assets/pessoa2.svg";
 import pessoa3 from "../../assets/pessoa3.svg";
 
-import voltarIcon from "../../assets/voltar.svg";
+import voltarIcon from "../../assets/setaleft.svg";
 
 const slides = [
   {
@@ -59,7 +59,7 @@ export default function Onboarding() {
   useEffect(() => {
     const jaViu = localStorage.getItem("onboardingVisto");
     if (jaViu === "true") {
-      navigate("/", { replace: true });
+  navigate("/selecao-perfil", { replace: true });
     }
   }, [navigate]);
 
@@ -77,7 +77,7 @@ export default function Onboarding() {
 
   const skip = () => {
     localStorage.setItem("onboardingVisto", "true");
-    navigate("/", { replace: true });
+  navigate("/selecao-perfil", { replace: true });
   };
 
   const {

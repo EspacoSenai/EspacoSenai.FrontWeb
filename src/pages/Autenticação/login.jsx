@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import logo from "../../assets/EspacoSenai.svg";
+import logoDark from "../../assets/logodark.svg";
 import onda from "../../assets/ondasLogin.svg";
 import olhoAberto from "../../assets/olhoFechado.svg";
 import olhoFechado from "../../assets/olhoAberto.svg";
@@ -7,39 +9,43 @@ import googleIcon from "../../assets/Google.svg";
 
 export default function Login() {
   const [showSenha, setShowSenha] = useState(false);
+  const navigate = useNavigate();
+  // controla o tema apenas a partir da preferência salva (defaut: claro)
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    const theme = localStorage.getItem('theme');
+    setIsDarkMode(theme === 'dark');
+  }, []);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // aqui você validaria o login; para agora, redireciona para a landing
+    navigate('/landing', { replace: true });
+  };
 
   return (
-    <div className="min-h-screen bg-[#f8f8f8] flex items-center justify-center relative overflow-hidden dark:bg-black">
+    <div className={`min-h-screen ${isDarkMode ? 'bg-[#0B0B0B]' : 'bg-white'} flex items-center justify-center relative overflow-hidden`}>
       {/* Curva vermelha */}
       <img src={onda} alt="Onda" className="absolute top-5 left-0 w-full h-auto z-0" />
 
       {/* Logo */}
-          <>
-          {/* Logo clara (padrão) */}
-           <img
-              src={logo}
-              alt="Logo EspaçoSenai"
-              className="absolute top-6 left-6 w-24 z-10 block dark:hidden"
-           />
-      
-          {/* Logo escura (modo dark) */}
-           <img
-              src="src/assets/logodark.svg"
-              alt="Logo EspaçoSenai Dark"
-              className="absolute top-6 left-6 w-24 z-10 hidden dark:block"
-           />
-          </>
+        <img
+          src={isDarkMode ? logoDark : logo}
+          alt="Logo EspaçoSenai"
+          className="absolute top-6 left-6 w-24 z-10"
+        />
 
       {/* Card de Login */}
-      <div className="bg-white bg-opacity-90 rounded-xl shadow-md px-6 py-10 w-full max-w-sm z-10">
-        <h2 className="text-2xl font-semibold text-center text-black">
+      <div className={`${isDarkMode ? 'bg-[#111] text-white' : 'bg-white text-black'} bg-opacity-90 rounded-xl shadow-md px-6 py-10 w-full max-w-sm z-10`}>
+        <h2 className="text-2xl font-semibold text-center">
           Bem-Vindo(a)
         </h2>
-        <h3 className="text-xl font-medium text-center text-black mb-6">
+        <h3 className="text-xl font-medium text-center mb-6">
           novamente!
         </h3>
 
-        <form className="flex flex-col gap-4">
+  <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <input
             type="email"
             placeholder="Email"
@@ -51,7 +57,7 @@ export default function Login() {
             <input
               type={showSenha ? "text" : "password"}
               placeholder="Senha"
-              className="p-3 rounded-md shadow-sm border border-gray-300 w-full pr-10 text-black bg-white placeholder-gray-700 focus:outline-none"
+              className={`p-3 rounded-md shadow-sm border border-gray-300 w-full pr-10 ${isDarkMode ? 'bg-[#222] text-white placeholder-gray-400' : 'bg-white text-black placeholder-gray-700'} focus:outline-none`}
               required
             />
             <span
@@ -80,10 +86,10 @@ export default function Login() {
 
           <button
             type="button"
-            className="flex items-center justify-center gap-2 border border-gray-300 py-2 rounded-md bg-white shadow hover:bg-gray-100 transition"
+            className={`flex items-center justify-center gap-2 border border-gray-300 py-2 rounded-md shadow hover:bg-gray-100 transition ${isDarkMode ? 'bg-[#222]' : 'bg-white'}`}
           >
             <img src={googleIcon} alt="Google" className="w-5 h-5" />
-            <span className="text-black text-sm">Login com Google</span>
+            <span className={`${isDarkMode ? 'text-white' : 'text-black'} text-sm`}>Login com Google</span>
           </button>
 
           <button
@@ -94,7 +100,7 @@ export default function Login() {
           </button>
         </form>
 
-        <div className="text-xs text-center text-black mt-4">
+  <div className={`text-xs text-center mt-4 ${isDarkMode ? 'text-white' : 'text-black'}`}>
           Não tem uma conta?{" "}
           <a href="/cadastro" className="text-blue-600 underline">
             Cadastre-se

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../../App.css';
 import logoImg from '../../assets/EspacoSenai.svg';
 import ondasVectorImg from '../../assets/ondas vector.svg';
@@ -6,6 +7,10 @@ import setaImg from '../../assets/seta.svg';
 
 
 const SelecaoPerfil = () => {
+  const navigate = useNavigate();
+
+  const irParaLogin = () => navigate('/login');
+
   return (
     <div className="min-h-screen min-w-full w-screen h-screen flex items-center justify-center bg-white relative overflow-hidden">
       {/* Logo e nome no canto superior esquerdo */}
@@ -54,6 +59,7 @@ const SelecaoPerfil = () => {
           <button
             className="flex items-center justify-between mx-auto text-gray-800 hover:bg-red-50 transition-colors font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-red-200 border border-red-600"
             style={{ width: '295px', height: '57px', borderRadius: '10px', borderWidth: '1px', padding: '0 24px', fontSize: '20px' }}
+            onClick={irParaLogin}
           >
             <span>Estudantes</span>
             <img src={setaImg} alt="Seta" className="ml-2 w-6 h-6" />
@@ -61,6 +67,7 @@ const SelecaoPerfil = () => {
           <button
             className="flex items-center justify-between mx-auto text-gray-800 hover:bg-red-50 transition-colors font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-red-200 border border-red-600"
             style={{ width: '295px', height: '57px', borderRadius: '10px', borderWidth: '1px', padding: '0 24px', fontSize: '20px' }}
+            onClick={irParaLogin}
           >
             <span>Professores</span>
             <img src={setaImg} alt="Seta" className="ml-2 w-6 h-6" />
@@ -68,6 +75,7 @@ const SelecaoPerfil = () => {
           <button
             className="flex items-center justify-between mx-auto text-gray-800 hover:bg-red-50 transition-colors font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-red-200 border border-red-600"
             style={{ width: '295px', height: '57px', borderRadius: '10px', borderWidth: '1px', padding: '0 24px', fontSize: '20px' }}
+            onClick={irParaLogin}
           >
             <span>Coordenadores</span>
             <img src={setaImg} alt="Seta" className="ml-2 w-6 h-6" />
@@ -75,6 +83,7 @@ const SelecaoPerfil = () => {
           <button
             className="flex items-center justify-between mx-auto text-gray-800 hover:bg-red-50 transition-colors font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-red-200 border border-red-600"
             style={{ width: '295px', height: '57px', borderRadius: '10px', borderWidth: '1px', padding: '0 24px', fontSize: '20px' }}
+            onClick={irParaLogin}
           >
             <span>Administradores</span>
             <img src={setaImg} alt="Seta" className="ml-2 w-6 h-6" />

@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 
 import LandingPage from './pages/PageIniciais/landingPage.jsx';
 import SemNotificacao from './pages/Notificações/semnotificação.jsx';
+import Notificacoes from './pages/Notificações/notificações.jsx';
 import NovaSenha from './pages/Senhas/novasenha.jsx';
 import Onboarding from './pages/PageIniciais/onboarding.jsx';
 import Cadastro from './pages/Autenticação/cadastro.jsx';
@@ -19,6 +20,20 @@ import 'aos/dist/aos.css';
 export default function App() {
   useEffect(() => {
     AOS.init({ duration: 800 });
+
+    // Inicializa o tema global a partir da preferência salva na LandingPage.
+    // Todas as telas subsequentes respeitarão essa preferência porque o
+    // Header também altera localStorage e o document.documentElement.classList.
+    try {
+      const theme = localStorage.getItem('theme');
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    } catch (e) {
+      // no-op em ambientes onde localStorage não está disponível
+    }
   }, []);
 
   return (
@@ -33,6 +48,7 @@ export default function App() {
       <Route path="/códigoderec" element={<CodigoDeRec />} />
   <Route path="/novasenha" element={<NovaSenha />} />
   <Route path="/semnotificacao" element={<SemNotificacao />} />
+  <Route path="/notificacoes" element={<Notificacoes />} />   
     </Routes>
   );
 }

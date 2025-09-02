@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import logo from "../../assets/EspacoSenai.svg";
 import onda from "../../assets/ondaCadastro.svg";
 import olhoAberto from "../../assets/olhoFechado.svg";
@@ -38,7 +39,9 @@ export default function Cadastro() {
     }
 
     setErro(false);
-    console.log("Cadastro enviado!");
+  // Simula cadastro bem-sucedido e navega para a landing
+  console.log("Cadastro enviado!");
+  navigate('/landing', { replace: true });
   };
 
   useEffect(() => {

@@ -1,7 +1,7 @@
 import React from 'react';
-import sino from '../assets/sem-notificacoes-1.svg';
-import setaLeft from '../assets/setaleft.svg';
-import sinodenoti from '../assets/sinodenoti.svg';
+import sino from '/src/assets/sem-notificacoes-1.svg';
+import setaLeft from '/src/assets/setaleft.svg';
+import sinodenoti from '/src/assets/sinodenoti.svg';
 
 export default function SemNotificacao() {
 	return (
@@ -21,8 +21,8 @@ export default function SemNotificacao() {
 							- p-0 flex items-center: alinha o ícone
 						*/}
 						<button className="bg-transparent border-0 p-0 flex items-center cursor-pointer" onClick={() => window.history.back()}>
-					<img src={setaLeft} alt="Voltar" className="w-8 h-8 block" />
-				</button>
+							<img src={setaLeft} alt="Voltar" className="w-8 h-8 block bg-transparent text-gray-800" />
+						</button>
 						{/*
 							titleContainer: centraliza o título horizontalmente usando absolute
 							- absolute inset-x-0: ocupa toda a largura entre left/right para centralizar
@@ -31,7 +31,7 @@ export default function SemNotificacao() {
 						*/}
 					<div className="absolute inset-x-0 flex justify-center transform -translate-x-3">
 							<div className="inline-flex items-center font-medium text-[#222]" style={{ fontFamily: 'Montserrat, Poppins, sans-serif' }}>
-								<img src={sinodenoti} alt="Ícone de notificação" className="w-5 h-5 mr-2 block" />
+								<img src={sinodenoti} alt="Ícone de notificação" className="w-5 h-5 mr-2 block bg-transparent text-[#AE0000]" />
 								<span className="relative inline-block text-[1.15rem]">
 									<span>Suas notificações</span>
 									<span className="absolute left-0 -bottom-0.5 w-full" style={{ height: 2, background: '#7c0c15' }} />
@@ -51,7 +51,7 @@ export default function SemNotificacao() {
 				<div className="w-full max-w-[720px] mx-auto flex flex-col items-center">
 					{/* Bell image: ocupa largura responsiva dentro do container central */}
 					<div className="flex items-center justify-center mt-10 mb-9 w-full">
-						<img src={sino} alt="Sino dormindo" className="block mx-auto" style={{ width: 'min(50vw, 320px)', height: 'auto' }} />
+						<img src={sino} alt="Sino dormindo" className="block mx-auto bg-transparent" style={{ width: 'min(50vw, 320px)', height: 'auto' }} />
 					</div>
 
 					{/* Text block: usa a mesma largura do container para alinhamento perfeito */}
