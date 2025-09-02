@@ -6,7 +6,7 @@ export default function GradeHorarios({
   isDisabled,
 }) {
   const base =
-    "min-w-[96px] h-12 text-center px-4 rounded-md text-sm md:text-base outline-none focus:ring-0 transition-colors duration-150";
+    "min-w-[96px] h-12 text-center px-4 rounded-md text-sm md:text-base transition-colors duration-150";
 
   return (
     <section>

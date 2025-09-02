@@ -18,7 +18,7 @@ export default function CodigoConvidados({
     });
   };
 
-  // refs dos inputs [convidado][digito]
+  // refs dos inputs
   const inputsRef = useRef([]);
   useEffect(() => {
     inputsRef.current = convidados.map(
@@ -26,7 +26,7 @@ export default function CodigoConvidados({
     );
   }, [convidados, tamanhoCodigo]);
 
-  // ===== Funções da "senha" do convidado =====
+  // Funções da "senha" do convidado
   function normalizaCodigoChar(v) {
     return String(v).slice(-1).replace(/[^0-9A-Za-z]/g, "").toUpperCase();
   }
@@ -148,7 +148,7 @@ export default function CodigoConvidados({
               />
             </label>
 
-            {/* Inputs do código com auto-avance/colar (responsivo) */}
+            {/* Inputs do código com auto-avance/colar */}
             <div className="flex items-center gap-2 sm:gap-3">
               {codigo.map((dig, iDig) => (
                 <input
@@ -176,7 +176,7 @@ export default function CodigoConvidados({
           </div>
         ))}
 
-        {/* Ações: adicionar e lixeira (tamanhos maiores no mobile) */}
+        {/* Ações: adicionar e lixeira */}
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -204,7 +204,7 @@ export default function CodigoConvidados({
                        border border-gray-300 bg-white rounded-md outline-none
                        transition-colors duration-150 hover:bg-[#AE0000] focus-visible:ring-2 focus-visible:ring-[#AE0000]"
           >
-            {/* Ícone inline (herda a cor via currentColor) */}
+            
             <span className="text-black group-hover:text-white">
               <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 md:w-4 md:h-4" aria-hidden="true">
                 <path d="M9 3v1H4v2h1v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1V4h-5V3H9Zm-2 3h10v13H7V6Zm2 2v9h2V8H9Zm4 0v9h2V8h-2Z" />
