@@ -1,7 +1,7 @@
 import React from 'react';
-import sino from '/src/assets/sem-notificacoes-1.svg';
-import setaLeft from '/src/assets/setaleft.svg';
-import sinodenoti from '/src/assets/sinodenoti.svg';
+import sino from '../../assets/sem notificações 1.svg';
+import setaLeft from '../../assets/setaleft.svg';
+import sinodenoti from '../../assets/sinodenoti.svg';
 
 export default function SemNotificacao() {
 	return (
@@ -51,7 +51,7 @@ export default function SemNotificacao() {
 				<div className="w-full max-w-[720px] mx-auto flex flex-col items-center">
 					{/* Bell image: ocupa largura responsiva dentro do container central */}
 					<div className="flex items-center justify-center mt-10 mb-9 w-full">
-						<img src={sino} alt="Sino dormindo" className="block mx-auto bg-transparent" style={{ width: 'min(50vw, 320px)', height: 'auto' }} />
+						<img src={sino} alt="Sem notificações" className="block mx-auto bg-transparent" style={{ width: 'min(50vw, 320px)', height: 'auto' }} />
 					</div>
 
 					{/* Text block: usa a mesma largura do container para alinhamento perfeito */}

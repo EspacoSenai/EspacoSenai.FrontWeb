@@ -28,7 +28,7 @@ const SelecaoPerfil = () => {
         <img 
           src={ondasVectorImg}
           alt="Onda decorativa" 
-          className="w-full min-h-[120px] object-cover"
+          className="w-full min-h-[120px] object-cover wave-animate md:wave-parallax"
         />
       </div>
 

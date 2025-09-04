@@ -27,7 +27,9 @@ export default function Login() {
   return (
     <div className={`min-h-screen ${isDarkMode ? 'bg-[#0B0B0B]' : 'bg-white'} flex items-center justify-center relative overflow-hidden`}>
       {/* Curva vermelha */}
-      <img src={onda} alt="Onda" className="absolute top-5 left-0 w-full h-auto z-0" />
+      <div className="absolute top-5 left-0 w-full h-auto z-0 wave-container">
+        <img src={onda} alt="Onda" className="w-full h-full object-cover wave-fill wave-animate" />
+      </div>
 
       {/* Logo */}
         <img

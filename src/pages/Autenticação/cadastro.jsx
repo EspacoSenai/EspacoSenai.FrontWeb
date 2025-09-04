@@ -53,7 +53,9 @@ export default function Cadastro() {
   return (
     <div className="min-h-screen bg-white flex items-center justify-center relative overflow-hidden dark:bg-black">
       {/* Onda de fundo */}
-      <img src={onda} alt="Onda" className="absolute top-10 left-0 w-full h-auto z-0" />
+      <div className="absolute top-10 left-0 w-full h-auto z-0 wave-container">
+        <img src={onda} alt="Onda" className="w-full h-full object-cover wave-fill wave-animate" />
+      </div>
 
       <>
         {/* Logo clara */}

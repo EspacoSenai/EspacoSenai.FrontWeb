@@ -1,8 +1,9 @@
-import React, { useState, useRef } from 'react';
-import setaLeft from '/src/assets/setaleft.svg';
-import lixeira from '/src/assets/lixeira.svg';
-import sinoSN from '/src/assets/sinoSN.svg';
-import lembrete from '/src/assets/lembrete.svg';
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import setaLeft from '../../assets/setaleft.svg';
+import lixeira from '../../assets/lixeira.svg';
+import sinoSN from '../../assets/sinoSN.svg';
+import lembrete from '../../assets/lembrete.svg';
 import SemNotificacao from './semnotificação.jsx';
 
 
@@ -26,6 +27,7 @@ const notificacoesIniciais = [
   }
 ];
 export default function Notificacoes() {
+  const navigate = useNavigate();
   // Estado das notificações mostrado na tela
   const [notificacoes, setNotificacoes] = useState(notificacoesIniciais);
   // guarda deslocamentos (translateX) por id para cada item
@@ -42,6 +44,14 @@ export default function Notificacoes() {
     delete copia[id];
     deslocamentosRef.current = copia;
   };
+
+  // se a lista ficar vazia, redireciona para a rota de sem notificação
+  useEffect(() => {
+    if (notificacoes.length === 0) {
+      // usa replace para não empilhar histórico
+      navigate('/semnotificacao', { replace: true });
+    }
+  }, [notificacoes, navigate]);
 
   // Atualiza o translate para um item e força re-render simples
   const setarDeslocamento = (id, x) => {

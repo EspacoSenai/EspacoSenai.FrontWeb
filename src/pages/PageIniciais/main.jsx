@@ -1,9 +1,14 @@
 import React from 'react';
+import ondaLandinpage from '../../assets/ondaLandinpage.svg';
+import ondaPrincipal from '../../assets/ondaPrincipal.svg';
+import mulherImg from '../../assets/mulher.svg';
 
 export default function Main() {
   return (
     <main className="bg-white dark:bg-[#0B0B0B] scroll-smooth">
-      <img src="src/assets/ondaLandinpage.svg" alt="Onda landingpage" className="w-full" />
+      <div className="w-full wave-container">
+        <img src={ondaLandinpage} alt="Onda landingpage" className="w-full wave-fill wave-animate" />
+      </div>
 
       <section id="espacoSenai" className="flex flex-col md:flex-row justify-between items-center py-12 px-6 md:px-12 relative z-10">
         <div className="max-w-xl pr-6">
@@ -19,7 +24,7 @@ export default function Main() {
             Ele centraliza as informações, reduz burocracias e garante mais organização no dia a dia.
           </p>
         </div>
-        <img src="src/assets/mulher.svg" alt="Ilustração EspaçoSenai" className="mt-8 md:mt-0" />
+  <img src={mulherImg} alt="Ilustração EspaçoSenai" className="mt-8 md:mt-0" />
       </section>
 
       <hr className="border-t-2 border-gray-300 dark:border-gray-600 mx-8 mt-[-50px]" />
@@ -86,7 +91,9 @@ export default function Main() {
           </div>
         </div>
 
-        <img src="src/assets/ondaPrincipal.svg" alt="Onda rodapé" className="w-full h-auto object-cover absolute top-[-200px] right-0 z-0" />
+        <div className="absolute top-[-200px] right-0 z-0 w-full md:w-auto wave-container">
+          <img src={ondaPrincipal} alt="Onda rodapé" className="w-full h-auto object-cover wave-fill wave-animate md:wave-parallax" />
+        </div>
       </section>
     </main>
   );

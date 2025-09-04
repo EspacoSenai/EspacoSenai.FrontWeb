@@ -92,3 +92,43 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/*animação das ondas */
+@keyframes waveFloat {
+  0% { transform: translateY(0) translateX(0) scale(1.02); }
+  50% { transform: translateY(-6px) translateX(4px) scale(1.02); }
+  100% { transform: translateY(0) translateX(0) scale(1.02); }
+}
+
+/*  waves */
+@keyframes waveParallax {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-6%); }
+}
+
+/* onboarding waves */
+.wave-animate {
+  animation: waveFloat 5s ease-in-out infinite;
+  will-change: transform;
+  display: block;
+}
+.wave-parallax {
+  animation: waveParallax 20s linear infinite;
+  will-change: transform;
+}
+
+/* garante que a imagem cubra totalmente seu contêiner mesmo durante animações */
+.wave-fill {
+  width: 110%; /* um pouco maior para evitar bordas visíveis */
+  height: auto;
+  min-height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transform-origin: center;
+  display: block;
+}
+
+/* container helper para garantir overflow hidden quando necessário */
+.wave-container {
+  overflow: hidden;
+}

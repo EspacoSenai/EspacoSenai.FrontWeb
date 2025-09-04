@@ -64,6 +64,7 @@ export default function NovaSenha() {
 			<img
 				src={ondaMeioImg}
 				alt="Onda do meio"
+				className="wave-animate md:wave-parallax wave-fill"
 				style={{
 					position: 'absolute',
 					top: '50%',

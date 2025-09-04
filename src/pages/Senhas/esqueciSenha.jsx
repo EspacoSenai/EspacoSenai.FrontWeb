@@ -18,18 +18,18 @@ export function EsqueciSenha({ buttonWidth = 180, buttonHeight = 36 } = {}) {
   return (
     <div className="min-h-screen w-full flex items-center justify-center relative bg-white overflow-hidden" style={{ fontFamily: 'Poppins, sans-serif' }}>
   {/* Onda lateral - Responsiva */}
-      <div className="absolute top-0 right-0 h-full w-1/2 md:w-1/3 z-0 overflow-hidden">
+      <div className="absolute top-0 right-0 h-full w-1/2 md:w-1/3 z-0 overflow-hidden wave-container">
         <img
           src={ondaLateralImg}
           alt="Onda decorativa lateral"
-          className="h-full w-full object-cover object-left transform scale-150 md:scale-100"
+          className="h-full w-full object-cover object-left transform scale-150 md:scale-100 wave-fill wave-animate md:wave-parallax"
         />
       </div>
   {/* Onda menor - Inferior esquerda, responsiva e grande */}
       <img
         src={ondaMenorImg}
         alt="Onda decorativa menor"
-        className="fixed left-0 bottom-0 z-0 select-none pointer-events-none"
+        className="fixed left-0 bottom-0 z-0 select-none pointer-events-none wave-fill wave-animate"
         style={{
           width: 'min(40vw, 600px)',
           minWidth: '200px',
@@ -43,7 +43,7 @@ export function EsqueciSenha({ buttonWidth = 180, buttonHeight = 36 } = {}) {
         <img
           src={ondaMenorImg}
           alt="Onda decorativa menor"
-          className="h-full w-full object-cover object-left transform scale-150 md:scale-100"
+          className="h-full w-full object-cover object-left transform scale-150 md:scale-100 wave-fill wave-animate md:wave-parallax"
         />
       </div>
       

@@ -96,11 +96,13 @@ export default function Onboarding() {
   return (
     <div className="min-h-screen overflow-hidden bg-white relative flex flex-col font-sans">
       {/* Onda no topo */}
-      <img
-        src={onda}
-        alt="Topo com ondas"
-        className="absolute top-[-23px] left-0 w-full h-[325px] object-cover z-0"
-      />
+      <div className="absolute top-[-23px] left-0 w-full h-[325px] z-0 wave-container">
+        <img
+          src={onda}
+          alt="Topo com ondas"
+          className="w-full h-full object-cover wave-fill wave-animate md:wave-parallax"
+        />
+      </div>
 
       {/* Título */}
       <div className={`pt-[10px] z-10 ${titleClass}`}>

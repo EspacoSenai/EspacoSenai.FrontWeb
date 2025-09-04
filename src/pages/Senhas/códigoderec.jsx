@@ -41,20 +41,20 @@ export default function CodigoDeRec() {
                   </div>
 
 			{/* Onda lateral - Responsiva */}
-                  <div className="absolute top-0 right-0 h-full w-1/2 md:w-1/3 z-0 overflow-hidden">
-                    <img
-                      src={ondaLateralImg}
-                      alt="Onda decorativa lateral"
-                      className="h-full w-full object-cover object-left transform scale-150 md:scale-100"
-                    />
-                  </div>
+									<div className="absolute top-0 right-0 h-full w-1/2 md:w-1/3 z-0 overflow-hidden wave-container">
+										<img
+											src={ondaLateralImg}
+											alt="Onda decorativa lateral"
+											className="h-full w-full object-cover object-left transform scale-150 md:scale-100 wave-fill wave-animate md:wave-parallax"
+										/>
+									</div>
 
 			 {/* Onda menor - Inferior esquerda, responsiva e grande */}
-                  <img
-                    src={ondaMenorImg}
-                    alt="Onda decorativa menor"
-                    className="fixed left-0 bottom-0 z-0 select-none pointer-events-none"
-                    style={{
+									<img
+										src={ondaMenorImg}
+										alt="Onda decorativa menor"
+										className="fixed left-0 bottom-0 z-0 select-none pointer-events-none wave-fill wave-animate"
+										style={{
                       width: 'min(40vw, 600px)',
                       minWidth: '200px',
                       maxWidth: '100vw',

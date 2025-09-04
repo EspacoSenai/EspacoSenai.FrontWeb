@@ -21,18 +21,15 @@ export default function App() {
   useEffect(() => {
     AOS.init({ duration: 800 });
 
-    // Inicializa o tema global a partir da preferência salva na LandingPage.
-    // Todas as telas subsequentes respeitarão essa preferência porque o
-    // Header também altera localStorage e o document.documentElement.classList.
     try {
-      const theme = localStorage.getItem('theme');
+      const theme = age.getItem('theme');
       if (theme === 'dark') {
         document.documentElement.classList.add('dark');
       } else {
         document.documentElement.classList.remove('dark');
       }
     } catch (e) {
-      // no-op em ambientes onde localStorage não está disponível
+      
     }
   }, []);
 
