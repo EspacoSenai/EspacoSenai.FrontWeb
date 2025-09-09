@@ -2,6 +2,8 @@ import React, { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
 import LandingPage from './pages/PageIniciais/landingPage.jsx';
+import EditarPerfil from './pages/Perfis/editarperfil.jsx';
+import Avatares from './pages/Perfis/avatares.jsx';
 import SemNotificacao from './pages/Notificações/semnotificação.jsx';
 import Notificacoes from './pages/Notificações/notificações.jsx';
 import NovaSenha from './pages/Senhas/novasenha.jsx';
@@ -46,6 +48,8 @@ export default function App() {
   <Route path="/novasenha" element={<NovaSenha />} />
   <Route path="/semnotificacao" element={<SemNotificacao />} />
   <Route path="/notificacoes" element={<Notificacoes />} />   
+  <Route path="/editarperfil" element={<EditarPerfil />} />
+  <Route path="/avatares" element={<Avatares />} />
     </Routes>
   );
 }
