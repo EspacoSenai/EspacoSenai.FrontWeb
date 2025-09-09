@@ -12,7 +12,6 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 
 export default function App() {
-  // mantém o tema salvo mesmo sem o Header na tela
   useLayoutEffect(() => {
     try {
       const salvo = localStorage.getItem("theme") || "light";
@@ -28,12 +27,10 @@ export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Index />} />
-
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="/landing" element={<LandingPage />} />
       <Route path="/cadastro" element={<Cadastro />} />
       <Route path="/login" element={<Login />} />
-
       <Route path="/agendamento-quadra" element={<AgendamentoQuadra />} />
       <Route path="/agendamento-computadores" element={<AgendamentoComputadores />} />
     </Routes>

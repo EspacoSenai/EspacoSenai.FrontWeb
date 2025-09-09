@@ -3,30 +3,35 @@ import React from "react";
 export default function Footer() {
   return (
     <>
-      {/* Retângulo superior com logo e links */}
-      <div className="bg-[#757575] dark:bg-[#FFFFFF] mt-24 sm:mt-32 md:mt-40 w-[92%] max-w-[700px] h-16 rounded-md mx-auto -mb-8 relative z-20 flex flex-col sm:flex-row justify-center items-center gap-3 sm:gap-6 px-6 text-center sm:text-left">
-        <a
-          href="#"
-          className="text-white text-xs hover:underline hover:text-white dark:text-black"
-        >
-          POLÍTICA DE PRIVACIDADE
-        </a>
-        <img
-          src="src/assets/EspacoSenai.svg"
-          alt="Logo EspaçoSenai"
-          className="w-[80px]"
-        />
-        <a
-          href="#"
-          className="text-white text-xs hover:underline hover:text-white dark:text-black"
-        >
-          TERMOS DE USO
-        </a>
+      {/* Cartão superior (retângulo com logo e links) */}
+      <div className="relative z-30 w-full flex justify-center">
+        <div className="bg-[#757575] dark:bg-white mt-24 sm:mt-32 md:mt-40 w-[92%] max-w-[700px] h-16 rounded-md mx-auto -mb-8
+                        flex items-center justify-center gap-8 px-6 text-center shadow-md">
+          <a
+            href="#"
+            className="text-white dark:text-black text-xs hover:underline whitespace-nowrap"
+          >
+            POLÍTICA DE PRIVACIDADE
+          </a>
+
+          <img
+            src="src/assets/EspacoSenai.svg"
+            alt="Logo EspaçoSenai"
+            className="w-[80px] h-auto select-none"
+          />
+
+          <a
+            href="#"
+            className="text-white dark:text-black text-xs hover:underline whitespace-nowrap"
+          >
+            TERMOS DE USO
+          </a>
+        </div>
       </div>
 
       {/* Rodapé principal */}
-      <footer className="bg-black text-white pt-32 lg:pt-28 relative z-10">
-        <div className="max-w-6xl mx-auto px-6 sm:px-8 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8 text-sm text-center md:text-left">
+      <footer className="relative z-20 bg-black text-white pt-32 lg:pt-28 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8 text-sm text-center md:text-left">
           {/* INFORMAÇÕES */}
           <div>
             <h4 className="font-regular text-base mb-3">INFORMAÇÕES</h4>
@@ -36,26 +41,24 @@ export default function Footer() {
               Suíço-Brasileira.
             </p>
             <div className="flex justify-center md:justify-start gap-4">
-              <a href="https://www.instagram.com/_.vitinho07/">
-                <img
-                  src="src/assets/instagram.svg"
-                  alt="Instagram"
-                  className="w-5 h-5"
-                />
+              <a
+                href="https://www.instagram.com/_.vitinho07/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+              >
+                <img src="src/assets/instagram.svg" alt="" className="w-5 h-5" />
               </a>
-              <a href="https://github.com/VitorAguiiar">
-                <img
-                  src="src/assets/github.svg"
-                  alt="GitHub"
-                  className="w-5 h-5"
-                />
+              <a
+                href="https://github.com/VitorAguiiar"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="GitHub"
+              >
+                <img src="src/assets/github.svg" alt="" className="w-5 h-5" />
               </a>
-              <a href="">
-                <img
-                  src="src/assets/linkedin.svg"
-                  alt="LinkedIn"
-                  className="w-5 h-5"
-                />
+              <a href="#" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                <img src="src/assets/linkedin.svg" alt="" className="w-5 h-5" />
               </a>
             </div>
           </div>
@@ -67,7 +70,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#espacoSenai"
-                  className="text-white border-b border-white hover:text-gray-300"
+                  className="inline-block border-b border-white text-white hover:text-gray-300"
                 >
                   O que é EspaçoSenai
                 </a>
@@ -75,7 +78,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#comoFunciona"
-                  className="text-white border-b border-white hover:text-gray-300"
+                  className="inline-block border-b border-white text-white hover:text-gray-300"
                 >
                   Como Funciona
                 </a>
@@ -83,7 +86,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#faq"
-                  className="text-white border-b border-white hover:text-gray-300"
+                  className="inline-block border-b border-white text-white hover:text-gray-300"
                 >
                   Perguntas Frequentes
                 </a>
@@ -101,7 +104,7 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Rodapé inferior */}
+        {/* Base arredondada */}
         <div className="w-full mt-12 md:mt-16 h-10 bg-[#D9D9D9] rounded-t-[100%] flex items-center justify-center text-[11px] sm:text-xs text-black px-4 text-center">
           <p>Copyright 2025 © Todos os direitos reservados.</p>
         </div>

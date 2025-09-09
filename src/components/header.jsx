@@ -21,13 +21,14 @@ export default function Header() {
   const toggleMenu = () => setMenuOpen((p) => !p);
 
   return (
-    <header className="w-full flex justify-center px-4 sm:px-6 py-3 sm:py-4 bg-white dark:bg-[#0B0B0B] transition-colors duration-300">
+    <header className="relative z-20 w-full flex justify-center px-4 sm:px-6 py-3 sm:py-4 bg-white dark:bg-[#0B0B0B] transition-colors duration-300 overflow-x-hidden">
       <div className="w-full max-w-7xl flex items-center justify-between border-b border-[#A6A3A3] dark:border-[#444] pb-2">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0 min-w-0">
           <img
             src={isDarkMode ? "src/assets/LogoDark.svg" : "src/assets/EspacoSenai.svg"}
             alt="Logo Senai"
-            className="h-10 sm:h-12 md:h-14 w-auto"
+            className="h-10 sm:h-12 md:h-14 w-auto object-contain"
+            style={{ width: "auto" }}
           />
         </div>
 
@@ -87,7 +88,7 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Menu lateral */}
+      {/* Menu lateral (inalterado) */}
       <div className={`fixed inset-0 z-40 md:hidden ${menuOpen ? "" : "pointer-events-none"}`}>
         <div
           className={`absolute inset-0 transition-opacity duration-300 ${
