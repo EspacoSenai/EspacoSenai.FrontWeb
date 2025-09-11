@@ -2,8 +2,8 @@ import React from 'react';
 
 export default function Main() {
   return (
-    <main className="bg-white dark:bg-[#0B0B0B] scroll-smooth overflow-hidden">
-      {/* Seção: O que é o EspaçoSenai? */}
+    <main className="bg-white dark:bg-[#0B0B0B] scroll-smooth overflow-hidden relative">
+      
       <img
         src="src/assets/ondaLandinpage.svg"
         alt="Onda landingpage"
@@ -12,7 +12,7 @@ export default function Main() {
 
       <section
         id="espacoSenai"
-        className="flex flex-col-reverse md:flex-row justify-between items-center gap-8 md:gap-12 py-12 px-6 md:px-12 relative z-10"
+        className="flex flex-col-reverse md:flex-row justify-between items-center gap-8 md:gap-12 py-12 px-6 md:px-12 relative z-20"
       >
         <div className="max-w-xl pr-0 md:pr-6">
           <div className="relative top-8 left-[-10px] w-1 h-7 bg-[#AE0000] rounded-full"></div>
@@ -22,22 +22,16 @@ export default function Main() {
             <span className="text-black dark:text-white">?</span>
           </h2>
           <p className="text-lg text-gray-700 dark:text-gray-300 mb-6">
-            <br />
             Criado para facilitar a organização de atividades acadêmicas e
             administrativas, o sistema permite reservar salas, laboratórios,
             áreas de lazer e muito mais de forma prática e rápida.
             <br />
-            <br />
-            <span>
-              Ele centraliza as informações, reduz burocracias e garante mais
-              organização no dia a dia, tanto para quem utiliza os espaços
-              quanto para quem os administra.
-            </span>
+            Ele centraliza as informações, reduz burocracias e garante mais
+            organização no dia a dia, tanto para quem utiliza os espaços
+            quanto para quem os administra.
             <br /> <br />
-            <span>
-              Precisa de um espaço para organizar a aula, fazer um projeto ou
-              organizar um evento? Agora ficou fácil!
-            </span>
+            Precisa de um espaço para organizar a aula, fazer um projeto ou
+            organizar um evento? Agora ficou fácil!
           </p>
         </div>
 
@@ -115,7 +109,7 @@ export default function Main() {
       {/* Seção: Perguntas Frequentes */}
       <section
         id="faq"
-        className="px-6 md:px-12 py-16 bg-white dark:bg-[#0B0B0B] relative z-10"
+        className="px-6 md:px-12 py-16 bg-white dark:bg-[#0B0B0B] relative z-4"
       >
         <h2 className="text-2xl md:text-3xl font-semibold mb-6 relative">
           <div className="absolute top-1 left-[-10px] w-1 h-7 bg-[#AE0000] rounded-full z-0"></div>
@@ -124,14 +118,13 @@ export default function Main() {
           </span>
         </h2>
 
-        <div className="space-y-20 max-w-3xl">
+        <div className="space-y-10 md:space-y-12 max-w-3xl">
           <div>
             <p className="border border-[#AE0000] text-black dark:border-white dark:text-white rounded-lg inline-block px-4 py-2 font-medium mb-2">
               Consigo cancelar ou editar uma reserva?
             </p>
             <p className="ml-2 border-b-4 text-black dark:text-white border-[#AE0000] pb-1">
-              Sim! Você pode alterar ou cancelar suas reservas pelo próprio
-              painel do usuário.
+              Sim! Você pode alterar ou cancelar suas reservas pelo próprio painel do usuário.
             </p>
           </div>
           <div>
@@ -152,13 +145,14 @@ export default function Main() {
           </div>
         </div>
       </section>
-
-      {/* Onda final: igual à de cima e colada no footer */}
-      <img
-        src="src/assets/ondaPrincipal.svg"
-        alt="Onda rodapé"
-        className="w-full h-auto object-cover block -mb-px"
-      />
+      
+      <div className="relative -z-2 mt-[-700px]">
+        <img
+          src="src/assets/ondaPrincipal.svg"
+          alt="Onda rodapé"
+          className="w-full h-[50vh] md:h-auto object-cover"
+        />
+      </div>
     </main>
   );
 }

@@ -4,9 +4,9 @@ export default function Footer() {
   return (
     <>
       {/* Cartão superior (retângulo com logo e links) */}
-      <div className="relative z-30 w-full flex justify-center">
-        <div className="bg-[#757575] dark:bg-white mt-24 sm:mt-32 md:mt-40 w-[92%] max-w-[700px] h-16 rounded-md mx-auto -mb-8
-                        flex items-center justify-center gap-8 px-6 text-center shadow-md">
+      <div className="relative z-30 w-full flex justify-center -mt-16">
+        <div className="bg-[#757575] dark:bg-white w-[92%] max-w-[700px] h-16 rounded-md mx-auto -mb-8
+                        flex items-center justify-center px-6 text-center shadow-md">
           <a
             href="#"
             className="text-white dark:text-black text-xs hover:underline whitespace-nowrap"
