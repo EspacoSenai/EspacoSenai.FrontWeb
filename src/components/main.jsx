@@ -4,12 +4,14 @@ export default function Main() {
   return (
     <main className="bg-white dark:bg-[#0B0B0B] scroll-smooth overflow-hidden relative">
       
+      {/* Onda do topo */}
       <img
         src="src/assets/ondaLandinpage.svg"
         alt="Onda landingpage"
         className="w-full h-auto object-cover"
       />
 
+      {/* Seção: O que é o EspaçoSenai */}
       <section
         id="espacoSenai"
         className="flex flex-col-reverse md:flex-row justify-between items-center gap-8 md:gap-12 py-12 px-6 md:px-12 relative z-20"
@@ -109,7 +111,11 @@ export default function Main() {
       {/* Seção: Perguntas Frequentes */}
       <section
         id="faq"
-        className="px-6 md:px-12 py-16 bg-white dark:bg-[#0B0B0B] relative z-4"
+        className="
+          px-6 md:px-12 pt-16
+          pb-0 sm:pb-[200px] md:pb-0
+          bg-white dark:bg-[#0B0B0B] relative z-5
+        "
       >
         <h2 className="text-2xl md:text-3xl font-semibold mb-6 relative">
           <div className="absolute top-1 left-[-10px] w-1 h-7 bg-[#AE0000] rounded-full z-0"></div>
@@ -145,12 +151,16 @@ export default function Main() {
           </div>
         </div>
       </section>
+
+      {/* Espaço extra só no mobile para não colidir com o footer */}
+      <div className="block md:hidden h-20"></div>
       
-      <div className="relative -z-2 mt-[-700px]">
+      {/* Onda do rodapé — visível apenas do md pra cima */}
+      <div className="relative -z-2 mt-[-700px] hidden md:block">
         <img
           src="src/assets/ondaPrincipal.svg"
           alt="Onda rodapé"
-          className="w-full h-[50vh] md:h-auto object-cover"
+          className="w-full h-auto object-cover select-none"
         />
       </div>
     </main>

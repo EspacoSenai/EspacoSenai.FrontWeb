@@ -5,10 +5,12 @@ import Footer from '../components/footer';
 
 export default function LandingPage() {
   return (
-    <div className="flex flex-col min-h-screen justify-between">
+    <div className="flex flex-col min-h-screen">
       <Header />
       <Main />
-      <Footer />
+      <div className="mt-auto">
+        <Footer />
+      </div>
     </div>
   );
 }

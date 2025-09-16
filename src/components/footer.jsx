@@ -3,10 +3,10 @@ import React from "react";
 export default function Footer() {
   return (
     <>
-      {/* Cartão superior (retângulo com logo e links) */}
-      <div className="relative z-30 w-full flex justify-center -mt-16">
+      {/* Cartão superior (logo + links) — agora aparece em todas as telas */}
+      <div className="relative z-30 w-full flex justify-center -mt-10 md:-mt-16">
         <div className="bg-[#757575] dark:bg-white w-[92%] max-w-[700px] h-16 rounded-md mx-auto -mb-8
-                        flex items-center justify-center px-6 text-center shadow-md">
+                        flex items-center justify-center px-6 text-center shadow-md gap-6">
           <a
             href="#"
             className="text-white dark:text-black text-xs hover:underline whitespace-nowrap"
@@ -30,7 +30,7 @@ export default function Footer() {
       </div>
 
       {/* Rodapé principal */}
-      <footer className="relative z-20 bg-black text-white pt-32 lg:pt-28 overflow-hidden">
+      <footer className="relative z-20 bg-black text-white pt-24 md:pt-32 lg:pt-28 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8 text-sm text-center md:text-left">
           {/* INFORMAÇÕES */}
           <div>
