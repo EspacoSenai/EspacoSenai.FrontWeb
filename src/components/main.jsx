@@ -4,7 +4,7 @@ export default function Main() {
   return (
     <main className="bg-white dark:bg-[#0B0B0B] scroll-smooth overflow-hidden relative">
       
-      {/* Onda do topo */}
+      {/* Onda do topo (sempre visível) */}
       <img
         src="src/assets/ondaLandinpage.svg"
         alt="Onda landingpage"
@@ -46,7 +46,7 @@ export default function Main() {
 
       <div className="border-t-2 border-gray-300 dark:border-gray-600 mx-8 mt-[-50px]"></div>
 
-      {/* Seção: Como Funciona */}
+      {/* Seção: Como Funciona — alinhada e responsiva */}
       <section
         id="comoFunciona"
         className="bg-white dark:bg-[#0B0B0B] py-12 px-6 md:px-12"
@@ -56,34 +56,36 @@ export default function Main() {
           Como <span className="text-black dark:text-white"> Funciona?</span>
         </h2>
 
-        <div className="flex flex-col md:flex-row justify-between items-center">
-          <div className="w-full md:w-1/3 text-center md:text-left mb-6 md:mb-0">
-            <ol className="list-none pl-6 space-y-4 text-lg text-gray-700 dark:text-gray-300">
-              <li className="flex items-center space-x-3 relative">
-                <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[#AE0000] text-white font-bold text-sm z-[1]">
-                  1
-                </span>
-                <span>Faça login com seu usuário SENAI</span>
-                <div className="absolute left-1 transform -translate-x-1/2 top-2 w-px h-16 bg-[#C5C5C5] dark:bg-white z-[0]"></div>
-              </li>
-              <li className="flex items-center space-x-3 relative">
-                <span className="flex items-center justify-center w-9 h-8 rounded-full bg-[#AE0000] text-white font-bold text-sm z-[1]">
-                  2
-                </span>
-                <span>Use os filtros para encontrar o espaço ideal</span>
-                <div className="absolute left-1 transform -translate-x-1/2 top-4 w-px h-16 bg-[#C5C5C5] dark:bg-white z-[0]"></div>
-              </li>
-              <li className="flex items-center space-x-3 relative top-[-5px]">
-                <span className="flex items-center justify-center w-10 h-8 rounded-full bg-[#AE0000] text-white font-bold text-sm z-[1]">
-                  3
-                </span>
-                <span>Consulte os horários disponíveis com facilidade</span>
-              </li>
-            </ol>
-          </div>
+        <div className="w-full md:w-2/3 max-w-2xl">
+          {/* Linha vertical única com borda; badges ficam centralizados sobre a linha */}
+          <ol className="relative border-l border-[#C5C5C5] dark:border-white/80 pl-10 space-y-6 text-lg leading-relaxed text-gray-700 dark:text-gray-300">
+            {/* Item 1 */}
+            <li className="relative">
+              <span className="absolute -left-4 md:-left-5 top-0 flex h-8 w-8 items-center justify-center rounded-full bg-[#AE0000] text-white text-sm font-bold select-none">
+                1
+              </span>
+              <p>Faça login com seu usuário SENAI</p>
+            </li>
+
+            {/* Item 2 */}
+            <li className="relative">
+              <span className="absolute -left-4 md:-left-5 top-0 flex h-8 w-8 items-center justify-center rounded-full bg-[#AE0000] text-white text-sm font-bold select-none">
+                2
+              </span>
+              <p>Use os filtros para encontrar o espaço ideal</p>
+            </li>
+
+            {/* Item 3 */}
+            <li className="relative">
+              <span className="absolute -left-4 md:-left-5 top-0 flex h-8 w-8 items-center justify-center rounded-full bg-[#AE0000] text-white text-sm font-bold select-none">
+                3
+              </span>
+              <p>Consulte os horários disponíveis com facilidade</p>
+            </li>
+          </ol>
         </div>
 
-        <div className="w-full text-center mt-8 relative z-50">
+        <div className="w-full text-center mt-10 relative z-50">
           <p className="text-2xl font-regular text-black dark:text-white mb-4">
             Aqui você terá a <span className="text-[#AE0000]">melhor</span>{' '}
             experiência!
@@ -113,8 +115,9 @@ export default function Main() {
         id="faq"
         className="
           px-6 md:px-12 pt-16
-          pb-0 sm:pb-[200px] md:pb-0
           bg-white dark:bg-[#0B0B0B] relative z-5
+          max-1030:pb-28
+          min-1031:pb-0
         "
       >
         <h2 className="text-2xl md:text-3xl font-semibold mb-6 relative">
@@ -152,11 +155,11 @@ export default function Main() {
         </div>
       </section>
 
-      {/* Espaço extra só no mobile para não colidir com o footer */}
-      <div className="block md:hidden h-20"></div>
-      
-      {/* Onda do rodapé — visível apenas do md pra cima */}
-      <div className="relative -z-2 mt-[-700px] hidden md:block">
+      {/* Espaço extra só quando a onda estiver oculta (<=1030px) */}
+      <div className="max-1030:block min-1031:hidden h-24" />
+
+      {/* Onda do rodapé — só aparece acima de 1030px */}
+      <div className="relative -z-2 min-1031:mt-[-700px] max-1030:mt-0 min-1031:block max-1030:hidden">
         <img
           src="src/assets/ondaPrincipal.svg"
           alt="Onda rodapé"
