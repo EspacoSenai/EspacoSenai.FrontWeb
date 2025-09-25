@@ -80,7 +80,7 @@ export default function Notificacoes() {
   };
 
   // Solta o ponteiro: verifica limite para deletar ou retorna à posição
-  const aoSoltarPonteiro = (e) => {
+  const aoSoltarPonteiro = () => {
     if (!ponteiroAbaixadoRef.current) return;
     ponteiroAbaixadoRef.current = false;
     const id = arrastandoIdRef.current;

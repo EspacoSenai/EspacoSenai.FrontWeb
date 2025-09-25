@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import logo from "../../assets/EspacoSenai.svg";
-import onda from "../../assets/ondaCadastro.svg";
-import olhoAberto from "../../assets/olhoFechado.svg";
-import olhoFechado from "../../assets/olhoAberto.svg";
+import { Link } from "react-router-dom";
+import logo from "../assets/EspacoSenai.svg";
+import onda from "../assets/ondaCadastro.svg";
+import olhoAberto from "../assets/olhoFechado.svg";
+import olhoFechado from "../assets/olhoAberto.svg";
 
 // Função para verificar força da senha
 const getForcaSenha = (senha) => {
@@ -29,7 +29,6 @@ export default function Cadastro() {
 
   const [erro, setErro] = useState(false);
   const [forcaSenha, setForcaSenha] = useState("");
-  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -40,9 +39,7 @@ export default function Cadastro() {
     }
 
     setErro(false);
-  // Simula cadastro bem-sucedido e navega para a landing
-  console.log("Cadastro enviado!");
-  navigate('/landing', { replace: true });
+    console.log("Cadastro enviado!");
   };
 
   useEffect(() => {
@@ -53,10 +50,8 @@ export default function Cadastro() {
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center relative overflow-hidden dark:bg-black">
-      {/* Onda de fundo */}
-      <div className="absolute top-10 left-0 w-full h-auto z-0 wave-container">
-        <img src={onda} alt="Onda" className="w-full h-full object-cover wave-fill wave-animate" />
-      </div>
+  
+      <img src={onda} alt="Onda" className="absolute top-10 left-0 w-full h-auto z-0" />
 
       <>
         {/* Logo clara */}
@@ -75,21 +70,28 @@ export default function Cadastro() {
 
       {/* Card branco */}
       <div className="bg-white bg-opacity-90 rounded-lg shadow-lg px-6 py-8 w-full max-w-sm z-10">
-        <h2 className="text-xl font-semibold text-center mb-5 leading-tight text-black">
-          Bem-Vindo(a) ao <br /> <span className="text-[#000]">EspaçoSenai!</span>
+        <h2 className="text-xl font-medium text-center mb-5 leading-tight text-black">
+          Bem-Vindo(a) ao <br /> <span className="text-[#000] font-medium">EspaçoSenai!</span>
         </h2>
 
         <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
           <input
             type="text"
             placeholder="Nome"
-            className="p-2 rounded-md shadow-sm border bg-white placeholder-black text-black focus:outline-none"
+            className="p-2 rounded-md shadow-sm border bg-white placeholder-black text-black focus:outline-none placeholder-[#898787]"
             required
           />
           <input
+            type="text"
+            placeholder="Apelido"
+            className="p-2 rounded-md shadow-sm border bg-white placeholder-black text-black focus:outline-none placeholder-[#898787]"
+            required
+          />
+          
+          <input
             type="email"
             placeholder="Email"
-            className="p-2 rounded-md shadow-sm border bg-white placeholder-black text-black focus:outline-none"
+            className="p-2 rounded-md shadow-sm border bg-white placeholder-black text-black focus:outline-none placeholder-[#898787]"
             required
           />
 
@@ -101,7 +103,7 @@ export default function Cadastro() {
             const somenteNumeros = e.target.value.replace(/\D/g, "");
             e.target.value = somenteNumeros;
             }}
-            className="p-2 rounded-md shadow-sm border bg-white placeholder-black text-black focus:outline-none"
+            className="p-2 rounded-md shadow-sm border bg-white placeholder-black text-black focus:outline-none placeholder-[#898787]"
             required
             />
 
@@ -115,7 +117,7 @@ export default function Cadastro() {
                 setSenha(e.target.value);
                 setForcaSenha(getForcaSenha(e.target.value));
               }}
-              className={`p-2 rounded-md shadow-sm w-full pr-10 text-black bg-white placeholder-black focus:outline-none border ${erro ? "border-red-500" : "border-gray-300"}`}
+              className={`p-2 rounded-md shadow-sm w-full pr-10 text-black bg-white placeholder-[#898787] focus:outline-none border ${erro ? "border-red-500" : "border-gray-300"}`}
               required
             />
             <span
@@ -183,7 +185,7 @@ export default function Cadastro() {
               placeholder="Confirmar senha"
               value={confirmarSenha}
               onChange={(e) => setConfirmarSenha(e.target.value)}
-              className={`p-2 rounded-md shadow-sm w-full pr-10 text-black bg-white placeholder-black focus:outline-none border ${erro ? "border-red-500" : "border-gray-300"}`}
+              className={`p-2 rounded-md shadow-sm w-full pr-10 text-black bg-white placeholder-[#898787] focus:outline-none border ${erro ? "border-red-500" : "border-gray-300"}`}
               required
             />
             <span
@@ -203,11 +205,11 @@ export default function Cadastro() {
             )}
           </div>
 
-          <div className="text-sm text-black mt-1">
+          <div className="text-xs text-black mt-1">
             Já tem uma conta?{" "}
-            <a href="/login" className="text-blue underline">
+            <Link to="/login" className="text-blue underline">
               Entre aqui
-            </a>
+            </Link>
           </div>
 
           <button

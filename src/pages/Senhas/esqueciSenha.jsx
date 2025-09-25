@@ -146,8 +146,8 @@ export function EsqueciSenha({ buttonWidth = 180, buttonHeight = 36 } = {}) {
             <button
               type="submit"
               style={{
-                width: '40%',
-                height: '33px',
+                width: `${buttonWidth}px`,
+                height: `${buttonHeight}px`,
                 color: '#fff',
                 padding: '7px 0',
                 borderRadius: 6,

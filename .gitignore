@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Workspace copies
+EspacoSenai.FrontWeb-Lucas/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
