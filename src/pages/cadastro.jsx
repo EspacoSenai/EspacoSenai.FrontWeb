@@ -5,7 +5,6 @@ import onda from "../assets/ondaCadastro.svg";
 import olhoAberto from "../assets/olhoFechado.svg";
 import olhoFechado from "../assets/olhoAberto.svg";
 
-// Função para verificar força da senha
 const getForcaSenha = (senha) => {
   if (!senha) return "";
 
@@ -46,11 +45,10 @@ export default function Cadastro() {
     if (senha === confirmarSenha && erro) {
       setErro(false);
     }
-  }, [senha, confirmarSenha]);
+  }, [senha, confirmarSenha, erro]);
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center relative overflow-hidden dark:bg-black">
-  
       <img src={onda} alt="Onda" className="absolute top-10 left-0 w-full h-auto z-0" />
 
       <>
@@ -58,13 +56,13 @@ export default function Cadastro() {
         <img
           src={logo}
           alt="Logo EspaçoSenai"
-          className="absolute top-6 left-6 w-24 z-10 block dark:hidden"
+          className="absolute top-6 right-6 lg:right-auto lg:left-6 w-24 z-10 block dark:hidden"
         />
         {/* Logo escura */}
         <img
           src="src/assets/logodark.svg"
           alt="Logo EspaçoSenai Dark"
-          className="absolute top-6 left-6 w-24 z-10 hidden dark:block"
+          className="absolute top-6 right-6 lg:right-auto lg:left-6 w-24 z-10 hidden dark:block"
         />
       </>
 
@@ -87,25 +85,23 @@ export default function Cadastro() {
             className="p-2 rounded-md shadow-sm border bg-white placeholder-black text-black focus:outline-none placeholder-[#898787]"
             required
           />
-          
           <input
             type="email"
             placeholder="Email"
             className="p-2 rounded-md shadow-sm border bg-white placeholder-black text-black focus:outline-none placeholder-[#898787]"
             required
           />
-
           <input
             type="tel"
             placeholder="Telefone"
             maxLength={11}
             onChange={(e) => {
-            const somenteNumeros = e.target.value.replace(/\D/g, "");
-            e.target.value = somenteNumeros;
+              const somenteNumeros = e.target.value.replace(/\D/g, "");
+              e.target.value = somenteNumeros;
             }}
             className="p-2 rounded-md shadow-sm border bg-white placeholder-black text-black focus:outline-none placeholder-[#898787]"
             required
-            />
+          />
 
           {/* Campo Senha */}
           <div className="relative">
@@ -117,7 +113,9 @@ export default function Cadastro() {
                 setSenha(e.target.value);
                 setForcaSenha(getForcaSenha(e.target.value));
               }}
-              className={`p-2 rounded-md shadow-sm w-full pr-10 text-black bg-white placeholder-[#898787] focus:outline-none border ${erro ? "border-red-500" : "border-gray-300"}`}
+              className={`p-2 rounded-md shadow-sm w-full pr-10 text-black bg-white placeholder-[#898787] focus:outline-none border ${
+                erro ? "border-red-500" : "border-gray-300"
+              }`}
               required
             />
             <span
@@ -185,7 +183,9 @@ export default function Cadastro() {
               placeholder="Confirmar senha"
               value={confirmarSenha}
               onChange={(e) => setConfirmarSenha(e.target.value)}
-              className={`p-2 rounded-md shadow-sm w-full pr-10 text-black bg-white placeholder-[#898787] focus:outline-none border ${erro ? "border-red-500" : "border-gray-300"}`}
+              className={`p-2 rounded-md shadow-sm w-full pr-10 text-black bg-white placeholder-[#898787] focus:outline-none border ${
+                erro ? "border-red-500" : "border-gray-300"
+              }`}
               required
             />
             <span
@@ -199,9 +199,7 @@ export default function Cadastro() {
               />
             </span>
             {erro && (
-              <p className="text-red-600 text-sm mt-1">
-                As senhas não coincidem.
-              </p>
+              <p className="text-red-600 text-sm mt-1">As senhas não coincidem.</p>
             )}
           </div>
 

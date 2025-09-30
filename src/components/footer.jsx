@@ -3,34 +3,33 @@ import React from "react";
 export default function Footer() {
   return (
     <>
-      {/* Cartão superior (logo + links) — agora aparece em todas as telas */}
-      <div className="relative z-30 w-full flex justify-center -mt-10 md:-mt-16">
-        <div className="bg-[#757575] dark:bg-white w-[92%] max-w-[700px] h-16 rounded-md mx-auto -mb-8
-                        flex items-center justify-center px-6 text-center shadow-md gap-6">
+      <div className="relative z-10 w-full flex justify-center -mt-10 md:-mt-16">
+        
+        <div className="bg-[#757575] w-[92%] max-w-[700px] py-2 rounded-md mx-auto -mb-8
+                       flex items-center justify-center px-4 sm:px-6 text-center shadow-md gap-3 sm:gap-4">
           <a
             href="#"
-            className="text-white dark:text-black text-xs hover:underline whitespace-nowrap"
+            className="text-white text-xs hover:underline"
           >
             POLÍTICA DE PRIVACIDADE
           </a>
 
           <img
-            src="src/assets/EspacoSenai.svg"
+            src="src/assets/esquilo.svg"
             alt="Logo EspaçoSenai"
-            className="w-[80px] h-auto select-none"
+            className="w-10 sm:w-12 h-auto select-none"
           />
 
           <a
             href="#"
-            className="text-white dark:text-black text-xs hover:underline whitespace-nowrap"
+            className="text-white text-xs hover:underline"
           >
             TERMOS DE USO
           </a>
         </div>
       </div>
 
-      {/* Rodapé principal */}
-      <footer className="relative z-20 bg-black text-white pt-24 md:pt-32 lg:pt-28 overflow-hidden">
+      <footer className="relative bg-black text-white pt-24 md:pt-32 lg:pt-28 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8 text-sm text-center md:text-left">
           {/* INFORMAÇÕES */}
           <div>
