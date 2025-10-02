@@ -2,11 +2,36 @@ export const COR_VERMELHO = "#AE0000";
 export const TAMANHO_CODIGO = 5;
 export const MAX_CONVIDADOS = 9;
 
-export const HORARIOS_INICIO_QUADRA = ["11:50","13:30","14:30","15:30","16:00","16:50"];
-export const HORARIOS_TERMINO_QUADRA = ["14:50","13:00","16:00","16:30","17:00","17:30"];
 
-export const HORARIOS_INICIO_COMPUTADOR = ["08:50","09:30","10:00","11:30","14:00","14:45"];
+export const HORARIOS_INICIO_QUADRA = [
+  "11:50",
+  "13:30",
+  "14:30",
+  "15:30",
+  "16:00",
+  "16:50",
+];
+export const HORARIOS_TERMINO_QUADRA = [
+  "14:50",
+  "13:00",
+  "16:00",
+  "16:30",
+  "17:00",
+  "17:30",
+];
+
+export const HORARIOS_INICIO_COMPUTADOR = [
+  "08:50",
+  "09:30",
+  "10:00",
+  "11:30",
+  "14:00",
+  "14:45",
+];
+
 export const HORARIO_TERMINO_COMPUTADOR_FIXO = "21:00";
+
+export const HORARIOS_TERMINO_COMPUTADOR = [HORARIO_TERMINO_COMPUTADOR_FIXO];
 
 export function juntarClasses(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -26,7 +51,9 @@ export function montarDiasSemana(semanaAdiante = 0) {
   segunda.setDate(segunda.getDate() + semanaAdiante * 7);
   const hoje = new Date();
   hoje.setHours(0, 0, 0, 0);
-  const diasSemana = ["S","T","Q","Q","S","S"];
+
+  const diasSemana = ["S", "T", "Q", "Q", "S", "S"];
+
   return [...Array(6)].map((_, i) => {
     const d = new Date(segunda);
     d.setDate(segunda.getDate() + i);

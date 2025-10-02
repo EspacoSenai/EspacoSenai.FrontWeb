@@ -5,7 +5,7 @@ export default function TrocaSemana({ value, onChange }) {
   const ativo = "bg-[#AE0000] text-white";
   const inativo = "bg-[#F6F6F6] text-gray-700 hover:bg-[#AE0000] hover:text-white";
 
-  // setas do teclado (↑/← = essa, ↓/→ = próxima)
+  
   const handleKeyDown = (e) => {
     if (e.key === "ArrowLeft" || e.key === "ArrowUp") onChange("essa");
     if (e.key === "ArrowRight" || e.key === "ArrowDown") onChange("proxima");

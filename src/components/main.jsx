@@ -7,7 +7,7 @@ export default function Main() {
       <img
         src="src/assets/ondaLandinpage.svg"
         alt="Onda landingpage"
-        className="w-full h-auto object-cover"
+        className="w-full h-auto object-cover"  
       />
 
       <section

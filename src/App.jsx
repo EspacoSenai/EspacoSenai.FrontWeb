@@ -1,5 +1,7 @@
 import React, { useEffect, useLayoutEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+
 import LandingPage from "./pages/landingPage";
 import Onboarding from "./pages/onboarding";
 import Cadastro from "./pages/cadastro";
@@ -12,6 +14,8 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 
 export default function App() {
+  const location = useLocation();
+
   useLayoutEffect(() => {
     try {
       const salvo = localStorage.getItem("theme") || "light";
@@ -25,14 +29,79 @@ export default function App() {
   }, []);
 
   return (
-    <Routes>
-      <Route path="/" element={<Index />} />
-      <Route path="/onboarding" element={<Onboarding />} />
-      <Route path="/landing" element={<LandingPage />} />
-      <Route path="/cadastro" element={<Cadastro />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/agendamento-quadra" element={<AgendamentoQuadra />} />
-      <Route path="/agendamento-computadores" element={<AgendamentoComputadores />} />
-    </Routes>
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route
+          path="/"
+          element={
+            <PageTransition>
+              <Index />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="/onboarding"
+          element={
+            <PageTransition>
+              <Onboarding />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="/landing"
+          element={
+            <PageTransition>
+              <LandingPage />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="/cadastro"
+          element={
+            <PageTransition>
+              <Cadastro />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <PageTransition>
+              <Login />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="/agendamento-quadra"
+          element={
+            <PageTransition>
+              <AgendamentoQuadra />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="/agendamento-computadores"
+          element={
+            <PageTransition>
+              <AgendamentoComputadores />
+            </PageTransition>
+          }
+        />
+      </Routes>
+    </AnimatePresence>
+  );
+}
+
+function PageTransition({ children }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.4, ease: "easeInOut" }}
+      className="h-full"
+    >
+      {children}
+    </motion.div>
   );
 }

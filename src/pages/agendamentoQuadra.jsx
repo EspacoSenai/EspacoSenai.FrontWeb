@@ -23,6 +23,11 @@ export default function AgendamentoQuadra() {
   const [diaSelecionado, setDiaSelecionado] = useState(0);
   const [horaInicio, setHoraInicio] = useState(null);
   const [horaTermino, setHoraTermino] = useState(null);
+
+  // ✅ filtros de pesquisa para os dois inputs
+  const [horaInicioFiltro, setHoraInicioFiltro] = useState("");
+  const [horaTerminoFiltro, setHoraTerminoFiltro] = useState("");
+
   const [convidados, setConvidados] = useState([Array(TAMANHO_CODIGO).fill("")]);
 
   // Modal
@@ -98,6 +103,8 @@ export default function AgendamentoQuadra() {
     setDiaSelecionado(0);
     setHoraInicio(null);
     setHoraTermino(null);
+    setHoraInicioFiltro("");
+    setHoraTerminoFiltro("");
     setConvidados([Array(TAMANHO_CODIGO).fill("")]);
   }
 
@@ -154,19 +161,28 @@ export default function AgendamentoQuadra() {
 
         {/* Conteúdo */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Horário de início COM pesquisa */}
           <GradeHorarios
             titulo="Horário de início:"
             opcoes={HORARIOS_INICIO_QUADRA}
             selecionado={horaInicio}
             onSelect={setHoraInicio}
             isDisabled={(t) => isHoje && timeToMin(t) <= nowMinutes}
+            comFiltro={true}
+            filtro={horaInicioFiltro}
+            onFiltroChange={setHoraInicioFiltro}
           />
+
+          {/* Horário de término COM pesquisa */}
           <GradeHorarios
             titulo="Horário de término:"
             opcoes={HORARIOS_TERMINO_QUADRA}
             selecionado={horaTermino}
             onSelect={setHoraTermino}
             isDisabled={(t) => isHoje && timeToMin(t) <= nowMinutes}
+            comFiltro={true}
+            filtro={horaTerminoFiltro}
+            onFiltroChange={setHoraTerminoFiltro}
           />
 
           <div className="md:col-span-2">
