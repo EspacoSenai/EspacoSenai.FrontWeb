@@ -1,12 +1,9 @@
 import React, { useEffect, useLayoutEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 
 import Index from './navigation/index';
 
-import LegacyLandingPage from './pages/PageIniciais/landingPage.jsx';
-import LegacyOnboarding from './pages/PageIniciais/onboarding.jsx';
-import CadastroLegacy from './pages/Autenticação/cadastro.jsx';
-import LoginLegacy from './pages/Autenticação/login.jsx';
 import EditarPerfil from './pages/Perfis/editarperfil.jsx';
 import Avatares from './pages/Perfis/avatares.jsx';
 import SemNotificacao from './pages/Notificações/semnotificação.jsx';
@@ -16,17 +13,19 @@ import SelecaoPerfil from './pages/Autenticação/selecaoPerfil.jsx';
 import EsqueciSenha from './pages/Senhas/esqueciSenha.jsx';
 import CodigoDeRec from './pages/Senhas/códigoderec.jsx';
 
-import LandingPage from './pages/landingPage.jsx';
-import Onboarding from './pages/onboarding.jsx';
-import Cadastro from './pages/cadastro.jsx';
-import Login from './pages/login.jsx';
-import AgendamentoQuadra from './pages/agendamentoQuadra.jsx';
-import AgendamentoComputadores from './pages/AgendamentoComputadores.jsx';
+import LandingPage from './pages/PageIniciais/landingPage.jsx';
+import Onboarding from './pages/PageIniciais/onboarding.jsx';
+import Cadastro from './pages/Autenticação/cadastro.jsx';
+import Login from './pages/Autenticação/login.jsx';
+import AgendamentoQuadra from './pages/Agendamento/agendamentoQuadra.jsx';
+import AgendamentoComputadores from './pages/Agendamento/AgendamentoComputadores.jsx';
 
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
 export default function App() {
+  const location = useLocation();
+
   useLayoutEffect(() => {
     try {
       const salvo = localStorage.getItem('theme') || 'light';
@@ -45,29 +44,38 @@ export default function App() {
   }, []);
 
   return (
-    <Routes>
-      <Route path="/" element={<Index />} />
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<PageTransition><Index /></PageTransition>} />
+        <Route path="/onboarding" element={<PageTransition><Onboarding /></PageTransition>} />
+        <Route path="/landing" element={<PageTransition><LandingPage /></PageTransition>} />
+        <Route path="/cadastro" element={<PageTransition><Cadastro /></PageTransition>} />
+        <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
+        <Route path="/agendamento-quadra" element={<PageTransition><AgendamentoQuadra /></PageTransition>} />
+        <Route path="/agendamento-computadores" element={<PageTransition><AgendamentoComputadores /></PageTransition>} />
+        <Route path="/esqueci-senha" element={<PageTransition><EsqueciSenha /></PageTransition>} />
+        <Route path="/selecao-perfil" element={<PageTransition><SelecaoPerfil /></PageTransition>} />
+        <Route path="/códigoderec" element={<PageTransition><CodigoDeRec /></PageTransition>} />
+        <Route path="/novasenha" element={<PageTransition><NovaSenha /></PageTransition>} />
+        <Route path="/semnotificacao" element={<PageTransition><SemNotificacao /></PageTransition>} />
+        <Route path="/notificacoes" element={<PageTransition><Notificacoes /></PageTransition>} />
+        <Route path="/editarperfil" element={<PageTransition><EditarPerfil /></PageTransition>} />
+        <Route path="/avatares" element={<PageTransition><Avatares /></PageTransition>} />
+      </Routes>
+    </AnimatePresence>
+  );
+}
 
-      <Route path="/onboarding" element={<Onboarding />} />
-      <Route path="/landing" element={<LandingPage />} />
-      <Route path="/cadastro" element={<Cadastro />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/agendamento-quadra" element={<AgendamentoQuadra />} />
-      <Route path="/agendamento-computadores" element={<AgendamentoComputadores />} />
-
-      <Route path="/onboarding-legacy" element={<LegacyOnboarding />} />
-      <Route path="/landing-legacy" element={<LegacyLandingPage />} />
-      <Route path="/cadastro-legacy" element={<CadastroLegacy />} />
-      <Route path="/login-legacy" element={<LoginLegacy />} />
-
-      <Route path="/esqueci-senha" element={<EsqueciSenha />} />
-      <Route path="/selecao-perfil" element={<SelecaoPerfil />} />
-      <Route path="/códigoderec" element={<CodigoDeRec />} />
-      <Route path="/novasenha" element={<NovaSenha />} />
-      <Route path="/semnotificacao" element={<SemNotificacao />} />
-      <Route path="/notificacoes" element={<Notificacoes />} />
-      <Route path="/editarperfil" element={<EditarPerfil />} />
-      <Route path="/avatares" element={<Avatares />} />
-    </Routes>
+function PageTransition({ children }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.4, ease: 'easeInOut' }}
+      className="h-full"
+    >
+      {children}
+    </motion.div>
   );
 }
