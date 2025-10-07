@@ -5,35 +5,32 @@ import sucessoIcon from "../../assets/sucesso.svg";
 import TrocaSemana from "../../components/ComponentsDeAgendamento/TrocaSemana";
 import SeletorDia from "../../components/ComponentsDeAgendamento/SeletorDia";
 import GradeHorarios from "../../components/ComponentsDeAgendamento/GradeHorarios";
-import SeletorComputadores from "../../components/ComponentsDeAgendamento/SeletorComputadores";
+import CodigoConvidados from "../../components/ComponentsDeAgendamento/CodigoConvidados";
 import ModalDeAgendamento from "../../components/ComponentsDeAgendamento/ModalDeAgendamento";
 
 import {
   COR_VERMELHO,
-  HORARIOS_INICIO_COMPUTADOR,
-  HORARIOS_TERMINO_COMPUTADOR,
-  HORARIO_TERMINO_COMPUTADOR_FIXO, // <-- importado p/ usar no texto
+  TAMANHO_CODIGO,
+  MAX_CONVIDADOS,
+  HORARIOS_INICIO_PS5,
+  HORARIOS_TERMINO_PS5,
   montarDiasSemana,
   validaIntervalo,
 } from "../../components/ComponentsDeAgendamento/FuncoesCompartilhada";
 
-export default function AgendamentoComputadores() {
+export default function AgendamentoPS5() {
   const [semanaSelecionada, setSemanaSelecionada] = useState("essa");
   const [diaSelecionado, setDiaSelecionado] = useState(0);
   const [horaInicio, setHoraInicio] = useState(null);
   const [horaTermino, setHoraTermino] = useState(null);
 
   const [horaInicioFiltro, setHoraInicioFiltro] = useState("");
+  const [horaTerminoFiltro, setHoraTerminoFiltro] = useState("");
 
-  const [computadorSelecionado, setComputadorSelecionado] = useState(null);
+  const [convidados, setConvidados] = useState([Array(TAMANHO_CODIGO).fill("")]);
 
   // Modal
-  const [modal, setModal] = useState({
-    aberto: false,
-    tipo: "success",
-    titulo: "",
-    mensagem: "",
-  });
+  const [modal, setModal] = useState({ aberto: false, tipo: "success", titulo: "", mensagem: "" });
   const modalBtnRef = useRef(null);
 
   const diasDaSemana = useMemo(
@@ -53,6 +50,7 @@ export default function AgendamentoComputadores() {
     }, 30_000);
     return () => clearInterval(id);
   }, []);
+
   const isHoje = useMemo(() => {
     const dia = diasDaSemana[diaSelecionado]?.dataCompleta;
     if (!dia) return false;
@@ -63,8 +61,9 @@ export default function AgendamentoComputadores() {
       dia.getDate() === n.getDate()
     );
   }, [diasDaSemana, diaSelecionado]);
+
   const timeToMin = (s) => {
-    const [h, m] = s.split(":").map(Number);
+    const [h, m] = String(s || "").split(":").map(Number);
     return h * 60 + m;
   };
 
@@ -106,83 +105,67 @@ export default function AgendamentoComputadores() {
     setHoraInicio(null);
     setHoraTermino(null);
     setHoraInicioFiltro("");
-    setComputadorSelecionado(null);
+    setHoraTerminoFiltro("");
+    setConvidados([Array(TAMANHO_CODIGO).fill("")]);
   }
 
   function confirmar() {
-    if (!horaInicio || !horaTermino || !computadorSelecionado) {
-      abrirModal(
-        "error",
-        "Dados incompletos",
-        "Escolha os horários e um computador para continuar."
-      );
+    if (!horaInicio || !horaTermino) {
+      abrirModal("error", "Selecione os horários", "Escolha o horário de início e o de término para continuar.");
       return;
     }
     const dia = diasDaSemana[diaSelecionado];
     if (!dia || dia.desabilitado) {
-      abrirModal("error", "Data inválida", "Selecione uma data válida.");
+      abrirModal("error", "Data inválida", "Selecione uma data válida para agendar.");
       return;
     }
     if (!validaIntervalo(horaInicio, horaTermino)) {
-      abrirModal(
-        "error",
-        "Horários inconsistentes",
-        "O término precisa ser depois do início."
-      );
+      abrirModal("error", "Horários inconsistentes", "O término precisa ser depois do início.");
       return;
     }
 
+    const codigosConvidados = convidados.map((arr) => arr.join(""));
     const dados = {
-      local: "Computadores",
+      local: "PS5",
       semana: semanaSelecionada === "essa" ? "Essa semana" : "Próxima semana",
       data: dia.dataCompleta.toISOString(),
       inicio: horaInicio,
       termino: horaTermino,
-      computador: computadorSelecionado,
+      codigosConvidados,
+      qtdeConvidados: convidados.length,
     };
     console.log("Agendamento:", dados);
 
-    abrirModal(
-      "success",
-      "Reserva realizada com sucesso!",
-      "Sua solicitação foi enviada e está aguardando aprovação."
-    );
+    abrirModal("success", "Reserva realizada com sucesso!", "Sua solicitação foi enviada e está aguardando aprovação.");
   }
 
   return (
     <div className="w-full min-h-screen bg-white dark:bg-[#0B0B0B] flex justify-center">
       <div className="w-full max-w-5xl px-4 md:px-8 py-8">
         {/* Cabeçalho */}
-        <div
-          className="w-full rounded-md text-white px-6 py-5 mb-6 text-center"
-          style={{ backgroundColor: COR_VERMELHO }}
-        >
+        <div className="w-full rounded-md text-white px-6 py-5 mb-6 text-center" style={{ backgroundColor: COR_VERMELHO }}>
           <h1 className="text-xl md:text-2xl font-regular font-sans">
             Agendamento <span className="opacity-70">–</span>{" "}
-            <span className="font-medium font-sans">Computadores</span>
+            <span className="font-medium font-sans">PS5</span>
           </h1>
         </div>
 
         {/* Seleção semana e data */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start mb-6">
           <TrocaSemana value={semanaSelecionada} onChange={setSemanaSelecionada} />
-          <div className="hidden md:block " />
+          <div className="hidden md:block" />
           <div className="flex md:justify-end items-center gap-2 text-black dark:text-white">
             <span className="font-medium mr-1">Data:</span>
-            <SeletorDia
-              dias={diasDaSemana}
-              selectedIndex={diaSelecionado}
-              onSelect={setDiaSelecionado}
-            />
+            <SeletorDia dias={diasDaSemana} selectedIndex={diaSelecionado} onSelect={setDiaSelecionado} />
           </div>
         </div>
 
         {/* Conteúdo */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Início */}
+          {/* Horário de início COM pesquisa */}
           <GradeHorarios
             titulo="Horário de início:"
-            opcoes={HORARIOS_INICIO_COMPUTADOR}
+            opcoes={HORARIOS_INICIO_PS5}
             selecionado={horaInicio}
             onSelect={setHoraInicio}
             isDisabled={(t) => isHoje && timeToMin(t) <= nowMinutes}
@@ -191,40 +174,27 @@ export default function AgendamentoComputadores() {
             onFiltroChange={setHoraInicioFiltro}
           />
 
-          {/* Término */}
-          <div>
-            <h2 className="text-lg font-medium text-black dark:text-white mb-1">
-              Horário de término:
-            </h2>
-
-            <GradeHorarios
-              titulo=""
-              opcoes={HORARIOS_TERMINO_COMPUTADOR}
-              selecionado={horaTermino}
-              onSelect={setHoraTermino}
-              isDisabled={(t) => isHoje && timeToMin(t) <= nowMinutes}
-              comFiltro={false}
-            />
-          </div>
-        </div>
-
-        {/* Seletor de computadores */}
-        <div className="mt-6">
-          <SeletorComputadores
-            valor={computadorSelecionado}
-            onChange={setComputadorSelecionado}
+          {/* Horário de término COM pesquisa */}
+          <GradeHorarios
+            titulo="Horário de término:"
+            opcoes={HORARIOS_TERMINO_PS5}
+            selecionado={horaTermino}
+            onSelect={setHoraTermino}
+            isDisabled={(t) => isHoje && timeToMin(t) <= nowMinutes}
+            comFiltro={true}
+            filtro={horaTerminoFiltro}
+            onFiltroChange={setHoraTerminoFiltro}
           />
 
-          {/* OBS abaixo do seletor */}
-          <p className="mt-3 text-sm leading-5">
-            <span className="font-semibold" style={{ color: COR_VERMELHO }}>
-              OBS:
-            </span>{" "}
-            <span className="text-[#1E1E1E] dark:text-gray-200">
-              Informe apenas o horário de início. Todos devem desocupar os computadores
-              até, no máximo, às {HORARIO_TERMINO_COMPUTADOR_FIXO}.
-            </span>
-          </p>
+          <div className="md:col-span-2">
+            <CodigoConvidados
+              convidados={convidados}
+              setConvidados={setConvidados}
+              tamanhoCodigo={TAMANHO_CODIGO}
+              maxConvidados={MAX_CONVIDADOS}
+              onAviso={abrirModal}
+            />
+          </div>
         </div>
 
         {/* Botões */}

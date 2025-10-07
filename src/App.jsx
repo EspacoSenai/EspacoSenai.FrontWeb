@@ -19,6 +19,8 @@ import Cadastro from './pages/Autenticação/cadastro.jsx';
 import Login from './pages/Autenticação/login.jsx';
 import AgendamentoQuadra from './pages/Agendamento/agendamentoQuadra.jsx';
 import AgendamentoComputadores from './pages/Agendamento/AgendamentoComputadores.jsx';
+import AgendamentoPS5 from './pages/Agendamento/AgendamentoPS5.jsx';
+import HomeAlunos from './pages/PaginaDosAlunos/HomeAlunos.jsx'; 
 
 import AOS from 'aos';
 import 'aos/dist/aos.css';
@@ -47,12 +49,14 @@ export default function App() {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<PageTransition><Index /></PageTransition>} />
+        <Route path="/HomeAlunos" element={<PageTransition><HomeAlunos /></PageTransition>} /> {/* NOVO */}
         <Route path="/onboarding" element={<PageTransition><Onboarding /></PageTransition>} />
         <Route path="/landing" element={<PageTransition><LandingPage /></PageTransition>} />
         <Route path="/cadastro" element={<PageTransition><Cadastro /></PageTransition>} />
         <Route path="/login" element={<PageTransition><Login /></PageTransition>} />
         <Route path="/agendamento-quadra" element={<PageTransition><AgendamentoQuadra /></PageTransition>} />
         <Route path="/agendamento-computadores" element={<PageTransition><AgendamentoComputadores /></PageTransition>} />
+        <Route path="/agendamento-ps5" element={<PageTransition><AgendamentoPS5 /></PageTransition>} />
         <Route path="/esqueci-senha" element={<PageTransition><EsqueciSenha /></PageTransition>} />
         <Route path="/selecao-perfil" element={<PageTransition><SelecaoPerfil /></PageTransition>} />
         <Route path="/códigoderec" element={<PageTransition><CodigoDeRec /></PageTransition>} />
