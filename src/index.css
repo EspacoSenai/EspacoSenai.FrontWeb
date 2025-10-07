@@ -1,0 +1,187 @@
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  min-height: 100vh;
+  min-width: 100vw;
+  background: #fff;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: white;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.dark body {
+  background-color: #0B0B0B;
+  color: white;
+}
+
+input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+  box-shadow: 0 0 0px 1000px white inset !important;
+  -webkit-text-fill-color: #000 !important;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+
+button:hover {
+  border-color: #646cff;
+}
+
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+
+  a:hover {
+    color: #747bff;
+  }
+
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+/*animação das ondas */
+@keyframes waveFloat {
+  0% { transform: translateY(0) translateX(0) scale(1.02); }
+  50% { transform: translateY(-6px) translateX(4px) scale(1.02); }
+  100% { transform: translateY(0) translateX(0) scale(1.02); }
+}
+
+/*  waves */
+@keyframes waveParallax {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-6%); }
+}
+
+/* onboarding waves */
+.wave-animate {
+  animation: waveFloat 5s ease-in-out infinite;
+  will-change: transform;
+  display: block;
+}
+
+.wave-parallax {
+  animation: waveParallax 20s linear infinite;
+  will-change: transform;
+}
+
+/* garante que a imagem cubra totalmente seu contêiner mesmo durante animações */
+.wave-fill {
+  width: 110%;
+  height: auto;
+  min-height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transform-origin: center;
+  display: block;
+}
+
+/* container helper para garantir overflow hidden quando necessário */
+.wave-container {
+  overflow: hidden;
+}
+
+/* Scrollbar */
+.thin-scroll::-webkit-scrollbar {
+  width: 6px;  
+}
+.thin-scroll {
+  scrollbar-gutter: stable both-edges; 
+}
+.thin-scroll::-webkit-scrollbar-track {
+  background: #ffffff;  
+  border-radius: 9999px; 
+  margin: 12px 0 2px 0; 
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.03); 
+  background-clip: padding-box;
+}
+.thin-scroll::-webkit-scrollbar-thumb {
+  background: #9d0c0c;  
+  border-radius: 9999px;  
+  border: 2px solid #ffffff;  
+}
+.thin-scroll::-webkit-scrollbar-thumb:hover {
+  background: #b80f0f;
+}
+
+
+.thin-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #9d0c0c #ffffff; 
+}
+
+/* OBS note*/
+.obs-note {
+  margin-top: 3.5rem; 
+  text-align: left;
+  max-width: 720px;
+  margin-left: 0;  
+  margin-right: auto;
+  color: #000000; 
+  font-size: 0.875rem;
+}
+.obs-note .label {
+  color: #c53030; /* vermelho */
+  font-weight: 700;
+  margin-right: 0.5rem;
+}
