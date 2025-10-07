@@ -55,7 +55,7 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/agendamento-quadra" element={<AgendamentoQuadra />} />
       <Route path="/agendamento-computadores" element={<AgendamentoComputadores />} />
-  <Route path="/agendamento-impressora" element={<AgendamentoImpressora />} />
+      <Route path="/agendamento-impressora" element={<AgendamentoImpressora />} />
 
       <Route path="/onboarding-legacy" element={<LegacyOnboarding />} />
       <Route path="/landing-legacy" element={<LegacyLandingPage />} />
