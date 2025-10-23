@@ -19,7 +19,7 @@ import CodigoDeRec from './pages/Senhas/códigoderec.jsx';
 import LandingPage from './pages/landingPage.jsx';
 import Onboarding from './pages/onboarding.jsx';
 import Cadastro from './pages/cadastro.jsx';
-import Login from './pages/login.jsx';
+import Login from './pages/Autenticação/login.jsx';
 import AgendamentoQuadra from './pages/agendamentoQuadra.jsx';
 import AgendamentoComputadores from './pages/AgendamentoComputadores.jsx';
 import AgendamentoImpressora from './pages/agendamentoImpressora.jsx';

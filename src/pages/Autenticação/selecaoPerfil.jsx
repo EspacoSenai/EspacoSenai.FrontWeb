@@ -78,7 +78,7 @@ const SelecaoPerfil = () => {
             }}
             onClick={irParaLogin}
           >
-            <div className="absolute inset-0 bg-[#AE0000] opacity-0 group-hover:opacity-10 transition-opacity duration-200"></div>
+            <div className="absolute inset-0 bg-[#AE0000] opacity-0 group-hover:opacity-80 transition-opacity duration-200"></div>
             <span className="relative z-10">Estudantes</span>
             <img src={setaImg} alt="Seta" className="ml-2 w-6 h-6 relative z-10" />
           </button>
@@ -104,7 +104,7 @@ const SelecaoPerfil = () => {
             }}
             onClick={irParaLogin}
           >
-            <div className="absolute inset-0 bg-[#AE0000] opacity-0 group-hover:opacity-10 transition-opacity duration-200"></div>
+            <div className="absolute inset-0 bg-[#AE0000] opacity-0 group-hover:opacity-80 transition-opacity duration-200"></div>
             <span className="relative z-10">Professores</span>
             <img src={setaImg} alt="Seta" className="ml-2 w-6 h-6 relative z-10" />
           </button>
@@ -130,7 +130,7 @@ const SelecaoPerfil = () => {
             }}
             onClick={irParaLogin}
           >
-            <div className="absolute inset-0 bg-[#AE0000] opacity-0 group-hover:opacity-10 transition-opacity duration-200"></div>
+            <div className="absolute inset-0 bg-[#AE0000] opacity-0 group-hover:opacity-80 transition-opacity duration-200"></div>
             <span className="relative z-10">Coordenadores</span>
             <img src={setaImg} alt="Seta" className="ml-2 w-6 h-6 relative z-10" />
           </button>
@@ -156,7 +156,7 @@ const SelecaoPerfil = () => {
             }}
             onClick={irParaLogin}
           >
-            <div className="absolute inset-0 bg-[#AE0000] opacity-0 group-hover:opacity-10 transition-opacity duration-200"></div>
+            <div className="absolute inset-0 bg-[#AE0000] opacity-0 group-hover:opacity-80 transition-opacity duration-200"></div>
             <span className="relative z-10">Administradores</span>
             <img src={setaImg} alt="Seta" className="ml-2 w-6 h-6 relative z-10" />
           </button>
