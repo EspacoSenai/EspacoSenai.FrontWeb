@@ -2,52 +2,59 @@ name: Azure Static Web Apps CI/CD
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
     types: [opened, synchronize, reopened, closed]
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   build_and_deploy_job:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
-    name: Build and Deploy Job
+    name: Build, Test and Deploy
+    timeout-minutes: 20
+    
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: true
           lfs: false
 
-      # 🔹 Configura Node.js 20
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
-      # 🔹 Instala dependências
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
       - name: Install dependencies
         run: npm ci
 
-      # 🔹 Faz o build do projeto Vite
+      - name: Run linter
+        run: npm run lint
+
+      - name: Run tests
+        run: npm test
+
       - name: Build project
         run: npm run build
 
-      # 🔹 Faz o deploy para Azure Static Web Apps
-      - name: Build And Deploy
-        id: builddeploy
+      - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_YELLOW_PEBBLE_0B05B320F }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
-          app_location: "/" # Pasta onde está o código do app (raiz)
-          api_location: ""  # API não usada
-          output_location: "dist" # Pasta de build gerada pelo Vite
-          ###### End of Repository/Build Configurations ######
+          app_location: "/"
+          api_location: ""
+          output_location: "dist"
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
@@ -55,7 +62,6 @@ jobs:
     name: Close Pull Request Job
     steps:
       - name: Close Pull Request
-        id: closepullrequest
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_YELLOW_PEBBLE_0B05B320F }}
