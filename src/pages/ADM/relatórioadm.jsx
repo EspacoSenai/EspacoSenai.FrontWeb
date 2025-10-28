@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import EspacoSenai from "../../assets/EspacoSenai.svg";
 import OndaGeral from "../../assets/ondageral.svg";
 import Noite from "../../assets/noite.svg";
-import Sol from "../../assets/sol.svg";
+import Sol from "../../assets/Sol.svg";
 import BotaoSidebar from "../../assets/botaoSidebar.svg";
 import BotaoSidebarDark from "../../assets/botaoSidebardark.svg";
 import Samira from "../../assets/avatar11.svg";

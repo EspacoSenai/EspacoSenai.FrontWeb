@@ -5,7 +5,7 @@ import ErrorImgDark from "../../assets/errodark.svg";
 import EspacoLogo from "../../assets/EspacoSenai.svg";
 import LogoDark from "../../assets/logodark.svg";
 import Noite from "../../assets/noite.svg";
-import Sol from "../../assets/sol.svg";
+import Sol from "../../assets/Sol.svg";
 
 export default function PaginaErro() {
   const [isDarkMode, setIsDarkMode] = useState(() => {
