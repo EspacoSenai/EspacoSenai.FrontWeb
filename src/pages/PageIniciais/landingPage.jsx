@@ -1,14 +1,16 @@
 import React from 'react';
-import Header from './header';
-import Main from './main';
-import Footer from './footer';
+import Header from '../../components/header';
+import Main from '../../components/main';
+import Footer from '../../components/footer';
 
 export default function LandingPage() {
   return (
-    <div className="flex flex-col min-h-screen justify-between">
+    <div className="flex flex-col min-h-screen">
       <Header />
       <Main />
-      <Footer />
+      <div className="mt-auto">
+        <Footer />
+      </div>
     </div>
   );
 }

@@ -133,8 +133,8 @@ export default function CriarSala() {
 
   function criar(e) {
     e.preventDefault();
-    if (typeof formValido !== "undefined" && !formValido) return;
-    alert('Sala criada com sucesso!');
+    if (!formValido) return;
+    alert('Editado com sucesso!');
   }
 
   return (
@@ -145,7 +145,7 @@ export default function CriarSala() {
           <Link to="/admin-dashboard" className="absolute left-4">
             <img src="/src/assets/sairdomodal.svg" alt="Voltar" className="w-8 h-8 md:w-9 md:h-9" />
           </Link>
-          <h1 className="text-white text-lg md:text-xl font-medium">Criar Sala</h1>
+          <h1 className="text-white text-lg md:text-xl font-medium">Editar Sala</h1>
         </div>
       </header>
 
@@ -172,13 +172,13 @@ export default function CriarSala() {
                     </button>
                   </>
                 ) : (
-                 <div className="flex flex-col items-center justify-center gap-2 px-4 text-center text-gray-500">
+                  <div className="flex flex-col items-center justify-center gap-2 px-4 text-center text-gray-500">
                     <svg width="44" height="34" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="opacity-80">
                       <path d="M21 19V7a2 2 0 0 0-2-2h-3.586a1 1 0 0 1-.707-.293l-1.414-1.414A1 1 0 0 0 12.586 2H11.414a1 1 0 0 0-.707.293L9.293 3.707A1 1 0 0 1 8.586 4H5a2 2 0 0 0-2 2v12" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
                       <rect x="3" y="8" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="1.2"/>
                       <circle cx="8.5" cy="12.5" r="1.5" fill="currentColor"/>
                     </svg>
-                    <div className="text-sm font-medium">Clique para adicionar imagem do ambiente</div>
+                    <div className="text-sm font-medium">Clique para editar imagem do ambiente</div>
                   </div>
                 )}
               </label>
@@ -244,7 +244,7 @@ export default function CriarSala() {
 
               <div className="space-y-2 text-left w-full">
                 <label className={TXT_LABEL}>Descrição:</label>
-                <textarea className={CL_TEXTAREA} placeholder=" " value={descricao} onChange={(e) => setDescricao(e.target.value)} />
+                <textarea className={CL_TEXTAREA} placeholder=" Acesso aos agendamentos para organizar e supervisionar o uso do espaço. " value={descricao} onChange={(e) => setDescricao(e.target.value)} />
               </div>
 
               <div className="space-y-2 text-left w-full">
@@ -289,7 +289,7 @@ export default function CriarSala() {
           </div>
 
           {/* Horários */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-7 mt-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-7 mt-12">
             {/* Início */}
             <div className="space-y-2">
               <p className={TXT_LABEL}>Horário de início:</p>
@@ -386,7 +386,7 @@ export default function CriarSala() {
           </div>
 
           {/* Capacidade */}
-          <div className="mt-8 ml-[10px]">
+          <div className="mt-12 ml-[10px]">
             <div className="flex items-center flex-wrap gap-3 md:gap-4"> 
               {/* não deixe o label ocupar toda a largura */}
               <p className={`${TXT_LABEL} whitespace-nowrap w-auto flex-none`}>

@@ -2,7 +2,7 @@ import React, { useState, useRef } from "react";
 import EspacoSenai from "../../assets/EspacoSenai.svg";
 import OndaGeral from "../../assets/ondaPrecadastro.svg";
 
-// Utilitários compartilhados
+// Expressão para validar email
 const REGEX_EMAIL = /\S+@\S+\.\S+/;
 const CLASSES_INPUT =
   "w-full max-w-[340px] mx-auto rounded-md border border-[#E5E5E5] bg-white px-4 py-2 text-[16px] shadow-[0_2px_6px_rgba(0,0,0,0.25)] outline-none focus:ring-2 focus:ring-[#B10404] text-black placeholder-gray-400";
@@ -94,7 +94,7 @@ export default function PreCadastrarUsuario() {
     ev.preventDefault();
     const eAll = validarTudo();
     if (Object.keys(eAll).length === 0) {
-      // Tudo ok, submete
+
       aoSubmeter(ev);
     } else {
       setErros(eAll);

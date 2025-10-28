@@ -1,5 +1,6 @@
 import React, { useEffect, useLayoutEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 import Index from './navigation/index';
 
@@ -11,15 +12,15 @@ import EditarPerfil from './pages/Perfis/editarperfil.jsx';
 import Avatares from './pages/Perfis/avatares.jsx';
 import SemNotificacao from './pages/Notificações/semnotificação.jsx';
 import Notificacoes from './pages/Notificações/notificações.jsx';
-import NovaSenha from './pages/Senhas/novasenha.jsx';
+import NovaSenha from './pages/Autenticação/novasenha.jsx';
 import SelecaoPerfil from './pages/Autenticação/selecaoPerfil.jsx';
-import EsqueciSenha from './pages/Senhas/esqueciSenha.jsx';
-import CodigoDeRec from './pages/Senhas/códigoderec.jsx';
+import EsqueciSenha from './pages/Autenticação/esqueciSenha.jsx';
+import CodigoDeRecuperacao from './pages/Autenticação/códigoderec.jsx';
 
-import LandingPage from './pages/landingPage.jsx';
-import Onboarding from './pages/onboarding.jsx';
-import Cadastro from './pages/cadastro.jsx';
-import Login from './pages/login.jsx';
+import LandingPage from './pages/PageIniciais/landingPage.jsx';
+import Onboarding from './pages/PageIniciais/onboarding.jsx';
+import Cadastro from './pages/Autenticação/cadastro.jsx';
+import Login from './pages/Autenticação/login.jsx';
 import AgendamentoQuadra from './pages/agendamentoQuadra.jsx';
 import AgendamentoComputadores from './pages/AgendamentoComputadores.jsx';
 import AgendamentoImpressora from './pages/agendamentoImpressora.jsx';
@@ -30,6 +31,12 @@ import RelatorioAdm from './pages/ADM/relatórioadm.jsx';
 import GestaoDeAluno from './pages/ADM/gestaodealuno.jsx';
 import PreCadastrarUsuario from './pages/ADM/precadastrar.jsx';
 import CriarUsuario from './pages/ADM/criaruser.jsx';
+import ReservaPendente from './pages/ADM/reservapendente.jsx';
+import EditarVersala from './pages/ADM/editarversala.jsx';
+import CriarSala from './pages/ADM/criarsala.jsx';
+import EditarSala from './pages/ADM/editarsala.jsx';
+import PaginaErro from './pages/ADM/paginaerro.jsx';
+import AuthGate from './navigation';
 
 export default function App() {
   useLayoutEffect(() => {
@@ -68,7 +75,7 @@ export default function App() {
 
       <Route path="/esqueci-senha" element={<EsqueciSenha />} />
       <Route path="/selecao-perfil" element={<SelecaoPerfil />} />
-      <Route path="/códigoderec" element={<CodigoDeRec />} />
+      <Route path="/codigodere" element={<CodigoDeRecuperacao />} />
       <Route path="/novasenha" element={<NovaSenha />} />
       <Route path="/semnotificacao" element={<SemNotificacao />} />
       <Route path="/notificacoes" element={<Notificacoes />} />
@@ -78,6 +85,13 @@ export default function App() {
       <Route path="/relatorio-adm" element={<RelatorioAdm />} />
       <Route path="/pre-cadastrar" element={<PreCadastrarUsuario />} />
       <Route path="/criar-usuario" element={<CriarUsuario />} />
+      <Route path="/editar-versala" element={<EditarVersala />} />
+      <Route path="/reserva-pendente" element={<ReservaPendente />} />
+      <Route path="/criar-sala" element={<CriarSala />} />
+      <Route path="/editar-sala" element={<EditarSala />} />
+      <Route path="/404" element={<PaginaErro />} />
+      <Route path="/auth-gate" element={<AuthGate />} />
+      <Route path="*" element={<Navigate to="/404" replace />} />
     </Routes>
   );
 }

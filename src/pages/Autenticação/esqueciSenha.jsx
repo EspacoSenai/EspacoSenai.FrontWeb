@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import logoImg from '../../assets/EspacoSenai.svg';
 import ondaLateralImg from '../../assets/onda lateral.svg';
 import ondaMenorImg from '../../assets/onde menor.svg';
 
 export function EsqueciSenha({ buttonWidth = 180, buttonHeight = 36 } = {}) {
+  const navigate = useNavigate();
+  const goToCodigo = () => navigate('/codigodere');
   // Garantir cor vermelha ao iniciar
   const [buttonColor, setButtonColor] = useState('#b91c1c');
   const [email, setEmail] = useState('');
@@ -17,19 +19,19 @@ export function EsqueciSenha({ buttonWidth = 180, buttonHeight = 36 } = {}) {
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center relative bg-white overflow-hidden" style={{ fontFamily: 'Poppins, sans-serif' }}>
-  {/* Onda lateral - Responsiva */}
-      <div className="absolute top-0 right-0 h-full w-1/2 md:w-1/3 z-0 overflow-hidden wave-container">
+      {/* Onda lateral */}
+      <div className="absolute top-0 right-0 h-full w-1/2 md:w-1/3 z-0 overflow-hidden">
         <img
           src={ondaLateralImg}
           alt="Onda decorativa lateral"
-          className="h-full w-full object-cover object-left transform scale-150 md:scale-100 wave-fill wave-animate md:wave-parallax"
+          className="h-full w-full object-cover object-left transform scale-150 md:scale-100"
         />
       </div>
-  {/* Onda menor - Inferior esquerda, responsiva e grande */}
+      {/* Onda menor */}
       <img
         src={ondaMenorImg}
         alt="Onda decorativa menor"
-        className="fixed left-0 bottom-0 z-0 select-none pointer-events-none wave-fill wave-animate"
+        className="fixed left-0 bottom-0 z-0 select-none pointer-events-none"
         style={{
           width: 'min(40vw, 600px)',
           minWidth: '200px',
@@ -38,12 +40,12 @@ export function EsqueciSenha({ buttonWidth = 180, buttonHeight = 36 } = {}) {
           opacity: 0.9
         }}
       />
-      {/* Onda decorativa inferior esquerda */}
+      {/* Onda decorativa inferior esquerda (efeitos removidos) */}
       <div className="absolute left-0 bottom-0 w-1/2 h-1/3 z-0 overflow-hidden">
         <img
           src={ondaMenorImg}
           alt="Onda decorativa menor"
-          className="h-full w-full object-cover object-left transform scale-150 md:scale-100 wave-fill wave-animate md:wave-parallax"
+          className="h-full w-full object-cover object-left transform scale-150 md:scale-100"
         />
       </div>
       
@@ -144,35 +146,25 @@ export function EsqueciSenha({ buttonWidth = 180, buttonHeight = 36 } = {}) {
             </div>
 
             <button
-              type="submit"
+              type="button"
+              onClick={goToCodigo}
+              className="bg-[#B10404] text-white px-[10px] rounded-md transform transition-transform duration-200 hover:scale-105"
               style={{
-                width: `${buttonWidth}px`,
-                height: `${buttonHeight}px`,
-                color: '#fff',
-                padding: '7px 0',
-                borderRadius: 6,
-                fontSize: 16,
-                fontFamily: 'Poppins, sans-serif',
-                fontWeight: 350,
-                boxShadow: '0 4px 16px 0 rgba(0,0,0,0.29)',
-                border: 'none',
-                cursor: 'pointer',
-                transition: 'background 0.2s',  
-                alignSelf: 'center',
-                marginTop: 7,
-                display: 'flex',
-                alignItems: 'center',
+                height: '36px',
+                width: '190px',
+                padding: '6px 10px',
                 justifyContent: 'center',
-                background: buttonColor,
+                alignItems: 'center',
+                display: 'flex',
+                margin: '0 auto',
+                willChange: 'transform'
               }}
-              onMouseOver={() => setButtonColor('#991b1b')}
-              onMouseOut={() => setButtonColor('#b91c1c')}
             >
               Enviar código
             </button>
           </form>
 
-          <div style={{ marginTop: 10, textAlign: 'center', fontSize: 14, fontFamily: 'Montserrat, sans-serif', }}>
+          <div style={{ marginTop: 10, textAlign: 'center', fontSize: 14, fontFamily: 'Poppins, sans-serif' }}>
             <span style={{ color: '#111' }}>Voltar ao </span>
             <Link to="/login" style={{ color: '#2563eb', textDecoration: 'underline', fontWeight: 540 }}>Login</Link>
           </div>
