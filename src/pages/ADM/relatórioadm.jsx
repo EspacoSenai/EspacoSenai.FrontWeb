@@ -3,8 +3,8 @@ import EspacoSenai from "../../assets/EspacoSenai.svg";
 import OndaGeral from "../../assets/ondageral.svg";
 import Noite from "../../assets/noite.svg";
 import Sol from "../../assets/sol.svg";
-import BotaoSidebar from "../../assets/botaosidebar.svg";
-import BotaoSidebarDark from "../../assets/botaosidebardark.svg";
+import BotaoSidebar from "../../assets/botaoSidebar.svg";
+import BotaoSidebarDark from "../../assets/botaoSidebardark.svg";
 import Samira from "../../assets/avatar11.svg";
 
 // Faixa de título
