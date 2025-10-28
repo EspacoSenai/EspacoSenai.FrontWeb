@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import ErrorImg from "../../assets/error.svg";
 import ErrorImgDark from "../../assets/errodark.svg";
-import EspacoLogo from "../../assets/EspacoSenai.svg";
+import EspacoLogo from "../../assets/espacosena.svg";
 import LogoDark from "../../assets/logodark.svg";
 import Noite from "../../assets/noite.svg";
-import Sol from "../../assets/Sol.svg";
+import Sol from "../../assets/sol.svg";
 
 export default function PaginaErro() {
   const [isDarkMode, setIsDarkMode] = useState(() => {

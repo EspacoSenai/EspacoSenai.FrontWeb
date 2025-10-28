@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import EspacoSenai from "../../assets/EspacoSenai.svg";
+import EspacoSenai from "../../assets/espacosena.svg";
 import OndaGeral from "../../assets/ondageral.svg";
 import Noite from "../../assets/noite.svg";
 import Sol from "../../assets/sol.svg";
