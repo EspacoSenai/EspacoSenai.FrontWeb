@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion } from 'framer-motion'; 
 
 import Index from './navigation/index';
 
@@ -29,6 +29,7 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import RelatorioAdm from './pages/ADM/relatórioadm.jsx';
 import GestaoDeAluno from './pages/ADM/gestaodealuno.jsx';
+import GestaoDeAlunos from './pages/ADM/gestaodealunos.jsx';
 import PreCadastrarUsuario from './pages/ADM/precadastrar.jsx';
 import CriarUsuario from './pages/ADM/criaruser.jsx';
 import ReservaPendente from './pages/ADM/reservapendente.jsx';
@@ -82,6 +83,7 @@ export default function App() {
       <Route path="/editarperfil" element={<EditarPerfil />} />
       <Route path="/avatares" element={<Avatares />} />
       <Route path="/gestao-de-aluno" element={<GestaoDeAluno />} />
+      <Route path="/gestao-de-alunos" element={<GestaoDeAlunos />} />
       <Route path="/relatorio-adm" element={<RelatorioAdm />} />
       <Route path="/pre-cadastrar" element={<PreCadastrarUsuario />} />
       <Route path="/criar-usuario" element={<CriarUsuario />} />
