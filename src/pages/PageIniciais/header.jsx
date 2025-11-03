@@ -6,7 +6,7 @@ export default function Header() {
   const toggleMenu = () => setMenuOpen((p) => !p);
 
   return (
-    <header className="relative z-20 w-full flex justify-center px-4 sm:px-6 py-3 sm:py-4 bg-white transition-colors duration-300 overflow-x-hidden">
+    <header className="relative z-20 w-full flex justify-center px-4 sm:px-6 py-3 sm:py-4 bg-white transition-colors duration-300 overflow-x-hiddenz">
       <div className="w-full max-w-7xl flex items-center justify-between border-b border-[#A6A3A3] pb-2">
         <div className="flex items-center gap-2 shrink-0 min-w-0">
           <img

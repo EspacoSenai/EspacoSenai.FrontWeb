@@ -65,7 +65,7 @@ const slides = [
     WaveComponent: Wave3,
     imageUrl: pessoa3,
     imageLayout: "md:order-first",
-    textAlign: "text-center md:text-left",
+    textAlign: "text-center md:text-left ",
     imageSize: "w-60 sm:w-72 md:w-80 lg:w-[380px]",
   },
 ];
@@ -111,7 +111,7 @@ function Onboarding() {
             </div>
 
             <div className={`w-full md:w-1/2 ${textAlign}`}>
-              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-black lg:text-black">
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight lg:text-black">
                 {title}
                 <span
                   className="text-xl md:text-2xl font-normal block mt-1 

@@ -2,22 +2,24 @@ import React from "react";
 import { motion } from "framer-motion";
 
 export default function Footer() {
-  const scrollToSection = (id) => {
-    const section = document.querySelector(id);
-    if (section) {
-      section.scrollIntoView({ behavior: "smooth" });
+
+  const goToLandingAndScroll = (hash) => {
+    if (window.location.pathname === "/landing") {
+      const section = document.querySelector(hash);
+      if (section) section.scrollIntoView({ behavior: "smooth" });
+    } else {
+      window.location.href = `/landing${hash}`;
     }
   };
 
   return (
     <>
       <div className="relative z-10 w-full flex justify-center -mt-10 md:-mt-16">
-        
         <div className="bg-[#757575] w-[92%] max-w-[700px] py-2 rounded-md mx-auto -mb-8
-                       flex items-center justify-center px-4 sm:px-6 text-center shadow-md gap-3 sm:gap-4">
+                       flex items-center justify-center dark:bg-white px-4 sm:px-6 text-center shadow-md gap-3 sm:gap-4">
           <a
-            href="#"
-            className="text-white text-xs hover:underline"
+            href="https://www.sp.senai.br/termos-de-uso-e-politica-de-privacidade"
+            className="text-white dark:text-black text-xs hover:underline"
           >
             POLÍTICA DE PRIVACIDADE
           </a>
@@ -29,8 +31,8 @@ export default function Footer() {
           />
 
           <a
-            href="#"
-            className="text-white text-xs hover:underline"
+            href="https://www.sp.senai.br/termos-de-uso-e-politica-de-privacidade"
+            className="text-white dark:text-black text-xs hover:underline"
           >
             TERMOS DE USO
           </a>
@@ -49,7 +51,7 @@ export default function Footer() {
             </p>
             <div className="flex justify-center md:justify-start gap-4">
               <a
-                href="https://www.instagram.com/_.vitinho07/"
+                href="https://www.instagram.com/senai.suico?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
@@ -64,7 +66,7 @@ export default function Footer() {
               >
                 <img src="src/assets/github.svg" alt="" className="w-5 h-5" />
               </a>
-              <a href="#" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+              <a href="https://www.linkedin.com/school/senaisp-suico/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                 <img src="src/assets/linkedin.svg" alt="" className="w-5 h-5" />
               </a>
             </div>
@@ -78,7 +80,7 @@ export default function Footer() {
                 <motion.a
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.97 }}
-                  onClick={() => scrollToSection("#espacoSenai")}
+                  onClick={() => goToLandingAndScroll("#espacoSenai")}
                   className="inline-block border-b border-white text-white hover:text-gray-300"
                 >
                   O que é EspaçoSenai
@@ -88,7 +90,7 @@ export default function Footer() {
                 <motion.a
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.97 }}
-                  onClick={() => scrollToSection("#comoFunciona")}
+                  onClick={() => goToLandingAndScroll("#comoFunciona")}
                   className="inline-block border-b border-white text-white hover:text-gray-300"
                 >
                   Como Funciona
@@ -98,7 +100,7 @@ export default function Footer() {
                 <motion.a
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.97 }}
-                  onClick={() => scrollToSection("#faq")}
+                  onClick={() => goToLandingAndScroll("#faq")}
                   className="inline-block border-b border-white text-white hover:text-gray-300"
                 >
                   Perguntas Frequentes

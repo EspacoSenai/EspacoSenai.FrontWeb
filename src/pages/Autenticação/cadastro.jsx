@@ -40,9 +40,9 @@ export default function Cadastro() {
     }
 
     setErro(false);
-  // Simula cadastro bem-sucedido e navega para a landing
-  console.log("Cadastro enviado!");
-  navigate('/landing', { replace: true });
+    // Simula cadastro bem-sucedido e navega para a landing
+    console.log("Cadastro enviado!");
+    navigate("/landing", { replace: true });
   };
 
   useEffect(() => {
@@ -52,26 +52,18 @@ export default function Cadastro() {
   }, [senha, confirmarSenha, erro]);
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center relative overflow-hidden dark:bg-black">
+    <div className="min-h-screen bg-white flex items-center justify-center relative overflow-hidden">
       {/* Onda de fundo */}
       <div className="absolute top-10 left-0 w-full h-auto z-0 wave-container">
         <img src={onda} alt="Onda" className="w-full h-full object-cover wave-fill wave-animate" />
       </div>
 
-      <>
-        {/* Logo clara */}
-        <img
-          src={logo}
-          alt="Logo EspaçoSenai"
-          className="absolute top-6 left-6 w-24 z-10 block dark:hidden"
-        />
-        {/* Logo escura */}
-        <img
-          src="src/assets/logodark.svg"
-          alt="Logo EspaçoSenai Dark"
-          className="absolute top-6 left-6 w-24 z-10 hidden dark:block"
-        />
-      </>
+      {/* Logo */}
+      <img
+        src={logo}
+        alt="Logo EspaçoSenai"
+        className="absolute top-6 left-6 w-24 z-10"
+      />
 
       {/* Card branco */}
       <div className="bg-white bg-opacity-90 rounded-lg shadow-lg px-6 py-8 w-full max-w-sm z-10">
@@ -98,12 +90,12 @@ export default function Cadastro() {
             placeholder="Telefone"
             maxLength={11}
             onChange={(e) => {
-            const somenteNumeros = e.target.value.replace(/\D/g, "");
-            e.target.value = somenteNumeros;
+              const somenteNumeros = e.target.value.replace(/\D/g, "");
+              e.target.value = somenteNumeros;
             }}
             className="p-2 rounded-md shadow-sm border bg-white placeholder-black text-black focus:outline-none"
             required
-            />
+          />
 
           {/* Campo Senha */}
           <div className="relative">
@@ -205,7 +197,7 @@ export default function Cadastro() {
 
           <div className="text-sm text-black mt-1">
             Já tem uma conta?{" "}
-            <a href="/login" className="text-blue underline">
+            <a href="/login" className="text-blue-600 underline">
               Entre aqui
             </a>
           </div>

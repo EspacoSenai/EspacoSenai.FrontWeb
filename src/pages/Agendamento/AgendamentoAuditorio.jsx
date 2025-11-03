@@ -5,27 +5,30 @@ import sucessoIcon from "../../assets/sucesso.svg";
 import TrocaSemana from "../../components/ComponentsDeAgendamento/TrocaSemana";
 import SeletorDia from "../../components/ComponentsDeAgendamento/SeletorDia";
 import GradeHorarios from "../../components/ComponentsDeAgendamento/GradeHorarios";
-import SeletorComputadores from "../../components/ComponentsDeAgendamento/SeletorComputadores";
 import ModalDeAgendamento from "../../components/ComponentsDeAgendamento/ModalDeAgendamento";
 
 import {
   COR_VERMELHO,
-  HORARIOS_INICIO_COMPUTADOR,
-  HORARIOS_TERMINO_COMPUTADOR,
-  HORARIO_TERMINO_COMPUTADOR_FIXO, 
   montarDiasSemana,
   validaIntervalo,
 } from "../../components/ComponentsDeAgendamento/FuncoesCompartilhada";
 
-export default function AgendamentoComputadores() {
+
+const HORARIOS_INICIO_AUDITORIO = ["11:50", "13:30", "14:30", "15:30", "16:00", "16:50"];
+const HORARIOS_TERMINO_AUDITORIO = ["13:00", "14:50", "16:00", "16:30", "17:00", "17:30"];
+
+export default function AgendamentoAuditorio() {
   const [semanaSelecionada, setSemanaSelecionada] = useState("essa");
   const [diaSelecionado, setDiaSelecionado] = useState(0);
   const [horaInicio, setHoraInicio] = useState(null);
   const [horaTermino, setHoraTermino] = useState(null);
 
-  const [horaInicioFiltro, setHoraInicioFiltro] = useState("");
+  // nome da turma
+  const [turma, setTurma] = useState("");
 
-  const [computadorSelecionado, setComputadorSelecionado] = useState(null);
+  // filtros dos horários
+  const [horaInicioFiltro, setHoraInicioFiltro] = useState("");
+  const [horaTerminoFiltro, setHoraTerminoFiltro] = useState("");
 
   // Modal
   const [modal, setModal] = useState({
@@ -68,7 +71,7 @@ export default function AgendamentoComputadores() {
     return h * 60 + m;
   };
 
-  // só pode selecionar dia que não tenha passado
+ 
   useEffect(() => {
     const idxValido = diasDaSemana.findIndex((d) => !d.desabilitado);
     if (idxValido === -1 && semanaSelecionada === "essa") {
@@ -106,15 +109,20 @@ export default function AgendamentoComputadores() {
     setHoraInicio(null);
     setHoraTermino(null);
     setHoraInicioFiltro("");
-    setComputadorSelecionado(null);
+    setHoraTerminoFiltro("");
+    setTurma("");
   }
 
   function confirmar() {
-    if (!horaInicio || !horaTermino || !computadorSelecionado) {
+    if (!turma.trim()) {
+      abrirModal("error", "Nome da turma obrigatório", "Informe o nome da turma para continuar.");
+      return;
+    }
+    if (!horaInicio || !horaTermino) {
       abrirModal(
         "error",
         "Dados incompletos",
-        "Escolha os horários e um computador para continuar."
+        "Escolha os horários de início e término para continuar."
       );
       return;
     }
@@ -133,14 +141,14 @@ export default function AgendamentoComputadores() {
     }
 
     const dados = {
-      local: "Computadores",
+      local: "Auditório",
+      turma: turma.trim(),
       semana: semanaSelecionada === "essa" ? "Essa semana" : "Próxima semana",
       data: dia.dataCompleta.toISOString(),
       inicio: horaInicio,
       termino: horaTermino,
-      computador: computadorSelecionado,
     };
-    console.log("Agendamento:", dados);
+    console.log("Agendamento (AUDITÓRIO):", dados);
 
     abrirModal(
       "success",
@@ -159,12 +167,12 @@ export default function AgendamentoComputadores() {
         >
           <h1 className="text-xl md:text-2xl font-regular font-sans">
             Agendamento <span className="opacity-70">–</span>{" "}
-            <span className="font-medium font-sans">Computadores</span>
+            <span className="font-medium font-sans">Auditório</span>
           </h1>
         </div>
 
         {/* Seleção semana e data */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start mb-6">
           <TrocaSemana value={semanaSelecionada} onChange={setSemanaSelecionada} />
           <div className="hidden md:block " />
           <div className="flex md:justify-end items-center gap-2 text-black dark:text-white">
@@ -177,12 +185,33 @@ export default function AgendamentoComputadores() {
           </div>
         </div>
 
-        {/* Conteúdo */}
+        {/* Nome da turma (MENOR + largura limitada) */}
+        <div className="mb-8">
+          <label className="block text-black dark:text-white font-medium mb-2">
+            Nome da turma:
+          </label>
+
+          {/* limita a largura do input */}
+          <div className="w-full sm:max-w-[200px]">
+            <input
+              value={turma}
+              onChange={(e) => setTurma(e.target.value)}
+              placeholder="Ex.: Turma A"
+              maxLength={60}
+              className="w-full h-9 rounded-md px-3 bg-[#F2F2F2] dark:bg-[#1d1d1d]
+                         text-sm text-[#1E1E1E] dark:text-white outline-none border border-transparent
+                         focus:border-[#d1d1d1] dark:focus:border-zinc-700
+                         placeholder:text-[10px] md:placeholder:text-xs
+                         placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
+            />
+          </div>
+        </div>
+
+       
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Início */}
           <GradeHorarios
             titulo="Horário de início:"
-            opcoes={HORARIOS_INICIO_COMPUTADOR}
+            opcoes={HORARIOS_INICIO_AUDITORIO}
             selecionado={horaInicio}
             onSelect={setHoraInicio}
             isDisabled={(t) => isHoje && timeToMin(t) <= nowMinutes}
@@ -191,40 +220,16 @@ export default function AgendamentoComputadores() {
             onFiltroChange={setHoraInicioFiltro}
           />
 
-          {/* Término */}
-          <div>
-            <h2 className="text-lg font-medium text-black dark:text-white mb-1">
-              Horário de término:
-            </h2>
-
-            <GradeHorarios
-              titulo=""
-              opcoes={HORARIOS_TERMINO_COMPUTADOR}
-              selecionado={horaTermino}
-              onSelect={setHoraTermino}
-              isDisabled={(t) => isHoje && timeToMin(t) <= nowMinutes}
-              comFiltro={false}
-            />
-          </div>
-        </div>
-
-        {/* Seletor de computadores */}
-        <div className="mt-6">
-          <SeletorComputadores
-            valor={computadorSelecionado}
-            onChange={setComputadorSelecionado}
+          <GradeHorarios
+            titulo="Horário de término:"
+            opcoes={HORARIOS_TERMINO_AUDITORIO}
+            selecionado={horaTermino}
+            onSelect={setHoraTermino}
+            isDisabled={(t) => isHoje && timeToMin(t) <= nowMinutes}
+            comFiltro={true}
+            filtro={horaTerminoFiltro}
+            onFiltroChange={setHoraTerminoFiltro}
           />
-
-          {/* OBS abaixo do seletor */}
-          <p className="mt-3 text-sm leading-5">
-            <span className="font-semibold" style={{ color: COR_VERMELHO }}>
-              OBS:
-            </span>{" "}
-            <span className="text-[#1E1E1E] dark:text-gray-200">
-              Informe apenas o horário de início. Todos devem desocupar os computadores
-              até, no máximo, às {HORARIO_TERMINO_COMPUTADOR_FIXO}.
-            </span>
-          </p>
         </div>
 
         {/* Botões */}
