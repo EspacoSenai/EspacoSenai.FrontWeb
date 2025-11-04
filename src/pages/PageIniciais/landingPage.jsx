@@ -1,7 +1,7 @@
 import React from 'react';
-import Header from './header';
-import Main from './main';
-import Footer from './footer';
+import Header from '../../components/header';
+import Main from '../../components/main';
+import Footer from '../../components/footer';
 
 export default function LandingPage() {
   return (
@@ -9,7 +9,7 @@ export default function LandingPage() {
       <Header />
       <Main />
       <div className="mt-auto">
-      <Footer />
+        <Footer />
       </div>
     </div>
   );

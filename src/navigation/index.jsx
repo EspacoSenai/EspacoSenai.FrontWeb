@@ -1,17 +1,16 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function Index() {
+export default function AuthGate() {
   const navigate = useNavigate();
-  useEffect(() => {
-    const jaViu = localStorage.getItem("onboardingVisto");
-    const usarFluxoAntigo = localStorage.getItem("usarFluxoAntigo") === "true";
 
-    if (jaViu === "true") {
-      navigate(usarFluxoAntigo ? "/selecao-perfil" : "/landing");
-    } else {
-      navigate("/onboarding");
-    }
+  useEffect(() => {
+    const hasCadastro =
+      localStorage.getItem("hasCadastro") === "true" ||
+      !!localStorage.getItem("user") ||
+      !!localStorage.getItem("token");
+
+    navigate(hasCadastro ? "/login" : "/cadastro", { replace: true });
   }, [navigate]);
 
   return null;

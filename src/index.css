@@ -141,3 +141,46 @@ button:focus-visible {
 .wave-container {
   overflow: hidden;
 }
+/* Scrollbar */
+.thin-scroll::-webkit-scrollbar {
+  width: 6px;  
+}
+.thin-scroll {
+  scrollbar-gutter: stable both-edges; 
+}
+.thin-scroll::-webkit-scrollbar-track {
+  background: #ffffff;  
+  border-radius: 9999px; 
+  margin: 12px 0 2px 0; 
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.03); 
+  background-clip: padding-box;
+}
+.thin-scroll::-webkit-scrollbar-thumb {
+  background: #9d0c0c;  
+  border-radius: 9999px;  
+  border: 2px solid #ffffff;  
+}
+.thin-scroll::-webkit-scrollbar-thumb:hover {
+  background: #b80f0f;
+}
+
+.thin-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #9d0c0c #ffffff; 
+}
+
+/* OBS note*/
+.obs-note {
+  margin-top: 3.5rem; 
+  text-align: left;
+  max-width: 720px;
+  margin-left: 0;  
+  margin-right: auto;
+  color: #000000; 
+  font-size: 0.875rem;
+}
+.obs-note .label {
+  color: #c53030; /* vermelho */
+  font-weight: 700;
+  margin-right: 0.5rem;
+}
