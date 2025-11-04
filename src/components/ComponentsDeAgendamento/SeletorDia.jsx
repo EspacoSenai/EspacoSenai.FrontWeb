@@ -1,9 +1,15 @@
 export default function SeletorDia({ dias, selectedIndex, onSelect }) {
   return (
-    <div className="flex gap-2">
+    <div
+      className="
+        flex gap-2 
+        overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent
+        md:overflow-visible
+      "
+    >
       {dias.map((d, idx) => {
         const base =
-          "flex flex-col items-center justify-center w-12 h-12 rounded-md text-xs outline-none focus:ring-0 transition-colors duration-150";
+          "flex flex-col items-center justify-center w-12 h-12 rounded-md text-xs outline-none focus:ring-0 transition-colors duration-150 shrink-0";
         const classe = d.desabilitado
           ? "bg-[#E5E5E5] text-gray-400 cursor-not-allowed opacity-70"
           : selectedIndex === idx

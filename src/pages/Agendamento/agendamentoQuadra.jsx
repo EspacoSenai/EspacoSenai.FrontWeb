@@ -1,12 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-import sucessoIcon from "../assets/sucesso.svg";
+import sucessoIcon from "../../assets/sucesso.svg";
 
-import TrocaSemana from "../components/agendamento/TrocaSemana";
-import SeletorDia from "../components/agendamento/SeletorDia";
-import GradeHorarios from "../components/agendamento/GradeHorarios";
-import CodigoConvidados from "../components/agendamento/CodigoConvidados";
-import ModalDeAgendamento from "../components/agendamento/ModalDeAgendamento";
+import TrocaSemana from "../../components/ComponentsDeAgendamento/TrocaSemana";
+import SeletorDia from "../../components/ComponentsDeAgendamento/SeletorDia";
+import GradeHorarios from "../../components/ComponentsDeAgendamento/GradeHorarios";
+import CodigoConvidados from "../../components/ComponentsDeAgendamento/CodigoConvidados";
+import ModalDeAgendamento from "../../components/ComponentsDeAgendamento/ModalDeAgendamento";
 
 import {
   COR_VERMELHO,
@@ -16,13 +16,18 @@ import {
   HORARIOS_TERMINO_QUADRA,
   montarDiasSemana,
   validaIntervalo,
-} from "../components/agendamento/FuncoesCompartilhada";
+} from "../../components/ComponentsDeAgendamento/FuncoesCompartilhada";
 
 export default function AgendamentoQuadra() {
   const [semanaSelecionada, setSemanaSelecionada] = useState("essa");
   const [diaSelecionado, setDiaSelecionado] = useState(0);
   const [horaInicio, setHoraInicio] = useState(null);
   const [horaTermino, setHoraTermino] = useState(null);
+
+ 
+  const [horaInicioFiltro, setHoraInicioFiltro] = useState("");
+  const [horaTerminoFiltro, setHoraTerminoFiltro] = useState("");
+
   const [convidados, setConvidados] = useState([Array(TAMANHO_CODIGO).fill("")]);
 
   // Modal
@@ -98,6 +103,8 @@ export default function AgendamentoQuadra() {
     setDiaSelecionado(0);
     setHoraInicio(null);
     setHoraTermino(null);
+    setHoraInicioFiltro("");
+    setHoraTerminoFiltro("");
     setConvidados([Array(TAMANHO_CODIGO).fill("")]);
   }
 
@@ -154,19 +161,28 @@ export default function AgendamentoQuadra() {
 
         {/* Conteúdo */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Horário de início COM pesquisa */}
           <GradeHorarios
             titulo="Horário de início:"
             opcoes={HORARIOS_INICIO_QUADRA}
             selecionado={horaInicio}
             onSelect={setHoraInicio}
             isDisabled={(t) => isHoje && timeToMin(t) <= nowMinutes}
+            comFiltro={true}
+            filtro={horaInicioFiltro}
+            onFiltroChange={setHoraInicioFiltro}
           />
+
+          {/* Horário de término COM pesquisa */}
           <GradeHorarios
             titulo="Horário de término:"
             opcoes={HORARIOS_TERMINO_QUADRA}
             selecionado={horaTermino}
             onSelect={setHoraTermino}
             isDisabled={(t) => isHoje && timeToMin(t) <= nowMinutes}
+            comFiltro={true}
+            filtro={horaTerminoFiltro}
+            onFiltroChange={setHoraTerminoFiltro}
           />
 
           <div className="md:col-span-2">

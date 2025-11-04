@@ -1,6 +1,5 @@
 import React, { useEffect, useLayoutEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { motion } from 'framer-motion'; 
 
 import Index from './navigation/index';
 
@@ -37,19 +36,15 @@ import EditarVersala from './pages/ADM/editarversala.jsx';
 import CriarSala from './pages/ADM/criarsala.jsx';
 import EditarSala from './pages/ADM/editarsala.jsx';
 import PaginaErro from './pages/ADM/paginaerro.jsx';
-import AuthGate from './navigation';
 
 export default function App() {
   useLayoutEffect(() => {
     try {
       const salvo = localStorage.getItem('theme') || 'light';
-      if (salvo === 'dark') {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    } catch (error) {
-      console.error('Erro ao recuperar tema salvo:', error);
+      if (salvo === 'dark') document.documentElement.classList.add('dark');
+      else document.documentElement.classList.remove('dark');
+    } catch (e) {
+      console.error('Erro ao recuperar tema salvo:', e);
     }
   }, []);
 
@@ -92,7 +87,6 @@ export default function App() {
       <Route path="/criar-sala" element={<CriarSala />} />
       <Route path="/editar-sala" element={<EditarSala />} />
       <Route path="/404" element={<PaginaErro />} />
-      <Route path="/auth-gate" element={<AuthGate />} />
       <Route path="*" element={<Navigate to="/404" replace />} />
     </Routes>
   );

@@ -40,7 +40,13 @@ export default function Cadastro() {
     }
 
     setErro(false);
+<<<<<<< HEAD
     console.log("Cadastro enviado!");
+=======
+    // Simula cadastro bem-sucedido e navega para a landing
+    console.log("Cadastro enviado!");
+    navigate("/landing", { replace: true });
+>>>>>>> origin/VitorDev
   };
 
   useEffect(() => {
@@ -50,6 +56,7 @@ export default function Cadastro() {
   }, [senha, confirmarSenha, erro]);
 
   return (
+<<<<<<< HEAD
     <div className="min-h-screen bg-white flex items-center justify-center relative overflow-hidden dark:bg-black px-4">
   
       <>
@@ -67,6 +74,20 @@ export default function Cadastro() {
           className="absolute top-4 sm:top-6 left-4 sm:left-6 w-[105px] sm:w-[140px] md:w-[140px] z-0 hidden dark:block"
         />
       </>
+=======
+    <div className="min-h-screen bg-white flex items-center justify-center relative overflow-hidden">
+      {/* Onda de fundo */}
+      <div className="absolute top-10 left-0 w-full h-auto z-0 wave-container">
+        <img src={onda} alt="Onda" className="w-full h-full object-cover wave-fill wave-animate" />
+      </div>
+
+      {/* Logo */}
+      <img
+        src={logo}
+        alt="Logo EspaçoSenai"
+        className="absolute top-6 left-6 w-24 z-10"
+      />
+>>>>>>> origin/VitorDev
 
       <img src={onda} alt="Onda" className="absolute top-24 sm:top-18 md:top-20 lg:top-19 left-1/2 transform -translate-x-1/2 w-full h-auto z-0" />
 
@@ -91,6 +112,21 @@ export default function Cadastro() {
             required
           />
 
+<<<<<<< HEAD
+=======
+          <input
+            type="tel"
+            placeholder="Telefone"
+            maxLength={11}
+            onChange={(e) => {
+              const somenteNumeros = e.target.value.replace(/\D/g, "");
+              e.target.value = somenteNumeros;
+            }}
+            className="p-2 rounded-md shadow-sm border bg-white placeholder-black text-black focus:outline-none"
+            required
+          />
+
+>>>>>>> origin/VitorDev
           {/* Campo Senha */}
           <div className="relative self-center w-full max-w-[250px] sm:max-w-[350px]">
             <input
@@ -191,7 +227,11 @@ export default function Cadastro() {
 
           <div className="text-xs text-black mt-1 self-start font-medium ml-[40px]">
             Já tem uma conta?{" "}
+<<<<<<< HEAD
             <Link to="/login" className="text-blue underline">
+=======
+            <a href="/login" className="text-blue-600 underline">
+>>>>>>> origin/VitorDev
               Entre aqui
             </Link>
           </div>
