@@ -1,6 +1,6 @@
-//const API_URL = (import.meta.env.VITE_API_URL || "https://espacosenai.azurewebsites.net").replace(/\/+$/, "");
-// Para testar localmente, troque a linha acima por esta:
-const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:8080").replace(/\/+$/, "");
+const API_URL = (import.meta.env.VITE_API_URL || "https://espacosenai.azurewebsites.net").replace(/\/+$/, "");
+
+//const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:8080").replace(/\/+$/, "");
 
 function ensurePath(path = "") {
   const p = String(path || "");
