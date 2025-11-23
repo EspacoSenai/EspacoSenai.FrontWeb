@@ -45,7 +45,6 @@ export const pages = [
 ];
 export const pagesCount = pages.length;
 
-
 export const lembretesData = [
   {
     id: 1,
@@ -81,6 +80,26 @@ export const lembretesData = [
   },
 ];
 
+/** Decide para qual rota de SALAS deve ir de acordo com o perfil logado */
+function getSalasPathForCurrentProfile(defaultLink = "/salas-alunos") {
+  try {
+    const profile = localStorage.getItem("selected_profile") || "ALUNO";
+
+    switch (profile) {
+      case "ADMIN":
+        return "/salas-administradores";
+      case "COORDENADOR":
+        return "/salas-coordenadores";
+      case "PROFESSOR":
+        return "/salas-professores";
+      case "ALUNO":
+      default:
+        return defaultLink || "/salas-alunos";
+    }
+  } catch {
+    return defaultLink || "/salas-alunos";
+  }
+}
 
 export function ArrowBtn({ onClick }) {
   return (
@@ -109,11 +128,13 @@ export function ArrowBtn({ onClick }) {
   );
 }
 
-
 export function Card({ title, img, desc, link }) {
+  // aqui ele ajusta o link conforme o perfil logado
+  const finalLink = getSalasPathForCurrentProfile(link);
+
   return (
     <Link
-      to={link}
+      to={finalLink}
       className="block rounded-[12px] bg-white dark:bg-[#1B1B1B] shadow-md ring-1 ring-black/5 p-3 sm:p-4 md:p-5 group"
     >
       <div className="grid grid-cols-1 md:grid-cols-10 gap-4 md:gap-5 items-center">
@@ -155,7 +176,6 @@ export function Card({ title, img, desc, link }) {
     </Link>
   );
 }
-
 
 export function Dot() {
   return (
@@ -212,15 +232,12 @@ export function LembreteCard({ item }) {
 
   const handleEditar = () => {
     setOpen(false);
-    
     alert(`Editar reserva: ${item.titulo}`);
   };
 
   const handleCancelar = () => {
     setOpen(false);
-    const ok = window.confirm(
-      `Cancelar reserva de ${item.titulo}?`
-    );
+    const ok = window.confirm(`Cancelar reserva de ${item.titulo}?`);
     if (ok) {
       console.log("cancelado", item.id);
     }
@@ -229,10 +246,7 @@ export function LembreteCard({ item }) {
   return (
     <div className="relative rounded-xl bg-white dark:bg-[#1B1B1B] shadow-sm ring-1 ring-black/5 px-3 py-3 md:px-4 md:py-4">
       {/* botão de 3 pontinhos */}
-      <div
-        className="absolute bottom-3 right-3 -m-2 p-2 z-[70]"
-        ref={popRef}
-      >
+      <div className="absolute bottom-3 right-3 -m-2 p-2 z-[70]" ref={popRef}>
         <Kebab
           onClick={() => setOpen((v) => !v)}
           ariaControls={`menu-${item.id}`}
@@ -246,7 +260,7 @@ export function LembreteCard({ item }) {
             className="absolute bottom-12 right-0 w-56 overflow-hidden select-none z-[9999]
                        bg-white text-slate-900 rounded-xl border border-black/10 shadow-2xl"
           >
-            {/* Editar reserva (mesmo estilo claro do Coordenador) */}
+            {/* Editar reserva */}
             <button
               type="button"
               role="menuitem"
@@ -266,9 +280,7 @@ export function LembreteCard({ item }) {
                   strokeWidth="1.6"
                 />
               </svg>
-              <span className="font-medium text-slate-900">
-                Editar reserva
-              </span>
+              <span className="font-medium text-slate-900">Editar reserva</span>
             </button>
 
             <div className="h-px bg-black/10" />

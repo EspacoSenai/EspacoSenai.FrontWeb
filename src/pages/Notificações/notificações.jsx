@@ -6,8 +6,6 @@ import sinoSN from '../../assets/sinoSN.svg';
 import lembrete from '../../assets/lembrete.svg';
 import SemNotificacao from './semnotificação.jsx';
 
-
-
 // Notificações iniciais (dados mock)
 const notificacoesIniciais = [
   {
@@ -26,6 +24,7 @@ const notificacoesIniciais = [
     body: 'Você tem uma reserva confirmada nos Computadores das 10h40 até às 11h20. Garanta que estará pronto(a) com antecedência para aproveitar ao máximo o seu tempo.'
   }
 ];
+
 export default function Notificacoes() {
   const navigate = useNavigate();
   // Estado das notificações mostrado na tela
@@ -98,13 +97,19 @@ export default function Notificacoes() {
   return (
     <div className="min-h-screen bg-white text-[#111] font-sans">
       {/* Topbar */}
-  <header className="w-full bg-white border-b relative">
-        <button onClick={() => window.history.back()} className="absolute left-2 top-1/2 -translate-y-1/2 p-1 z-10">
-          <img src={setaLeft} alt="voltar" className="w-6 h-6 bg-transparent text-gray-800" />
+      <header className="w-full bg-white border-b relative">
+        <button
+          onClick={() => window.history.back()}
+          className="absolute left-2 top-1/2 -translate-y-1/2 p-1 z-10
+                     rounded-md bg-white border border-gray-300 shadow-sm
+                     hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#AE0000]"
+          aria-label="voltar"
+        >
+          <img src={setaLeft} alt="voltar" className="w-6 h-6" />
         </button>
         <div className="max-w-5xl mx-auto flex items-center py-4 px-4 sm:px-6">
           <div className="mx-auto flex items-center gap-2">
-            <img src={sinoSN} alt="ícone" className="w-6 h-6 bg-transparent text-[#AE0000]" />
+            <img src={sinoSN} alt="ícone" className="w-6 h-6" />
             <h1 className="text-lg font-semibold underline decoration-[#7c0c15] underline-offset-4">Suas notificações</h1>
           </div>
         </div>
@@ -141,7 +146,7 @@ export default function Notificacoes() {
                     className="w-full max-w-7xl mx-auto flex items-start gap-4 p-5 transition-transform duration-150"
                   >
                     <div className="flex-shrink-0 text-[#AE0000] mt-1">
-                      <img src={lembrete} alt="lembrete" className="w-6 h-6 bg-transparent" />
+                      <img src={lembrete} alt="lembrete" className="w-6 h-6" />
                     </div>
 
                     <div className="flex-1">
@@ -150,8 +155,14 @@ export default function Notificacoes() {
                     </div>
 
                     <div className="flex-shrink-0 ml-4">
-                      <button onClick={() => removerNotificacao(n.id)} className="p-2 text-gray-500 hover:text-red-600" aria-label="remover">
-                        <img src={lixeira} alt="remover" className="w-6 h-6 bg-transparent" />
+                      <button
+                        onClick={() => removerNotificacao(n.id)}
+                        className="p-2 rounded-md bg-white border border-gray-300 shadow-sm
+                                   hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-300"
+                        aria-label="remover"
+                        title="Remover"
+                      >
+                        <img src={lixeira} alt="remover" className="w-6 h-6" />
                       </button>
                     </div>
                   </div>

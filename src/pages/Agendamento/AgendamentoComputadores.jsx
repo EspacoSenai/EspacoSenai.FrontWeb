@@ -1,3 +1,4 @@
+// src/pages/Agendamentos/AgendamentoComputadores.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import sucessoIcon from "../../assets/sucesso.svg";
@@ -10,22 +11,105 @@ import ModalDeAgendamento from "../../components/ComponentsDeAgendamento/ModalDe
 
 import {
   COR_VERMELHO,
-  HORARIOS_INICIO_COMPUTADOR,
-  HORARIOS_TERMINO_COMPUTADOR,
-  HORARIO_TERMINO_COMPUTADOR_FIXO, 
+  HORARIO_TERMINO_COMPUTADOR_FIXO,
   montarDiasSemana,
   validaIntervalo,
 } from "../../components/ComponentsDeAgendamento/FuncoesCompartilhada";
 
+import { salvarReservaFormatoBack } from "../../service/reserva";
+import { api } from "../../service/api";
+
+/* ====== IDs fixos / ambiente ====== */
+// ID do AMBIENTE de computadores (ajuste conforme estiver no banco)
+const COMPUTADORES_AMBIENTE_ID = 3;
+// Fallback de catálogo se por algum motivo não achar o correto
+const COMPUTADORES_CATALOGO_FALLBACK_ID = 4;
+
+/* ===== dias da semana como o back usa ===== */
+const DIAS_BACK = [
+  "DOMINGO",
+  "SEGUNDA",
+  "TERCA",
+  "QUARTA",
+  "QUINTA",
+  "SEXTA",
+  "SABADO",
+];
+
+/* ===== helpers JWT p/ pegar id do usuário do token ===== */
+function b64urlDecode(str) {
+  try {
+    const pad = "=".repeat((4 - (str.length % 4)) % 4);
+    const b64 = (str + pad).replace(/-/g, "+").replace(/_/g, "/");
+    return atob(b64);
+  } catch {
+    return "";
+  }
+}
+function parseJwtLocal(token) {
+  try {
+    const [, payload] = String(token || "").split(".");
+    return JSON.parse(b64urlDecode(payload) || "{}");
+  } catch {
+    return {};
+  }
+}
+function getUserIdFromToken() {
+  const token = localStorage.getItem("access_token") || "";
+  const claims = parseJwtLocal(token);
+  return claims?.id ?? claims?.user_id ?? claims?.sub ?? null;
+}
+
+// ===== helpers de horário =====
+const timeToMin = (s) => {
+  const [h, m] = String(s || "")
+    .slice(0, 5)
+    .split(":")
+    .map(Number);
+  return h * 60 + m;
+};
+
+function toHHMM(hora) {
+  // aceita "09:00" ou "09:00:00"
+  return String(hora || "").slice(0, 5);
+}
+
+/**
+ * Gera slots de horários a partir das faixas do catálogo **sem inventar intervalos**.
+ *
+ * - Início: todos os `horaInicio` únicos do dia, ordenados
+ */
+function gerarSlotsPorFaixas(faixas) {
+  if (!Array.isArray(faixas) || !faixas.length) {
+    return { inicio: [] };
+  }
+
+  const inicioSet = new Set();
+
+  faixas.forEach((f) => {
+    if (f.horaInicio) inicioSet.add(toHHMM(f.horaInicio));
+  });
+
+  const inicio = Array.from(inicioSet).sort(
+    (a, b) => timeToMin(a) - timeToMin(b)
+  );
+
+  return { inicio };
+}
+
 export default function AgendamentoComputadores() {
   const [semanaSelecionada, setSemanaSelecionada] = useState("essa");
   const [diaSelecionado, setDiaSelecionado] = useState(0);
+
   const [horaInicio, setHoraInicio] = useState(null);
-  const [horaTermino, setHoraTermino] = useState(null);
+  const horaTermino = HORARIO_TERMINO_COMPUTADOR_FIXO;
 
   const [horaInicioFiltro, setHoraInicioFiltro] = useState("");
 
   const [computadorSelecionado, setComputadorSelecionado] = useState(null);
+
+  // catálogo de computadores vindo do back (lista de objetos com id, diaSemana, horaInicio, horaFim)
+  const [catalogoComputadores, setCatalogoComputadores] = useState([]);
 
   // Modal
   const [modal, setModal] = useState({
@@ -41,7 +125,7 @@ export default function AgendamentoComputadores() {
     [semanaSelecionada]
   );
 
-  // desabilita horários passados se for hoje
+  // relógio para bloquear horários passados no dia atual
   const [nowMinutes, setNowMinutes] = useState(() => {
     const n = new Date();
     return n.getHours() * 60 + n.getMinutes();
@@ -53,6 +137,7 @@ export default function AgendamentoComputadores() {
     }, 30_000);
     return () => clearInterval(id);
   }, []);
+
   const isHoje = useMemo(() => {
     const dia = diasDaSemana[diaSelecionado]?.dataCompleta;
     if (!dia) return false;
@@ -63,10 +148,6 @@ export default function AgendamentoComputadores() {
       dia.getDate() === n.getDate()
     );
   }, [diasDaSemana, diaSelecionado]);
-  const timeToMin = (s) => {
-    const [h, m] = s.split(":").map(Number);
-    return h * 60 + m;
-  };
 
   // só pode selecionar dia que não tenha passado
   useEffect(() => {
@@ -79,7 +160,7 @@ export default function AgendamentoComputadores() {
     }
   }, [diasDaSemana, diaSelecionado, semanaSelecionada]);
 
-  // ESC fecha modal e bloqueio de scroll
+  // ESC fecha modal + bloqueio de scroll enquanto aberto
   useEffect(() => {
     const onEsc = (e) => e.key === "Escape" && fecharModal();
     window.addEventListener("keydown", onEsc);
@@ -104,49 +185,241 @@ export default function AgendamentoComputadores() {
   function cancelar() {
     setDiaSelecionado(0);
     setHoraInicio(null);
-    setHoraTermino(null);
     setHoraInicioFiltro("");
     setComputadorSelecionado(null);
   }
 
-  function confirmar() {
-    if (!horaInicio || !horaTermino || !computadorSelecionado) {
+  // limpa filtro/horário de início quando trocar semana/dia
+  useEffect(() => {
+    setHoraInicioFiltro("");
+    setHoraInicio(null);
+  }, [semanaSelecionada, diaSelecionado]);
+
+  // ===== carrega catálogo de computadores =====
+  useEffect(() => {
+    let cancelado = false;
+
+    async function carregarCatalogoComputadores() {
+      try {
+        const resp = await api.get("/catalogo/buscar");
+        const data = Array.isArray(resp?.data) ? resp.data : resp;
+
+        if (!Array.isArray(data)) {
+          console.warn(
+            "[AgendamentoComputadores] /catalogo/buscar não retornou array:",
+            data
+          );
+          return;
+        }
+
+        const mapeado = data.map((item) => {
+          const catalogoIdItem = item?.id ?? null;
+
+          // suporta tanto ambiente.id quanto ambienteId direto
+          const ambienteId =
+            item?.ambiente?.id ?? item?.ambienteId ?? item?.idAmbiente ?? null;
+
+          const nomeAmbiente = String(
+            item?.ambiente?.nome || item?.ambienteNome || ""
+          )
+            .trim()
+            .toLowerCase();
+
+          const disponibilidadeItem = String(
+            item?.disponibilidade || item?.ambiente?.disponibilidade || ""
+          ).toUpperCase();
+
+          const diaSemanaNormalizado = String(item.diaSemana || "")
+            .trim()
+            .toUpperCase();
+
+          // COMPUTADORES: ambienteId = COMPUTADORES_AMBIENTE_ID
+          // ou nome contendo "computador"/"laboratório"
+          const isComputador =
+            ambienteId === COMPUTADORES_AMBIENTE_ID ||
+            nomeAmbiente.includes("computador") ||
+            nomeAmbiente.includes("laboratório") ||
+            nomeAmbiente.includes("laboratorio");
+
+          const isDisponivel =
+            !disponibilidadeItem || disponibilidadeItem === "DISPONIVEL";
+
+          return {
+            id: catalogoIdItem,
+            diaSemana: diaSemanaNormalizado,
+            horaInicio: toHHMM(item.horaInicio),
+            horaFim: toHHMM(item.horaFim),
+            isComputador,
+            isDisponivel,
+          };
+        });
+
+        console.log("[AgendamentoComputadores] catálogo completo:", mapeado);
+
+        const apenasComputadores = mapeado.filter(
+          (it) => it.isComputador && it.isDisponivel
+        );
+
+        console.log(
+          "[AgendamentoComputadores] apenas computadores:",
+          apenasComputadores
+        );
+
+        if (!cancelado) {
+          setCatalogoComputadores(
+            apenasComputadores.map((it) => ({
+              id: it.id,
+              diaSemana: it.diaSemana,
+              horaInicio: it.horaInicio,
+              horaFim: it.horaFim,
+            }))
+          );
+        }
+      } catch (err) {
+        console.error("Erro ao buscar catálogo de computadores:", err);
+      }
+    }
+
+    carregarCatalogoComputadores();
+
+    return () => {
+      cancelado = true;
+    };
+  }, []);
+
+  // ===== dia da semana no formato do back =====
+  const diaSemanaBackSelecionado = useMemo(() => {
+    const dia = diasDaSemana[diaSelecionado]?.dataCompleta;
+    if (!dia) return null;
+    return DIAS_BACK[dia.getDay()];
+  }, [diasDaSemana, diaSelecionado]);
+
+  // ===== faixas do dia =====
+  const faixasDoDia = useMemo(() => {
+    if (!diaSemanaBackSelecionado) return [];
+    const faixas = catalogoComputadores.filter(
+      (c) => c.diaSemana === diaSemanaBackSelecionado
+    );
+    console.log(
+      "[AgendamentoComputadores] faixasDoDia para",
+      diaSemanaBackSelecionado,
+      faixas
+    );
+    return faixas;
+  }, [catalogoComputadores, diaSemanaBackSelecionado]);
+
+  // horários de início disponíveis (saindo do catálogo)
+  const { inicio: horariosInicioDisponiveis } = useMemo(
+    () => gerarSlotsPorFaixas(faixasDoDia),
+    [faixasDoDia]
+  );
+
+  const temHorariosParaDia = horariosInicioDisponiveis.length > 0;
+
+  async function confirmar() {
+    if (!horaInicio || !computadorSelecionado) {
       abrirModal(
         "error",
         "Dados incompletos",
-        "Escolha os horários e um computador para continuar."
+        "Escolha o horário de início e um computador para continuar."
       );
       return;
     }
+
     const dia = diasDaSemana[diaSelecionado];
     if (!dia || dia.desabilitado) {
       abrirModal("error", "Data inválida", "Selecione uma data válida.");
       return;
     }
-    if (!validaIntervalo(horaInicio, horaTermino)) {
+
+    // Back com @Future em data -> HOJE não passa
+    if (isHoje) {
       abrirModal(
         "error",
-        "Horários inconsistentes",
-        "O término precisa ser depois do início."
+        "Data não permitida",
+        "As reservas de computadores só são aceitas a partir de amanhã."
       );
       return;
     }
 
-    const dados = {
-      local: "Computadores",
-      semana: semanaSelecionada === "essa" ? "Essa semana" : "Próxima semana",
-      data: dia.dataCompleta.toISOString(),
-      inicio: horaInicio,
-      termino: horaTermino,
-      computador: computadorSelecionado,
-    };
-    console.log("Agendamento:", dados);
+    if (!horariosInicioDisponiveis.includes(horaInicio)) {
+      abrirModal(
+        "error",
+        "Horário indisponível",
+        "O horário selecionado não está disponível para este dia."
+      );
+      return;
+    }
 
-    abrirModal(
-      "success",
-      "Reserva realizada com sucesso!",
-      "Sua solicitação foi enviada e está aguardando aprovação."
+    // início deve ser antes do horário de encerramento (exibição)
+    if (!validaIntervalo(horaInicio, horaTermino)) {
+      abrirModal(
+        "error",
+        "Horários inconsistentes",
+        `O início precisa ser antes de ${horaTermino}.`
+      );
+      return;
+    }
+
+    const hostId = getUserIdFromToken();
+    if (!hostId) {
+      abrirModal(
+        "error",
+        "Sessão inválida",
+        "Não foi possível identificar o usuário logado."
+      );
+      return;
+    }
+
+    // catálogo correto pelo dia + horário de início
+    const catalogoSelecionado = catalogoComputadores.find(
+      (c) =>
+        c.diaSemana === diaSemanaBackSelecionado &&
+        c.horaInicio === horaInicio
     );
+
+    if (!catalogoSelecionado?.id) {
+      console.error(
+        "[AgendamentoComputadores] Não encontrou catálogo para",
+        diaSemanaBackSelecionado,
+        horaInicio
+      );
+      abrirModal(
+        "error",
+        "Configuração inválida",
+        "Não foi possível localizar o catálogo correspondente para esse horário. Avise o coordenador."
+      );
+      return;
+    }
+
+    const catalogoId =
+      catalogoSelecionado.id || COMPUTADORES_CATALOGO_FALLBACK_ID;
+
+    try {
+      await salvarReservaFormatoBack({
+        idUsuario: hostId,
+        catalogoId,
+        dataJS: dia.dataCompleta,
+        horaInicioHHMM: horaInicio,
+        // término fixo (o mesmo que você mostra na tela)
+        horaFimHHMM: HORARIO_TERMINO_COMPUTADOR_FIXO,
+        msgUsuario: `Reserva de computadores - máquina: ${computadorSelecionado}`,
+      });
+
+      abrirModal(
+        "success",
+        "Reserva realizada com sucesso!",
+        "Seu pedido foi enviado e está aguardando aprovação."
+      );
+      // cancelar(); // se quiser limpar o formulário depois
+    } catch (err) {
+      console.error("ERRO SALVAR RESERVA [COMPUTADORES]:", err);
+      const msg =
+        err?.data?.message ||
+        err?.message ||
+        `Erro ao comunicar com o servidor. [${err?.status || ""}]`;
+      abrirModal("error", "Falha ao reservar", msg);
+    }
   }
 
   return (
@@ -165,7 +438,10 @@ export default function AgendamentoComputadores() {
 
         {/* Seleção semana e data */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start mb-10">
-          <TrocaSemana value={semanaSelecionada} onChange={setSemanaSelecionada} />
+          <TrocaSemana
+            value={semanaSelecionada}
+            onChange={setSemanaSelecionada}
+          />
           <div className="hidden md:block " />
           <div className="flex md:justify-end items-center gap-2 text-black dark:text-white">
             <span className="font-medium mr-1">Data:</span>
@@ -178,54 +454,81 @@ export default function AgendamentoComputadores() {
         </div>
 
         {/* Conteúdo */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Início */}
-          <GradeHorarios
-            titulo="Horário de início:"
-            opcoes={HORARIOS_INICIO_COMPUTADOR}
-            selecionado={horaInicio}
-            onSelect={setHoraInicio}
-            isDisabled={(t) => isHoje && timeToMin(t) <= nowMinutes}
-            comFiltro={true}
-            filtro={horaInicioFiltro}
-            onFiltroChange={setHoraInicioFiltro}
-          />
+        {temHorariosParaDia ? (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Início */}
+              <GradeHorarios
+                titulo="Horário de início:"
+                opcoes={horariosInicioDisponiveis}
+                selecionado={horaInicio}
+                onSelect={setHoraInicio}
+                isDisabled={(t) => {
+                  const passado = isHoje && timeToMin(t) <= nowMinutes;
+                  const depoisTermino =
+                    timeToMin(t) >= timeToMin(horaTermino);
+                  return passado || depoisTermino;
+                }}
+                comFiltro={true}
+                filtro={horaInicioFiltro}
+                onFiltroChange={setHoraInicioFiltro}
+              />
 
-          {/* Término */}
-          <div>
-            <h2 className="text-lg font-medium text-black dark:text-white mb-1">
-              Horário de término:
-            </h2>
+              {/* Término fixo (exibição) */}
+              <div className="flex flex-col gap-4">
+                <h2 className="text-lg font-medium text-black dark:text-white">
+                  Horário de término:
+                </h2>
 
-            <GradeHorarios
-              titulo=""
-              opcoes={HORARIOS_TERMINO_COMPUTADOR}
-              selecionado={horaTermino}
-              onSelect={setHoraTermino}
-              isDisabled={(t) => isHoje && timeToMin(t) <= nowMinutes}
-              comFiltro={false}
-            />
+                <div className="rounded-lg border border-black/10 dark:border-white/10 p-4 bg-[#F7F7F7] dark:bg-[#151515] text-black dark:text-white">
+                  <p className="text-sm leading-relaxed">
+                    Todos devem desocupar os computadores até{" "}
+                    <span
+                      className="font-semibold"
+                      style={{ color: COR_VERMELHO }}
+                    >
+                      {horaTermino}
+                    </span>
+                    .
+                  </p>
+
+                  {horaInicio &&
+                    timeToMin(horaInicio) >= timeToMin(horaTermino) && (
+                      <p className="mt-3 text-sm text-red-600 dark:text-red-400">
+                        O início precisa ser antes do término.
+                      </p>
+                    )}
+                </div>
+              </div>
+            </div>
+
+            {/* Seletor de computadores */}
+            <div className="mt-6">
+              <SeletorComputadores
+                valor={computadorSelecionado}
+                onChange={setComputadorSelecionado}
+              />
+
+              {/* OBS abaixo do seletor */}
+              <p className="mt-3 text-sm leading-5">
+                <span
+                  className="font-semibold"
+                  style={{ color: COR_VERMELHO }}
+                >
+                  OBS:
+                </span>{" "}
+                <span className="text-[#1E1E1E] dark:text-gray-200">
+                  Informe apenas o horário de início. Todos devem desocupar os
+                  computadores até, no máximo, às {HORARIO_TERMINO_COMPUTADOR_FIXO}.
+                </span>
+              </p>
+            </div>
+          </>
+        ) : (
+          <div className="mt-6 bg-[#F5F5F5] dark:bg-[#111111] rounded-md px-4 py-8 flex items-center justify-center text-gray-600 dark:text-gray-300 text-sm md:text-base">
+            Nenhum horário disponível para este dia.
           </div>
-        </div>
-
-        {/* Seletor de computadores */}
-        <div className="mt-6">
-          <SeletorComputadores
-            valor={computadorSelecionado}
-            onChange={setComputadorSelecionado}
-          />
-
-          {/* OBS abaixo do seletor */}
-          <p className="mt-3 text-sm leading-5">
-            <span className="font-semibold" style={{ color: COR_VERMELHO }}>
-              OBS:
-            </span>{" "}
-            <span className="text-[#1E1E1E] dark:text-gray-200">
-              Informe apenas o horário de início. Todos devem desocupar os computadores
-              até, no máximo, às {HORARIO_TERMINO_COMPUTADOR_FIXO}.
-            </span>
-          </p>
-        </div>
+        )}
 
         {/* Botões */}
         <div className="mt-6 md:mt-4 flex flex-col md:flex-row gap-4 md:justify-end">

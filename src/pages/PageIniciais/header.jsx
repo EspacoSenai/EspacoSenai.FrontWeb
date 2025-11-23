@@ -21,7 +21,7 @@ export default function Header() {
           {/* Links desktop */}
           <div className="hidden md:flex items-center gap-3">
             <Link
-              to="/login"
+              to="/selecaoDePerfil"
               className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:opacity-90 transition"
             >
               Entrar
@@ -86,7 +86,7 @@ export default function Header() {
           </div>
 
           <Link
-            to="/login"
+            to="/selecaoDePerfil"
             onClick={() => setMenuOpen(false)}
             className="w-full px-4 py-3 text-sm font-medium text-white bg-red-600 rounded-lg text-center hover:opacity-90 transition"
           >

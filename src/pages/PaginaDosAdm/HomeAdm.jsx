@@ -1,4 +1,3 @@
-// src/pages/PaginaDosAdministradores/HomeAdm.jsx
 import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -20,10 +19,47 @@ import {
 } from "../../components/ComponentsHome/FuncoesHome";
 
 import ReservasConfirmadas from "../../components/ComponentsHome/ReservasConfirmadas.jsx";
+import { buscarMeuPerfil } from "../../service/usuario"; // Corrigir para buscar o perfil
 
 export default function HomeAdm() {
   const [page, setPage] = useState(0);
   const [lembretes] = useState(lembretesData);
+
+  const [displayName, setDisplayName] = useState("Administrador(a)");
+
+  useEffect(() => {
+    const loadName = async () => {
+      try {
+        const perfil = await buscarMeuPerfil(); // Busca o perfil do administrador no backend
+        const nomeBack =
+          (perfil &&
+            (perfil.nome || perfil.nomeCompleto || perfil.nomeUsuario || perfil.tag)) ||
+          "Administrador(a)"; // Se não encontrar, usa o nome padrão
+        setDisplayName(nomeBack); // Atualiza o estado com o nome encontrado
+      } catch {
+        setDisplayName("Administrador(a)"); // Se falhar, usa o nome padrão
+      }
+    };
+    loadName();
+  }, []);
+
+  const primeiroNome = displayName.split(" ")[0]; // Pega o primeiro nome do usuário
+
+  // AJUSTE 1: Diminuí o limite para 12 caracteres.
+  // Assim "Administrador(a)" (16 chars) cai na regra de fonte menor.
+  const isLongName = primeiroNome.length > 12;
+
+  const mobileTitleClass = isLongName
+    ? "text-[22px] leading-snug"
+    : "text-[26px] leading-tight";
+
+  const desktopFirstLineClass = isLongName
+    ? "text-[30px] lg:text-[34px]"
+    : "text-[36px] lg:text-[40px]";
+
+  const desktopSecondLineClass = isLongName
+    ? "text-[30px] lg:text-[36px]"
+    : "text-[40px] lg:text-[46px]";
 
   const nextPage = useCallback(() => setPage((p) => (p + 1) % pagesCount), []);
   const prevPage = useCallback(
@@ -44,19 +80,21 @@ export default function HomeAdm() {
     <>
       <Header />
 
-      <main className="bg-white dark:bg-[#0B0B0B] w-full">
-       
+      <main className="bg-white dark:bg-[#0B0B0B] w-full pb-24 relative overflow-hidden">
+        {/* ===== HERO ===== */}
         <section className="relative w-full -mt-px">
           {/* Mobile */}
-          <div className="md:hidden relative w-full h-[440px] bg-[#A00000] dark:bg-black text-white flex items-center">
+          <div className="md:hidden relative w-full h-[440px] bg-[#A00000] dark:bg-black text-white flex items-center pt-12">
             <div className="w-full max-w-7xl mx-auto px-4 flex flex-col items-center gap-4">
               <img
                 src={Pessoa}
                 alt=""
                 className="h-[170px] w-auto object-contain drop-shadow-[0_6px_18px_rgba(0,0,0,0.15)]"
               />
-              <h1 className="text-[26px] font-extrabold leading-tight text-center">
-                Bem-vindo(a) Nome,
+              <h1
+                className={`font-extrabold text-center text-balance ${mobileTitleClass}`}
+              >
+                Bem-vindo(a) {primeiroNome},
               </h1>
               <p className="text-sm opacity-95 text-center">
                 Este é o Painel de Administração!
@@ -74,23 +112,33 @@ export default function HomeAdm() {
             <div className="relative w-1/2 h-full flex items-end justify-center pb-12 md:translate-x-8 md:-translate-y-16 shrink-0 min-w-[360px]">
               <img src={Pessoa} alt="" className="h-[65%] w-auto" />
             </div>
+
             <div className="relative w-1/2 h-full overflow-hidden lg:-right-7">
               <img
                 src={OndaPrincipal}
                 alt=""
                 className="absolute inset-0 w-full h-full object-contain object-right-top z-0 pointer-events-none select-none"
               />
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-0 z-10 pb-32">
-                <h1 className="text-[36px] lg:text-[44px] font-extrabold leading-tight pl-8">
-                  Bem-vindo(a) Nome,
-                </h1>
-                <p className="text-lg mt-3">Este é o Painel do Coordenador!</p>
-                <div className="w-full mt-12 lg:mt-20 flex justify-end pr-10 lg:pr-20">
-                  <Link to="/salas-administradores">
-                    <button className="bg-white text-gray-900 font-semibold py-2 px-8 rounded-lg shadow-lg hover:bg-gray-200 transition">
-                      Começar agora
-                    </button>
-                  </Link>
+              {/* Texto alinhado à direita dentro da onda */}
+              <div className="absolute inset-0 flex flex-col items-end justify-center text-white text-right pr-12 lg:pr-24 z-10 pb-24">
+                {/* AJUSTE 2: max-w-[380px] para segurar o texto mais a direita em telas menores */}
+                <div className="w-full max-w-[380px] lg:max-w-[520px] ml-auto">
+                  <h1 className="font-extrabold text-balance leading-tight">
+                    <span className={`${desktopFirstLineClass} block`}>
+                      Bem-vindo(a)
+                    </span>
+                    <span className={`${desktopSecondLineClass} block`}>
+                      {primeiroNome},
+                    </span>
+                  </h1>
+                  <p className="text-lg mt-3">Este é o Painel de Administração!</p>
+                  <div className="w-full mt-12 lg:mt-20 flex justify-end">
+                    <Link to="/salas-administradores">
+                      <button className="bg-white text-gray-900 font-semibold py-2 px-8 rounded-lg shadow-lg hover:bg-gray-200 transition">
+                        Começar agora
+                      </button>
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
@@ -99,7 +147,7 @@ export default function HomeAdm() {
 
         <div className="border-t-2 border-gray-300 mx-8 mt-0 mb-3" />
 
-       
+        {/* ===== ESPAÇOS UTILIZADOS ===== */}
         <section className="w-full" id="atalhos">
           <div className="max-w-6xl mx-auto px-5 sm:px-6 md:px-8 lg:px-10 py-8 md:py-10">
             <div className="flex items-center gap-3 mb-4">
@@ -139,7 +187,9 @@ export default function HomeAdm() {
                   <span
                     key={i}
                     className={`h-2 w-2 rounded-full transition ${
-                      page === i ? "bg-[#AE0000]" : "bg-gray-400/70 dark:bg-gray-500"
+                      page === i
+                        ? "bg-[#AE0000]"
+                        : "bg-gray-400/70 dark:bg-gray-500"
                     }`}
                   />
                 ))}
@@ -154,13 +204,12 @@ export default function HomeAdm() {
 
         <div className="border-t-2 border-gray-300 mx-8 mt-0 mb-3" />
 
-     
+        {/* ===== BOTÕES ADMIN ===== */}
         <section className="w-full mt-6">
           <div className="max-w-5xl mx-auto px-5 sm:px-6 md:px-8 lg:px-10">
-            {/* Card dos botões (aprovado) */}
             <div className="bg-white dark:bg-neutral-900 rounded-lg shadow-[0_1px_0_rgba(0,0,0,0.08)] border border-[#EDEDED] dark:border-neutral-800 px-4 sm:px-6 py-4 max-w-[760px] mx-auto">
               <div className="w-full flex items-center justify-center gap-16">
-                <Link to="/pre-cadastro">
+                <Link to="/pre-cadastrar">
                   <button className="min-w-[180px] h-[44px] rounded-lg bg-[#AE0000] text-white font-semibold shadow-[0_3px_0_#7B0000] hover:brightness-95 active:translate-y-[1px] transition px-6">
                     Pré-Cadastro
                   </button>
@@ -180,7 +229,9 @@ export default function HomeAdm() {
             <div className="flex items-center gap-3 mt-7 -ml-5 sm:-ml-6">
               <span className="inline-block h-[22px] w-[6px] rounded-full bg-[#AE0000]" />
               <h3 className="text-[18px] sm:text-[19px] font-medium text-neutral-900 dark:text-white">
-                <span className="text-[#AE0000] font-semibold">Funcionalidades</span>{" "}
+                <span className="text-[#AE0000] font-semibold">
+                  Funcionalidades
+                </span>{" "}
                 do Administrador
               </h3>
             </div>
@@ -196,7 +247,9 @@ export default function HomeAdm() {
               </li>
               <li className="flex gap-3">
                 <span className="mt-[6px] h-[10px] w-[10px] rounded-full bg-[#7B0000] shrink-0" />
-                <span>Gere relatórios detalhados por sala, aluno ou período.</span>
+                <span>
+                  Gere relatórios detalhados por sala, aluno ou período.
+                </span>
               </li>
               <li className="flex gap-3">
                 <span className="mt-[6px] h-[10px] w-[10px] rounded-full bg-[#7B0000] shrink-0" />
@@ -205,9 +258,9 @@ export default function HomeAdm() {
             </ul>
 
             <p className="mt-6 text-[15px] text-neutral-900 dark:text-neutral-200">
-              <span className="font-semibold text-[#AE0000]">OBS:</span>{" "}
-              Todas as reservas seguem critérios pedagógicos e operacionais
-              definidos pela unidade.
+              <span className="font-semibold text-[#AE0000]">OBS:</span> Todas
+              as reservas seguem critérios pedagógicos e operacionais definidos
+              pela unidade.
             </p>
 
             <div className="mt-6">
@@ -222,11 +275,15 @@ export default function HomeAdm() {
           </div>
         </section>
 
-       
-        <section className="relative w-full overflow-visible">
-          {/* Spacer que garante espaço pro conteúdo aparecer acima da onda */}
-          <div className="relative z-10 max-w-6xl mx-auto px-5 sm:px-6 md:px-8 lg:px-10 pb-[360px] md:pb-[440px]" />
-          <div className="pointer-events-none select-none absolute inset-x-0 bottom-0 h-[140px] md:h-[180px]">
+        {/* ===== ONDA RODAPÉ ===== */}
+        <section className="relative w-full overflow-visible -mb-[140px] md:-mb-[200px]">
+          <div className="max-w-6xl mx-auto px-5 sm:px-6 md:px-8 lg:px-10 pt-6">
+            <div className="h-px w-full" />
+          </div>
+
+          <div className="relative z-10 max-w-6xl mx-auto px-5 sm:px-6 md:px-8 lg:px-10 pb-[460px] md:pb-[520px]" />
+
+          <div className="pointer-events-none select-none absolute inset-x-0 bottom-0 h-[160px] md:h-[200px]">
             <motion.img
               src={OndaRodape}
               alt=""
@@ -238,7 +295,6 @@ export default function HomeAdm() {
         </section>
       </main>
 
-      {/* Footer fora do main (mesmo padrão do Professor) */}
       <Footer />
     </>
   );

@@ -1,80 +1,135 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+// src/pages/Autenticação/cadastro.jsx
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+
 import logo from "../../assets/EspacoSenai.svg";
-import logoDark from "../../assets/logodark.svg";
 import onda from "../../assets/ondaCadastro.svg";
 import olhoAberto from "../../assets/olhoFechado.svg";
 import olhoFechado from "../../assets/olhoAberto.svg";
 
-// Função para verificar força da senha
+import { signUpUsuario } from "../../service/authService";
+import ModalCodigoVerificacao from "./ModalCodigoVerificacao";
+
+// === util força da senha ===
 const getForcaSenha = (senha) => {
   if (!senha) return "";
-
   const temLetra = /[a-zA-Z]/.test(senha);
   const temNumero = /[0-9]/.test(senha);
   const temEspecial = /[^a-zA-Z0-9]/.test(senha);
-
   if (senha.length < 6) return "fraca";
   if (senha.length >= 6 && temLetra && temNumero && !temEspecial) return "media";
   if (senha.length >= 8 && temLetra && temNumero && temEspecial) return "forte";
-
   return "fraca";
 };
 
 export default function Cadastro() {
+  const navigate = useNavigate();
+
+  // refs para manter caret/foco
+  const nomeRef = useRef(null);
+  const emailRef = useRef(null);
+  const telRef = useRef(null);
+  const senhaRef = useRef(null);
+  const confRef = useRef(null);
+
   const [showSenha, setShowSenha] = useState(false);
   const [showConfirmar, setShowConfirmar] = useState(false);
 
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [telefone, setTelefone] = useState("");
   const [senha, setSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
 
   const [erro, setErro] = useState(false);
+  const [mensagemErro, setMensagemErro] = useState("");
+  const [mensagemSucesso, setMensagemSucesso] = useState("");
   const [forcaSenha, setForcaSenha] = useState("");
 
-  const handleSubmit = (e) => {
+  const [loading, setLoading] = useState(false);
+
+  // Fluxo de confirmação
+  const [tokenCadastro, setTokenCadastro] = useState("");
+  const [openOtp, setOpenOtp] = useState(false);
+
+  const focusIfPossible = (ref) => {
+    if (ref?.current) {
+      ref.current.focus({ preventScroll: true });
+      setTimeout(() => {
+        try {
+          const el = ref.current;
+          const len = el.value?.length ?? 0;
+          el.setSelectionRange?.(len, len);
+        } catch {}
+      }, 0);
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setErro(false);
+    setMensagemErro("");
+    setMensagemSucesso("");
+
+    if (!nome || !email || !senha || !confirmarSenha) {
+      setErro(true);
+      setMensagemErro("Preencha todos os campos obrigatórios.");
+      return focusIfPossible(!nome ? nomeRef : !email ? emailRef : !senha ? senhaRef : confRef);
+    }
 
     if (senha !== confirmarSenha) {
       setErro(true);
-      return;
+      setMensagemErro("As senhas não coincidem.");
+      return focusIfPossible(confRef);
     }
 
-    setErro(false);
-<<<<<<< HEAD
-    console.log("Cadastro enviado!");
-=======
-    // Simula cadastro bem-sucedido e navega para a landing
-    console.log("Cadastro enviado!");
-    navigate("/landing", { replace: true });
->>>>>>> origin/VitorDev
+    if (senha.length < 8 || senha.length > 15) {
+      setErro(true);
+      setMensagemErro("A senha deve ter entre 8 e 15 caracteres.");
+      return focusIfPossible(senhaRef);
+    }
+
+    setLoading(true);
+
+    try {
+      const resp = await signUpUsuario({
+        nome: nome.trim(),
+        email: email.trim(),
+        senha,
+        tag: telefone.trim() || null,
+      });
+
+      const token = resp?.token ?? null;
+      const msg =
+        resp?.message ||
+        "Se elegível, um código foi enviado para seu e-mail para confirmar o cadastro.";
+
+      if (token) {
+        setTokenCadastro(token);
+        setMensagemSucesso(msg);
+        setOpenOtp(true);
+      } else {
+        setErro(true);
+        setMensagemErro("Cadastro iniciado, mas não recebemos o token de verificação. Tente novamente.");
+      }
+    } catch (error) {
+      setErro(true);
+      setMensagemErro(error?.message || "Não foi possível realizar o cadastro. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
-    if (senha === confirmarSenha && erro) {
-      setErro(false);
-    }
-  }, [senha, confirmarSenha, erro]);
+    if (senha === confirmarSenha && erro && !mensagemErro) setErro(false);
+  }, [senha, confirmarSenha, erro, mensagemErro]);
+
+  // evita zoom 300% no iOS (inputs >= 16px)
+  const baseInputCls =
+    "p-2 rounded-md shadow-sm border bg-white placeholder-black text-black focus:outline-none caret-black text-[16px]";
+  const borderState = erro ? "border-red-500" : "border-gray-300";
 
   return (
-<<<<<<< HEAD
-    <div className="min-h-screen bg-white flex items-center justify-center relative overflow-hidden dark:bg-black px-4">
-  
-      <>
-
-        {/* Logo clara */}
-        <img
-          src={logo}
-          alt="Logo EspaçoSenai"
-          className="absolute top-4 sm:top-6 left-4 sm:left-6 w-[105px] sm:w-[140px] md:w-[140px] z-0 block dark:hidden"
-        />
-        {/* Logo escura */}
-        <img
-          src={logoDark}
-          alt="Logo EspaçoSenai Dark"
-          className="absolute top-4 sm:top-6 left-4 sm:left-6 w-[105px] sm:w-[140px] md:w-[140px] z-0 hidden dark:block"
-        />
-      </>
-=======
     <div className="min-h-screen bg-white flex items-center justify-center relative overflow-hidden">
       {/* Onda de fundo */}
       <div className="absolute top-10 left-0 w-full h-auto z-0 wave-container">
@@ -82,77 +137,104 @@ export default function Cadastro() {
       </div>
 
       {/* Logo */}
-      <img
-        src={logo}
-        alt="Logo EspaçoSenai"
-        className="absolute top-6 left-6 w-24 z-10"
-      />
->>>>>>> origin/VitorDev
-
-      <img src={onda} alt="Onda" className="absolute top-24 sm:top-18 md:top-20 lg:top-19 left-1/2 transform -translate-x-1/2 w-full h-auto z-0" />
+      <img src={logo} alt="Logo EspaçoSenai" className="absolute top-6 left-6 w-24 z-10" />
 
       {/* Card branco */}
-      <div className="bg-white bg-opacity-90 rounded-lg shadow-2xl w-full max-w-[385px] md:max-w-[410px] lg:max-w-[450px] z-10 min-h-[500px] sm:min-h-[450px] md:min-h-[450px] lg:min-h-auto" style={{ padding: '34px 16px' }}>
-        <h2 className="font-medium text-center leading-tight text-black text-[18px] sm:text-[20px] md:text-[24px] lg:text-[30px] mb-[16px] sm:mb-[20px]">
-          Bem-Vindo(a) ao <br /> <span className="text-[#000] font-medium">EspaçoSenai!</span>
+      <div className="bg-white bg-opacity-90 rounded-lg shadow-lg px-6 py-8 w-full max-w-sm z-10">
+        <h2 className="text-xl font-semibold text-center mb-5 leading-tight text-black">
+          Bem-Vindo(a) ao <br /> <span className="text-[#000]">EspaçoSenai!</span>
         </h2>
 
-        <form className="flex flex-col gap-4 sm:gap-5 md:gap-4" onSubmit={handleSubmit}>
+        {/* Mensagens */}
+        {mensagemErro && <p className="text-red-600 text-sm mb-2">{mensagemErro}</p>}
+        {mensagemSucesso && <p className="text-green-600 text-sm mb-2">{mensagemSucesso}</p>}
+
+        <form className="flex flex-col gap-5" onSubmit={handleSubmit} autoComplete="off">
+          {/* Nome */}
           <input
+            ref={nomeRef}
             type="text"
+            inputMode="text"
+            autoComplete="name"
             placeholder="Nome"
-            className="w-full max-w-[250px] sm:max-w-[350px] p-3 sm:p-2 md:p-3 rounded-md shadow-lg border bg-white placeholder:text-[#898787] text-black focus:outline-none focus:ring-2 focus:ring-red-500 self-center"
+            className={`${baseInputCls} ${borderState}`}
             required
-          />
-          
-          <input
-            type="email"
-            placeholder="Email"
-            className="w-full max-w-[250px] sm:max-w-[350px] p-3 sm:p-2 md:p-3 rounded-md shadow-lg border bg-white placeholder:text-[#898787] text-black focus:outline-none focus:ring-2 focus:ring-red-500 self-center"
-            required
+            value={nome}
+            onChange={(e) => setNome(e.target.value)}
+            disabled={!!tokenCadastro}
+            spellCheck={false}
           />
 
-<<<<<<< HEAD
-=======
+          {/* Email */}
           <input
+            ref={emailRef}
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            placeholder="Email"
+            className={`${baseInputCls} ${borderState}`}
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value.trimStart())}
+            disabled={!!tokenCadastro}
+            spellCheck={false}
+          />
+
+          {/* Telefone */}
+          <input
+            ref={telRef}
             type="tel"
+            inputMode="numeric"
+            autoComplete="tel"
             placeholder="Telefone"
             maxLength={11}
+            className={`${baseInputCls} ${borderState}`}
+            required
+            value={telefone}
             onChange={(e) => {
               const somenteNumeros = e.target.value.replace(/\D/g, "");
-              e.target.value = somenteNumeros;
+              setTelefone(somenteNumeros);
             }}
-            className="p-2 rounded-md shadow-sm border bg-white placeholder-black text-black focus:outline-none"
-            required
+            disabled={!!tokenCadastro}
+            onFocus={() => focusIfPossible(telRef)}
           />
 
->>>>>>> origin/VitorDev
-          {/* Campo Senha */}
-          <div className="relative self-center w-full max-w-[250px] sm:max-w-[350px]">
+          {/* Senha */}
+          <div className="relative">
             <input
+              ref={senhaRef}
               type={showSenha ? "text" : "password"}
+              inputMode="text"
+              autoComplete="new-password"
               placeholder="Senha"
               value={senha}
               onChange={(e) => {
-                setSenha(e.target.value);
-                setForcaSenha(getForcaSenha(e.target.value));
+                const v = e.target.value;
+                setSenha(v);
+                setForcaSenha(getForcaSenha(v));
               }}
-              className={`p-3 sm:p-2 md:p-3 rounded-md shadow-lg w-full pr-10 text-black bg-white placeholder:text-[#898787] focus:outline-none focus:ring-2 focus:ring-red-500 border ${erro ? "border-red-500" : "border-gray-300"}`}
+              className={`${baseInputCls} w-full pr-10 ${borderState}`}
               required
+              disabled={!!tokenCadastro}
+              onFocus={() => focusIfPossible(senhaRef)}
             />
+
+            {/* OLHO (sem mexer no layout) */}
             <span
-              className="absolute right-3 top-3 sm:top-2 md:top-3 cursor-pointer"
-              onClick={() => setShowSenha(!showSenha)}
+              className="absolute right-3 top-3 grid place-items-center h-5 w-5 cursor-pointer select-none"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => {
+                setShowSenha((s) => !s);
+                focusIfPossible(senhaRef);
+              }}
+              role="button"
+              aria-label="Mostrar/ocultar senha"
             >
-              <img
-                src={showSenha ? olhoAberto : olhoFechado}
-                alt="Exibir senha"
-                className="w-5 h-5"
-              />
+              <img src={showSenha ? olhoAberto : olhoFechado} alt="" className="w-5 h-5 pointer-events-none" />
             </span>
 
             {/* Barra de força da senha */}
-            {senha && (
+            {senha && !tokenCadastro && (
               <div className="mt-2">
                 <div className="h-2 w-full rounded-full bg-gray-300 overflow-hidden">
                   <div
@@ -163,13 +245,12 @@ export default function Cadastro() {
                         ? "w-2/3 bg-yellow-400"
                         : "w-full bg-green-500"
                     }`}
-                  ></div>
+                  />
                 </div>
 
-                {/* Texto + Tooltip */}
                 <div className="flex items-center justify-between mt-1">
                   <p
-                    className={`text-xs sm:text-sm md:text-base ${
+                    className={`text-xs ${
                       forcaSenha === "fraca"
                         ? "text-red-600"
                         : forcaSenha === "media"
@@ -177,18 +258,13 @@ export default function Cadastro() {
                         : "text-green-600"
                     }`}
                   >
-                    Força da senha:{" "}
-                    {forcaSenha === "fraca"
-                      ? "Fraca"
-                      : forcaSenha === "media"
-                      ? "Média"
-                      : "Forte"}
+                    Força da senha: {forcaSenha === "fraca" ? "Fraca" : forcaSenha === "media" ? "Média" : "Forte"}
                   </p>
 
                   {forcaSenha === "fraca" && (
                     <div className="relative group cursor-pointer ml-2">
                       <span className="text-red-500 text-sm font-bold">!</span>
-                      <div className="absolute z-20 w-64 sm:w-48 md:w-56 bg-black text-white text-xs rounded-md px-2 py-1 bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                      <div className="absolute z-20 w-48 bg-black text-white text-xs rounded-md px-2 py-1 bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
                         Para sua segurança, recomendamos uma senha forte.
                       </div>
                     </div>
@@ -198,53 +274,68 @@ export default function Cadastro() {
             )}
           </div>
 
-          {/* Campo Confirmar Senha */}
-          <div className="relative self-center w-full max-w-[250px] sm:max-w-[350px]">
-            <input
-              type={showConfirmar ? "text" : "password"}
-              placeholder="Confirmar senha"
-              value={confirmarSenha}
-              onChange={(e) => setConfirmarSenha(e.target.value)}
-              className={`p-3 sm:p-2 md:p-3 rounded-md shadow-lg w-full pr-10 text-black bg-white placeholder:text-[#898787] focus:outline-none focus:ring-2 focus:ring-red-500 border ${erro ? "border-red-500" : "border-gray-300"}`}
-              required
-            />
-            <span
-              className="absolute right-3 top-3 sm:top-2 md:top-3 cursor-pointer"
-              onClick={() => setShowConfirmar(!showConfirmar)}
-            >
-              <img
-                src={showConfirmar ? olhoAberto : olhoFechado}
-                alt="Exibir confirmar"
-                className="w-5 h-5"
+          {/* Confirmar Senha */}
+          {!tokenCadastro && (
+            <div className="relative">
+              <input
+                ref={confRef}
+                type={showConfirmar ? "text" : "password"}
+                inputMode="text"
+                autoComplete="new-password"
+                placeholder="Confirmar senha"
+                value={confirmarSenha}
+                onChange={(e) => setConfirmarSenha(e.target.value)}
+                className={`${baseInputCls} w-full pr-10 ${borderState}`}
+                required
+                onFocus={() => focusIfPossible(confRef)}
               />
-            </span>
-            {erro && (
-              <p className="text-red-600 text-sm mt-1">
-                As senhas não coincidem.
-              </p>
-            )}
-          </div>
 
-          <div className="text-xs text-black mt-1 self-start font-medium ml-[40px]">
+              {/* OLHO confirmar */}
+              <span
+                className="absolute right-3 top-3 grid place-items-center h-5 w-5 cursor-pointer select-none"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => {
+                  setShowConfirmar((s) => !s);
+                  focusIfPossible(confRef);
+                }}
+                role="button"
+                aria-label="Mostrar/ocultar confirmação de senha"
+              >
+                <img src={showConfirmar ? olhoAberto : olhoFechado} alt="" className="w-5 h-5 pointer-events-none" />
+              </span>
+
+              {erro && mensagemErro && <p className="text-red-600 text-sm mt-1">{mensagemErro}</p>}
+            </div>
+          )}
+
+          <div className="text-sm text-black mt-1">
             Já tem uma conta?{" "}
-<<<<<<< HEAD
-            <Link to="/login" className="text-blue underline">
-=======
             <a href="/login" className="text-blue-600 underline">
->>>>>>> origin/VitorDev
               Entre aqui
-            </Link>
+            </a>
           </div>
 
           <button
             type="submit"
-            className="relative mt-2 bg-[#AE0000] text-white py-3 sm:py-2 md:py-3 rounded-md transition-all duration-200 overflow-hidden hover:scale-105 w-[150px] h-[48px] sm:h-[40px] md:h-[38px] self-center"
+            className="mt-2 bg-[#AE0000] text-white py-2 rounded-md hover:bg-red-700 transition disabled:opacity-60"
+            disabled={loading}
           >
-            <span className="absolute inset-0 bg-black opacity-0 hover:opacity-10 transition-opacity duration-200" />
-            <span className="relative z-10 text-center -top-1">Cadastrar</span>
+            {loading ? "Enviando..." : "Entrar"}
           </button>
         </form>
       </div>
+
+      {/* Modal de Verificação (OTP) */}
+      <ModalCodigoVerificacao
+        isOpen={openOtp}
+        token={tokenCadastro}
+        length={6}
+        onClose={() => setOpenOtp(false)}
+        onSuccess={() => {
+          setOpenOtp(false);
+          navigate("/login");
+        }}
+      />
     </div>
   );
 }

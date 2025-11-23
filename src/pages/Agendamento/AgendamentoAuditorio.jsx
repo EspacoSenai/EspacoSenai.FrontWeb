@@ -1,3 +1,4 @@
+// src/pages/Agendamentos/AgendamentoAuditorio.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import sucessoIcon from "../../assets/sucesso.svg";
@@ -11,15 +12,85 @@ import {
   COR_VERMELHO,
   montarDiasSemana,
   validaIntervalo,
+  paraMinutos,
 } from "../../components/ComponentsDeAgendamento/FuncoesCompartilhada";
 
+import { salvarReservaFormatoBack } from "../../service/reserva";
+import { api } from "../../service/api";
 
-const HORARIOS_INICIO_AUDITORIO = ["11:50", "13:30", "14:30", "15:30", "16:00", "16:50"];
-const HORARIOS_TERMINO_AUDITORIO = ["13:00", "14:50", "16:00", "16:30", "17:00", "17:30"];
+/* ===== IDs / helpers ===== */
+// AJUSTA esse ID se no back o ambiente "Auditório" tiver outro id
+const AUDITORIO_AMBIENTE_ID = 6;
+
+// dias da semana como o back usa
+const DIAS_BACK = [
+  "DOMINGO",
+  "SEGUNDA",
+  "TERCA",
+  "QUARTA",
+  "QUINTA",
+  "SEXTA",
+  "SABADO",
+];
+
+/* ===== helpers JWT p/ pegar id do usuário ===== */
+function b64urlDecode(str) {
+  try {
+    const pad = "=".repeat((4 - (str.length % 4)) % 4);
+    const b64 = (str + pad).replace(/-/g, "+").replace(/_/g, "/");
+    return atob(b64);
+  } catch {
+    return "";
+  }
+}
+
+function parseJwtLocal(token) {
+  try {
+    const [, payload] = String(token || "").split(".");
+    return JSON.parse(b64urlDecode(payload) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function getUserIdFromToken() {
+  const token = localStorage.getItem("access_token") || "";
+  const claims = parseJwtLocal(token);
+  return claims?.id ?? claims?.user_id ?? claims?.sub ?? null;
+}
+
+// helpers de horário
+const timeToMin = (s) => paraMinutos(s || "");
+
+/**
+ * Gera lista de horários de início a partir das faixas do catálogo
+ */
+function gerarInicioPorFaixas(faixas) {
+  if (!Array.isArray(faixas) || !faixas.length) return [];
+  const set = new Set();
+  faixas.forEach((f) => {
+    if (f.horaInicio) set.add(f.horaInicio);
+  });
+  return Array.from(set).sort((a, b) => timeToMin(a) - timeToMin(b));
+}
+
+
+function gerarTerminoPorFaixas(faixas, horaInicioSelecionada) {
+  if (!Array.isArray(faixas) || !faixas.length) return [];
+  const set = new Set();
+  faixas.forEach((f) => {
+    if (horaInicioSelecionada && f.horaInicio !== horaInicioSelecionada) {
+      return;
+    }
+    if (f.horaFim) set.add(f.horaFim);
+  });
+  return Array.from(set).sort((a, b) => timeToMin(a) - timeToMin(b));
+}
 
 export default function AgendamentoAuditorio() {
   const [semanaSelecionada, setSemanaSelecionada] = useState("essa");
   const [diaSelecionado, setDiaSelecionado] = useState(0);
+
   const [horaInicio, setHoraInicio] = useState(null);
   const [horaTermino, setHoraTermino] = useState(null);
 
@@ -30,6 +101,9 @@ export default function AgendamentoAuditorio() {
   const [horaInicioFiltro, setHoraInicioFiltro] = useState("");
   const [horaTerminoFiltro, setHoraTerminoFiltro] = useState("");
 
+  // catálogo do auditório vindo do back
+  const [catalogoAuditorio, setCatalogoAuditorio] = useState([]);
+
   // Modal
   const [modal, setModal] = useState({
     aberto: false,
@@ -39,6 +113,7 @@ export default function AgendamentoAuditorio() {
   });
   const modalBtnRef = useRef(null);
 
+  // Monta dias (seg–sáb), respeitando “essa/próxima” e bloqueando dias passados
   const diasDaSemana = useMemo(
     () => montarDiasSemana(semanaSelecionada === "essa" ? 0 : 1),
     [semanaSelecionada]
@@ -49,6 +124,7 @@ export default function AgendamentoAuditorio() {
     const n = new Date();
     return n.getHours() * 60 + n.getMinutes();
   });
+
   useEffect(() => {
     const id = setInterval(() => {
       const n = new Date();
@@ -56,6 +132,7 @@ export default function AgendamentoAuditorio() {
     }, 30_000);
     return () => clearInterval(id);
   }, []);
+
   const isHoje = useMemo(() => {
     const dia = diasDaSemana[diaSelecionado]?.dataCompleta;
     if (!dia) return false;
@@ -66,12 +143,8 @@ export default function AgendamentoAuditorio() {
       dia.getDate() === n.getDate()
     );
   }, [diasDaSemana, diaSelecionado]);
-  const timeToMin = (s) => {
-    const [h, m] = s.split(":").map(Number);
-    return h * 60 + m;
-  };
 
- 
+  // garante que o dia selecionado não esteja desabilitado
   useEffect(() => {
     const idxValido = diasDaSemana.findIndex((d) => !d.desabilitado);
     if (idxValido === -1 && semanaSelecionada === "essa") {
@@ -82,12 +155,13 @@ export default function AgendamentoAuditorio() {
     }
   }, [diasDaSemana, diaSelecionado, semanaSelecionada]);
 
-  // ESC fecha modal e bloqueio de scroll
+  // Modal: ESC fecha + bloqueio de scroll
   useEffect(() => {
     const onEsc = (e) => e.key === "Escape" && fecharModal();
     window.addEventListener("keydown", onEsc);
     return () => window.removeEventListener("keydown", onEsc);
   }, []);
+
   useEffect(() => {
     if (modal.aberto) {
       setTimeout(() => modalBtnRef.current?.focus(), 0);
@@ -105,6 +179,7 @@ export default function AgendamentoAuditorio() {
   }
 
   function cancelar() {
+    setSemanaSelecionada("essa");
     setDiaSelecionado(0);
     setHoraInicio(null);
     setHoraTermino(null);
@@ -113,24 +188,173 @@ export default function AgendamentoAuditorio() {
     setTurma("");
   }
 
-  function confirmar() {
-    if (!turma.trim()) {
-      abrirModal("error", "Nome da turma obrigatório", "Informe o nome da turma para continuar.");
-      return;
+  // ===== carrega catálogo do AUDITÓRIO =====
+  useEffect(() => {
+    let cancelado = false;
+
+    async function carregarCatalogoAuditorio() {
+      try {
+        const resp = await api.get("/catalogo/buscar");
+        const data = Array.isArray(resp?.data) ? resp.data : resp;
+
+        if (!Array.isArray(data)) {
+          console.warn(
+            "[AgendamentoAuditorio] /catalogo/buscar não retornou array:",
+            data
+          );
+          return;
+        }
+
+        const mapeado = data.map((item) => {
+          const catalogoIdItem = item?.id ?? null;
+          const ambienteId =
+            item?.ambiente?.id ?? item?.ambienteId ?? item?.idAmbiente ?? null;
+
+          const nomeAmbiente = String(
+            item?.ambiente?.nome || item?.ambienteNome || ""
+          )
+            .trim()
+            .toLowerCase();
+
+          const disponibilidadeItem = String(
+            item?.disponibilidade || item?.ambiente?.disponibilidade || ""
+          ).toUpperCase();
+
+          const diaSemanaNormalizado = String(item.diaSemana || "")
+            .trim()
+            .toUpperCase();
+
+          // heurística: ambiente do Auditório
+          const isAuditorio =
+            ambienteId === AUDITORIO_AMBIENTE_ID ||
+            nomeAmbiente.includes("auditório") ||
+            nomeAmbiente.includes("auditorio");
+
+          const isDisponivel =
+            !disponibilidadeItem || disponibilidadeItem === "DISPONIVEL";
+
+          const horaInicio = (item.horaInicio || "").toString().slice(0, 5);
+          const horaFim = (item.horaFim || "").toString().slice(0, 5);
+
+          return {
+            id: catalogoIdItem,
+            diaSemana: diaSemanaNormalizado,
+            horaInicio,
+            horaFim,
+            isAuditorio,
+            isDisponivel,
+          };
+        });
+
+        const apenasAuditorio = mapeado.filter(
+          (it) => it.isAuditorio && it.isDisponivel
+        );
+
+        console.log(
+          "[AgendamentoAuditorio] faixas AUDITÓRIO (disponíveis):",
+          apenasAuditorio
+        );
+
+        if (!cancelado) {
+          setCatalogoAuditorio(
+            apenasAuditorio.map((it) => ({
+              id: it.id,
+              diaSemana: it.diaSemana,
+              horaInicio: it.horaInicio,
+              horaFim: it.horaFim,
+            }))
+          );
+        }
+      } catch (err) {
+        console.error(
+          "[AgendamentoAuditorio] Erro ao buscar catálogo do auditório:",
+          err
+        );
+      }
     }
-    if (!horaInicio || !horaTermino) {
+
+    carregarCatalogoAuditorio();
+
+    return () => {
+      cancelado = true;
+    };
+  }, []);
+
+  // label de dia da semana como o back usa
+  const diaSemanaBackSelecionado = useMemo(() => {
+    const dia = diasDaSemana[diaSelecionado]?.dataCompleta;
+    if (!dia) return null;
+    return DIAS_BACK[dia.getDay()];
+  }, [diasDaSemana, diaSelecionado]);
+
+  // faixas do catálogo para o dia selecionado
+  const faixasDoDia = useMemo(() => {
+    if (!diaSemanaBackSelecionado) return [];
+    const faixas = catalogoAuditorio.filter(
+      (c) => c.diaSemana === diaSemanaBackSelecionado
+    );
+    console.log(
+      "[AgendamentoAuditorio] faixasDoDia para",
+      diaSemanaBackSelecionado,
+      faixas
+    );
+    return faixas;
+  }, [catalogoAuditorio, diaSemanaBackSelecionado]);
+
+  // horários de início/término disponíveis no dia
+  const horariosInicioDisponiveis = useMemo(
+    () => gerarInicioPorFaixas(faixasDoDia),
+    [faixasDoDia]
+  );
+
+  const horariosTerminoDisponiveis = useMemo(
+    () => gerarTerminoPorFaixas(faixasDoDia, horaInicio),
+    [faixasDoDia, horaInicio]
+  );
+
+  const temHorariosParaDia = horariosInicioDisponiveis.length > 0;
+
+  // limpa término quando muda o início
+  useEffect(() => {
+    setHoraTermino(null);
+    setHoraTerminoFiltro("");
+  }, [horaInicio]);
+
+  async function confirmar() {
+    const dia = diasDaSemana[diaSelecionado];
+
+    if (!turma.trim()) {
       abrirModal(
         "error",
-        "Dados incompletos",
-        "Escolha os horários de início e término para continuar."
+        "Nome da turma obrigatório",
+        "Informe o nome da turma para continuar."
       );
       return;
     }
-    const dia = diasDaSemana[diaSelecionado];
+
     if (!dia || dia.desabilitado) {
       abrirModal("error", "Data inválida", "Selecione uma data válida.");
       return;
     }
+
+    if (!temHorariosParaDia) {
+      abrirModal(
+        "error",
+        "Dia indisponível",
+        "Não há horários configurados para este dia."
+      );
+      return;
+    }
+
+    if (!horaInicio || !horaTermino) {
+      abrirModal(
+        "error",
+        "Dados incompletos",
+        "Escolha os horários de início e término."
+      );
+      return;
+    }
+
     if (!validaIntervalo(horaInicio, horaTermino)) {
       abrirModal(
         "error",
@@ -140,21 +364,76 @@ export default function AgendamentoAuditorio() {
       return;
     }
 
-    const dados = {
-      local: "Auditório",
-      turma: turma.trim(),
-      semana: semanaSelecionada === "essa" ? "Essa semana" : "Próxima semana",
-      data: dia.dataCompleta.toISOString(),
-      inicio: horaInicio,
-      termino: horaTermino,
-    };
-    console.log("Agendamento (AUDITÓRIO):", dados);
+    if (isHoje && timeToMin(horaInicio) <= nowMinutes) {
+      abrirModal(
+        "error",
+        "Horário não permitido",
+        "Escolha um horário de início que ainda não tenha passado."
+      );
+      return;
+    }
 
-    abrirModal(
-      "success",
-      "Reserva realizada com sucesso!",
-      "Sua solicitação foi enviada e está aguardando aprovação."
+    const hostId = getUserIdFromToken();
+    if (!hostId) {
+      abrirModal(
+        "error",
+        "Sessão inválida",
+        "Não foi possível identificar o usuário logado."
+      );
+      return;
+    }
+
+    // escolhe o catálogo certinho pelo dia + horário de início/término
+    const catalogoSelecionado = faixasDoDia.find(
+      (c) => c.horaInicio === horaInicio && c.horaFim === horaTermino
     );
+
+    if (!catalogoSelecionado?.id) {
+      console.error(
+        "[AgendamentoAuditorio] Não encontrou catálogo para",
+        diaSemanaBackSelecionado,
+        horaInicio,
+        horaTermino,
+        faixasDoDia
+      );
+      abrirModal(
+        "error",
+        "Configuração inválida",
+        "Não foi possível localizar o catálogo correspondente para esse horário. Avise o coordenador."
+      );
+      return;
+    }
+
+    const msgUsuario = `Reserva do Auditório para a turma ${turma.trim()}.`;
+
+    try {
+      await salvarReservaFormatoBack({
+        idUsuario: hostId,
+        catalogoId: catalogoSelecionado.id,
+        dataJS: dia.dataCompleta,
+        horaInicioHHMM: horaInicio,
+        horaFimHHMM: horaTermino,
+        msgUsuario,
+      });
+
+      abrirModal(
+        "success",
+        "Reserva realizada com sucesso!",
+        "Sua solicitação foi enviada e está aguardando aprovação."
+      );
+      cancelar();
+    } catch (err) {
+      console.error("[AgendamentoAuditorio] ERRO SALVAR RESERVA:", err);
+      const data = err?.response?.data || err?.data;
+      const msg =
+        data?.message ||
+        data?.mensagem ||
+        (Array.isArray(data?.erros) ? data.erros.join(" ") : null) ||
+        err?.message ||
+        `Erro ao comunicar com o servidor. [${err?.status || ""}]`;
+
+      abrirModal("error", "Falha ao reservar", msg);
+    }
   }
 
   return (
@@ -185,13 +464,12 @@ export default function AgendamentoAuditorio() {
           </div>
         </div>
 
-        {/* Nome da turma (MENOR + largura limitada) */}
+        {/* Nome da turma (visual igual ao que você já tinha) */}
         <div className="mb-8">
           <label className="block text-black dark:text-white font-medium mb-2">
             Nome da turma:
           </label>
 
-          {/* limita a largura do input */}
           <div className="w-full sm:max-w-[200px]">
             <input
               value={turma}
@@ -207,30 +485,36 @@ export default function AgendamentoAuditorio() {
           </div>
         </div>
 
-       
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <GradeHorarios
-            titulo="Horário de início:"
-            opcoes={HORARIOS_INICIO_AUDITORIO}
-            selecionado={horaInicio}
-            onSelect={setHoraInicio}
-            isDisabled={(t) => isHoje && timeToMin(t) <= nowMinutes}
-            comFiltro={true}
-            filtro={horaInicioFiltro}
-            onFiltroChange={setHoraInicioFiltro}
-          />
+        {/* Grades de horário (layout igual, mas horários vindo do back) */}
+        {temHorariosParaDia ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <GradeHorarios
+              titulo="Horário de início:"
+              opcoes={horariosInicioDisponiveis}
+              selecionado={horaInicio}
+              onSelect={setHoraInicio}
+              isDisabled={(t) => isHoje && timeToMin(t) <= nowMinutes}
+              comFiltro={true}
+              filtro={horaInicioFiltro}
+              onFiltroChange={setHoraInicioFiltro}
+            />
 
-          <GradeHorarios
-            titulo="Horário de término:"
-            opcoes={HORARIOS_TERMINO_AUDITORIO}
-            selecionado={horaTermino}
-            onSelect={setHoraTermino}
-            isDisabled={(t) => isHoje && timeToMin(t) <= nowMinutes}
-            comFiltro={true}
-            filtro={horaTerminoFiltro}
-            onFiltroChange={setHoraTerminoFiltro}
-          />
-        </div>
+            <GradeHorarios
+              titulo="Horário de término:"
+              opcoes={horariosTerminoDisponiveis}
+              selecionado={horaTermino}
+              onSelect={setHoraTermino}
+              isDisabled={(t) => isHoje && timeToMin(t) <= nowMinutes}
+              comFiltro={true}
+              filtro={horaTerminoFiltro}
+              onFiltroChange={setHoraTerminoFiltro}
+            />
+          </div>
+        ) : (
+          <div className="mt-6 bg-[#F5F5F5] dark:bg-[#111111] rounded-md px-4 py-8 flex items-center justify-center text-gray-600 dark:text-gray-300 text-sm md:text-base">
+            Nenhum horário disponível para este dia.
+          </div>
+        )}
 
         {/* Botões */}
         <div className="mt-6 md:mt-4 flex flex-col md:flex-row gap-4 md:justify-end">

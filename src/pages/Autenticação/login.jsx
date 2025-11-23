@@ -1,105 +1,108 @@
-import React, { useState } from "react";
-<<<<<<< HEAD
-import { Link, useNavigate } from 'react-router-dom';
-=======
+// src/pages/Autenticação/login.jsx
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
->>>>>>> origin/VitorDev
+
 import logo from "../../assets/EspacoSenai.svg";
 import onda from "../../assets/ondasLogin.svg";
 import olhoAberto from "../../assets/olhoFechado.svg";
 import olhoFechado from "../../assets/olhoAberto.svg";
 
+import { signIn, userHasRole, routeForProfile } from "../../service/authService";
+
 export default function Login() {
-  const navigate = useNavigate();
-<<<<<<< HEAD
   const [showSenha, setShowSenha] = useState(false);
+  const [identificador, setIdentificador] = useState(""); 
+  const [senha, setSenha] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [erro, setErro] = useState("");
 
-  return (
-    <div className="min-h-screen bg-[#f8f8f8] flex items-center justify-center relative overflow-hidden dark:bg-black px-4">
-      {/* imagem da Onda */}
-      <img src={onda} alt="Onda" className="absolute top-0 sm:top-5 left-0 w-full h-auto z-0" />
+  const navigate = useNavigate();
 
-      <>
-        {/* Logo clara */}
-        <img
-          src={logo}
-          alt="Logo EspaçoSenai"
-          className="absolute top-4 sm:top-6 left-4 sm:left-6 w-24 sm:w-28 md:w-32 z-10 block dark:hidden"
-        />
-=======
+  useEffect(() => {
+    const sel = localStorage.getItem("selected_profile");
+    if (!sel) navigate("/selecionar-perfil", { replace: true });
+  }, [navigate]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setErro("");
 
-    navigate("/landing", { replace: true });
+    const selected = localStorage.getItem("selected_profile");
+    if (!selected) {
+      navigate("/selecionar-perfil", { replace: true });
+      return;
+    }
+
+    const payload = {
+      identificador: identificador.trim(),
+      senha: senha,
+    };
+    console.log("[DEBUG] /auth/signin payload:", payload);
+
+    setLoading(true);
+    try {
+      const { roles } = await signIn(payload);
+
+      if (!userHasRole(selected, roles)) {
+        setErro(
+          "Seu usuário não possui permissão para o perfil selecionado. Escolha outro perfil ou fale com o administrador."
+        );
+        return;
+      }
+      navigate(routeForProfile(selected), { replace: true });
+    } catch (err) {
+      const msg =
+        err?.response?.data?.message ||
+        err?.message ||
+        "Não foi possível entrar. Verifique seus dados.";
+      setErro(msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center relative overflow-hidden">
-    
+      {/* Onda */}
       <div className="absolute top-5 left-0 w-full h-auto z-0 wave-container">
-        <img
-          src={onda}
-          alt="Onda"
-          className="w-full h-full object-cover wave-fill wave-animate"
-        />
+        <img src={onda} alt="Onda" className="w-full h-full object-cover wave-fill wave-animate" />
       </div>
 
       {/* Logo */}
-      <img
-        src={logo}
-        alt="Logo EspaçoSenai"
-        className="absolute top-6 left-6 w-24 z-10"
-      />
->>>>>>> origin/VitorDev
+      <img src={logo} alt="Logo EspaçoSenai" className="absolute top-6 left-6 w-24 z-10" />
 
-        {/* Logo escura */}
-        <img
-          src={logoDark}
-          alt="Logo EspaçoSenai Dark"
-          className="absolute top-4 sm:top-6 left-4 sm:left-6 w-24 sm:w-28 md:w-32 z-10 hidden dark:block"
-        />
-      </>
-
-      {/* Card de Login */}
-<<<<<<< HEAD
-      <div className="bg-white bg-opacity-90 rounded-xl shadow-md px-4 sm:px-6 py-8 sm:py-10 w-full max-w-sm z-10">
-        <h2 className="text-xl sm:text-3xl font-medium text-center text-black mb-2">
-          Bem-Vindo(a)
-        </h2>
-        <h3 className="text-lg sm:text-2xl font-medium text-center text-black mb-6">
-          novamente!
-        </h3>
-
-        <form className="flex flex-col gap-4">
-=======
+      {/* Card */}
       <div className="bg-white text-black bg-opacity-90 rounded-xl shadow-md px-6 py-10 w-full max-w-sm z-10">
         <h2 className="text-2xl font-semibold text-center">Bem-Vindo(a)</h2>
         <h3 className="text-xl font-medium text-center mb-6">novamente!</h3>
 
+        {erro && <div className="mb-3 text-sm text-red-600 text-center">{erro}</div>}
+
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
->>>>>>> origin/VitorDev
+          {/* Campo aceita email, tag ou 'admin' */}
           <input
-            type="email"
+            type="text"
             placeholder="Email"
-            className="p-3 rounded-md shadow-sm border border-gray-300 text-black bg-white placeholder-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+            className="p-3 rounded-md shadow-sm border border-gray-300 text-black bg-white placeholder-gray-700 focus:outline-none"
             required
+            value={identificador}
+            onChange={(e) => setIdentificador(e.target.value)}
+            autoComplete="username"
           />
 
           <div className="relative">
             <input
               type={showSenha ? "text" : "password"}
               placeholder="Senha"
-<<<<<<< HEAD
-              className="p-3 rounded-md shadow-sm border border-gray-300 w-full pr-10 text-black bg-white placeholder-gray-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-=======
               className="p-3 rounded-md shadow-sm border border-gray-300 w-full pr-10 bg-white text-black placeholder-gray-700 focus:outline-none"
->>>>>>> origin/VitorDev
               required
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
+              autoComplete="current-password"
             />
             <span
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
-              onClick={() => setShowSenha(!showSenha)}
+              className="absolute right-3 top-4 cursor-pointer"
+              onClick={() => setShowSenha((s) => !s)}
             >
               <img
                 src={showSenha ? olhoAberto : olhoFechado}
@@ -109,18 +112,8 @@ export default function Login() {
             </span>
           </div>
 
-<<<<<<< HEAD
-          <div className="flex items-center justify-end">
-            <div className="text-right text-sm">
-              <Link to="/esqueci-senha" className="text-red-700 hover:underline">
-                Esqueceu a senha?
-              </Link>
-            </div>
-          </div>
-
-=======
           <div className="text-right text-sm">
-            <a href="#" className="text-red-600 text-xs hover:underline">
+            <a href="/esqueci-senha" className="text-red-600 text-xs hover:underline">
               Esqueceu a Senha?
             </a>
           </div>
@@ -131,25 +124,20 @@ export default function Login() {
             <hr className="flex-grow border-gray-300" />
           </div>
 
->>>>>>> origin/VitorDev
           <button
             type="submit"
-            className="relative bg-[#AE0000] text-white py-3 rounded-md transition-all duration-200 font-medium overflow-hidden hover:scale-105 mt-8"
+            className="bg-[#AE0000] text-white py-2 rounded-md hover:bg-red-700 transition disabled:opacity-60"
+            disabled={loading}
           >
-            <span className="absolute inset-0 bg-black opacity-0 hover:opacity-10 transition-opacity duration-200" />
-            <span className="relative z-10">Login</span>
+            {loading ? "Entrando..." : "Login"}
           </button>
         </form>
 
-<<<<<<< HEAD
-        <div className="text-xs sm:text-sm text-center text-black dark:text-white mt-6">
-=======
         <div className="text-xs text-center mt-4 text-black">
->>>>>>> origin/VitorDev
           Não tem uma conta?{" "}
-          <Link to="/cadastro" className="text-black-600 underline hover:no-underline">
+          <a href="/cadastro" className="text-blue-600 underline">
             Cadastre-se
-          </Link>
+          </a>
         </div>
       </div>
     </div>

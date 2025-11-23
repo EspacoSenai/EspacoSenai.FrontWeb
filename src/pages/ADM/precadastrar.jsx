@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import EspacoSenai from "../../assets/EspacoSenai.svg";
 import OndaGeral from "../../assets/ondaPrecadastro.svg";
+import { criarPreCadastro } from "../../service/preCadastroService"; 
 
 // Expressão para validar email
 const REGEX_EMAIL = /\S+@\S+\.\S+/;
@@ -46,14 +47,14 @@ export default function PreCadastrarUsuario() {
     setSucesso("");
   }
 
-  // Submete o formulário (simulação)
+  // Submete o formulário (AGORA CONECTADO AO BACK)
   async function aoSubmeter(e) {
     e?.preventDefault();
     setSucesso("");
     const eAll = validarTudo();
     if (Object.keys(eAll).length > 0) {
       setErros(eAll);
-      // aqui ele foca no primeiro campo com erro
+      // foca no primeiro campo com erro
       if (eAll.nome) nomeRef.current?.focus();
       else if (eAll.email) emailRef.current?.focus();
       return;
@@ -61,14 +62,25 @@ export default function PreCadastrarUsuario() {
 
     setSalvando(true);
     try {
-      await new Promise((r) => setTimeout(r, 1200));
-      setSucesso("Salvo com sucesso!");
+      await criarPreCadastro({ nome, email }); // <<< CHAMADA REAL
+      setSucesso("Estudante pré-cadastrado com sucesso.");
       setNome("");
       setEmail("");
       setErros({});
       setTimeout(() => setSucesso(""), 3000);
-    } catch {
-      setErros({ form: "Erro ao salvar. Tente novamente." });
+    } catch (err) {
+      // mensagens úteis
+      const status = err?.response?.status;
+      const msgApi =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.message;
+
+      let mensagem = msgApi || "Erro ao salvar. Tente novamente.";
+      if (status === 401) mensagem = "Não autenticado. Faça login novamente.";
+      if (status === 403) mensagem = "Sem permissão para pré-cadastrar.";
+
+      setErros({ form: mensagem });
     } finally {
       setSalvando(false);
     }
@@ -94,7 +106,6 @@ export default function PreCadastrarUsuario() {
     ev.preventDefault();
     const eAll = validarTudo();
     if (Object.keys(eAll).length === 0) {
-
       aoSubmeter(ev);
     } else {
       setErros(eAll);
@@ -152,7 +163,11 @@ export default function PreCadastrarUsuario() {
                     aria-invalid={!!erros.nome}
                     aria-describedby={erros.nome ? "erro-nome" : undefined}
                   />
-                  {erros.nome && <p id="erro-nome" className="mt-2 text-sm text-red-600 text-center">{erros.nome}</p>}
+                  {erros.nome && (
+                    <p id="erro-nome" className="mt-2 text-sm text-red-600 text-center">
+                      {erros.nome}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -167,7 +182,11 @@ export default function PreCadastrarUsuario() {
                     aria-invalid={!!erros.email}
                     aria-describedby={erros.email ? "erro-email" : undefined}
                   />
-                  {erros.email && <p id="erro-email" className="mt-2 text-sm text-red-600 text-center">{erros.email}</p>}
+                  {erros.email && (
+                    <p id="erro-email" className="mt-2 text-sm text-red-600 text-center">
+                      {erros.email}
+                    </p>
+                  )}
                 </div>
 
                 <div className="pt-2 flex flex-col items-center">

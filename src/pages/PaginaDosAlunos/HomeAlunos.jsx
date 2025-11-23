@@ -19,10 +19,55 @@ import LembreteImgSalaPCs from "../../assets/Computadores.svg";
 
 import Footer from "../PageIniciais/footer";
 
+// >>> usa o service direto
+import { buscarMeuPerfil } from "../../service/usuario";
+
 const COR = "#AE0000";
 
 export default function HomeAlunos() {
   const [page, setPage] = useState(0);
+
+  const [displayName, setDisplayName] = useState("");
+  const nome = displayName || "Aluno";
+  const isLongName = nome.length > 18;
+
+  const mobileTitleClass = isLongName
+    ? "text-[22px] leading-snug"
+    : "text-[26px] leading-tight";
+
+  const desktopFirstLineClass = isLongName
+    ? "text-[30px] lg:text-[34px]"
+    : "text-[36px] lg:text-[40px]";
+
+  const desktopSecondLineClass = isLongName
+    ? "text-[30px] lg:text-[36px]"
+    : "text-[40px] lg:text-[46px]";
+
+  // ============================
+  // BUSCAR NOME DO BACK
+  // ============================
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const usuario = await buscarMeuPerfil();
+        const nomeBack =
+          (usuario &&
+            (usuario.nome ||
+              usuario.nomeCompleto ||
+              usuario.nomeUsuario ||
+              usuario.tag)) ||
+          "";
+        if (alive) setDisplayName(nomeBack.toString().trim() || "Aluno");
+      } catch (err) {
+        console.error("[HomeAlunos] Erro ao buscar perfil:", err);
+        if (alive) setDisplayName("Aluno");
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const items = [
     {
@@ -80,7 +125,7 @@ export default function HomeAlunos() {
       type="button"
       onClick={onClick}
       aria-label="Próximo"
-      className="absolute z-40 right-[-4px] md:right-[-2px] top-[46%] md:top-[44%] h-10 md:h-11 w-10 md:w-11 grid place-items-center rounded-full bg-transparent border-0 shadow-none ring-0 hover:scale-[1.06] active:scale-95 focus:outline-none focus-visible:outline-none select-none cursor-pointer"
+      className="absolute z-40 right-[-4px] lg:right-[-2px] top-[46%] lg:top-[44%] h-10 lg:h-11 w-10 lg:w-11 grid place-items-center rounded-full bg-transparent border-0 shadow-none ring-0 hover:scale-[1.06] active:scale-95 focus:outline-none focus-visible:outline-none select-none cursor-pointer"
       style={{
         WebkitTapHighlightColor: "transparent",
         background: "transparent",
@@ -247,7 +292,6 @@ export default function HomeAlunos() {
 
     return (
       <div className="relative rounded-xl bg-white dark:bg-[#1B1B1B] shadow-sm ring-1 ring-black/5 px-3 py-3 md:px-4 md:py-4">
-        {/* menu kebab */}
         <div className="absolute bottom-3 right-3 -m-2 p-2 z-[70]" ref={popRef}>
           <Kebab
             onClick={() => setOpen((v) => !v)}
@@ -295,7 +339,10 @@ export default function HomeAlunos() {
                 <span className="font-medium">Editar reserva</span>
               </button>
 
-              <div className="h-px" style={{ backgroundColor: "rgba(0,0,0,.06)" }} />
+              <div
+                className="h-px"
+                style={{ backgroundColor: "rgba(0,0,0,.06)" }}
+              />
 
               <button
                 type="button"
@@ -315,7 +362,11 @@ export default function HomeAlunos() {
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                   <circle cx="12" cy="12" r="8" stroke={COR} strokeWidth="1.8" />
-                  <path d="M9.5 9.5l5 5M14.5 9.5l-5 5" stroke={COR} strokeWidth="1.8" />
+                  <path
+                    d="M9.5 9.5l5 5M14.5 9.5l-5 5"
+                    stroke={COR}
+                    strokeWidth="1.8"
+                  />
                 </svg>
                 <span className="font-semibold">Cancelar reserva</span>
               </button>
@@ -332,7 +383,7 @@ export default function HomeAlunos() {
             />
           </div>
 
-        <div className="relative col-span-12 sm:col-span-7 md:col-span-8 pr-16 pt-12">
+          <div className="relative col-span-12 sm:col-span-7 md:col-span-8 pr-16 pt-12">
             <span className="absolute top-0 right-[-12px] md:right-[-16px] h-10 md:h-11 px-5 md:px-6 bg-[#720505] text-white text-[15px] md:text-[16px] font-semibold leading-[2.5rem] md:leading-[2.75rem] rounded-l-xl rounded-r-none whitespace-nowrap shadow-[0_1px_4px_rgba(0,0,0,0.15)]">
               {item.titulo}
             </span>
@@ -364,20 +415,19 @@ export default function HomeAlunos() {
     <>
       <Header />
 
-      {/* main todo o conteúdo + espaço pro wave encostar no footer */}
-      <main className="bg-white dark:bg-[#1E1E1E] w-full pb-24 relative overflow-hidden">
-        {/* HERO */}
+      <main className="bg-white dark:bg-[#0B0B0B] w-full pb-24 relative overflow-hidden">
         <section className="relative w-full -mt-px">
-          {/* mobile hero */}
-          <div className="md:hidden relative w-full h-[440px] bg-[#A00000] dark:bg-black text-white flex items-center">
+          <div className="lg:hidden relative w-full h-[440px] bg-[#A00000] dark:bg-black text-white flex items-center pt-12">
             <div className="w-full max-w-7xl mx-auto px-4 flex flex-col items-center gap-4">
               <img
                 src={Pessoa}
                 alt=""
                 className="h-[170px] w-auto object-contain drop-shadow-[0_6px_18px_rgba(0,0,0,0.15)]"
               />
-              <h1 className="text-[26px] font-extrabold leading-tight text-center">
-                Bem-vindo(a) Nome,
+              <h1
+                className={`font-extrabold text-center text-balance ${mobileTitleClass}`}
+              >
+                Bem-vindo(a) {nome},
               </h1>
               <p className="text-sm opacity-95 text-center">
                 Esta é a página principal!
@@ -390,8 +440,7 @@ export default function HomeAlunos() {
             </div>
           </div>
 
-          {/* desktop hero */}
-          <div className="hidden md:flex w-full h-[560px] lg:h-[600px] items-center">
+          <div className="hidden lg:flex w-full h-[560px] lg:h-[600px] items-center">
             <div className="relative w-1/2 h-full flex items-end justify-center pb-12 md:translate-x-8 md:-translate-y-16 shrink-0 min-w-[360px]">
               <img src={Pessoa} alt="" className="h-[65%] w-auto" />
             </div>
@@ -402,17 +451,24 @@ export default function HomeAlunos() {
                 alt=""
                 className="absolute inset-0 w-full h-full object-contain object-right-top z-0 pointer-events-none select-none"
               />
-              <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-0 z-10 pb-32">
-                <h1 className="text-[36px] lg:text-[44px] font-extrabold leading-tight pl-8">
-                  Bem-vindo(a) Nome,
-                </h1>
-                <p className="text-lg mt-3">Esta é a página principal!</p>
-                <div className="w-full mt-12 lg:mt-20 flex justify-end pr-10 lg:pr-20">
-                  <Link to="/salas-alunos">
-                    <button className="bg-white text-gray-900 font-semibold py-2 px-8 rounded-lg shadow-lg hover:bg-gray-200 transition">
-                      Reserve agora
-                    </button>
-                  </Link>
+              <div className="absolute inset-0 flex flex-col items-end justify-center text-white text-right pr-12 lg:pr-24 z-10 pb-24">
+                <div className="w-full max-w-[520px] ml-auto">
+                  <h1 className="font-extrabold text-balance leading-tight">
+                    <span className={`${desktopFirstLineClass} block`}>
+                      Bem-vindo(a)
+                    </span>
+                    <span className={`${desktopSecondLineClass} block`}>
+                      {nome},
+                    </span>
+                  </h1>
+                  <p className="text-lg mt-3">Esta é a página principal!</p>
+                  <div className="w-full mt-12 lg:mt-20 flex justify-end">
+                    <Link to="/salas-alunos">
+                      <button className="bg-white text-gray-900 font-semibold py-2 px-8 rounded-lg shadow-lg hover:bg-gray-200 transition">
+                        Reserve agora
+                      </button>
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
@@ -421,7 +477,6 @@ export default function HomeAlunos() {
 
         <div className="border-t-2 border-gray-300 mx-8 mt-[0px] mb-3"></div>
 
-        {/* DESTAQUES */}
         <section className="w-full">
           <div className="max-w-6xl mx-auto px-5 sm:px-6 md:px-8 lg:px-10 py-8 md:py-10">
             <div className="flex items-center gap-3 mb-4">
@@ -432,11 +487,9 @@ export default function HomeAlunos() {
             </div>
 
             <div className="relative rounded-[14px] bg-[#E5E5E5] dark:bg-[#2A2A2A] p-3 sm:p-4 md:p-5 shadow-[inset_0_1px_0_rgba(0,0,0,0.05)]">
-              {/* botão seta */}
-              <div className="absolute right-0 top-0 bottom-0 w-3 rounded-r-[14px] bg-[#E5E5E5] dark:bg-[#2A2A2A] z-10 pointer-events-none" />
+              <div className="absolute right-0 top-0 bottom-0 w-3 rounded-r-[14px] bg-[#E5E5E5] dark:bg-[#2A2AA] z-10 pointer-events-none" />
               <ArrowBtn onClick={nextPage} />
 
-              {/* carrossel */}
               <div className="relative overflow-hidden">
                 <div
                   className="flex transition-transform duration-500 ease-[cubic-bezier(0.22,0.61,0.36,1)]"
@@ -460,7 +513,6 @@ export default function HomeAlunos() {
                 </div>
               </div>
 
-              {/* bolinhas */}
               <div className="mt-4 flex items-center justify-center gap-2">
                 {Array.from({ length: pagesCount }).map((_, i) => (
                   <span
@@ -477,10 +529,9 @@ export default function HomeAlunos() {
           </div>
         </section>
 
-        {/* LEMBRETES */}
         <section className="w-full">
           <div className="max-w-6xl mx-auto px-5 sm:px-6 md:px-8 lg:px-10 pt-2 pb-10 md:pb-14">
-            <h3 className="text-center text-[20px] sm:text-[22px] font-semibold text-[#1E1E1E] dark:text-white">
+            <h3 className="text-center text-[20px] sm:text-[22px] font-semibold text-[#1E1E1E] dark:text:white">
               Lembretes
             </h3>
 
@@ -508,13 +559,11 @@ export default function HomeAlunos() {
           </div>
         </section>
 
-        {/* QUEM PODE RESERVAR */}
         <section className="relative w-full">
           <div className="max-w-6xl mx-auto px-6 md:px-10 pt-10 pb-16">
             <div className="border-t border-gray-200 dark:border-white/10 mb-10"></div>
 
             <div className="grid grid-cols-12 gap-8 items-center">
-              {/* Texto */}
               <div className="col-span-12 lg:col-span-7 xl:col-span-8">
                 <div className="flex items-center gap-3 mb-6">
                   <span
@@ -542,8 +591,8 @@ export default function HomeAlunos() {
                     OBS:
                   </span>{" "}
                   <span className="text-[#1E1E1E] dark:text-gray-200">
-                    Todas as reservas seguem critérios pedagógicos e operacionais
-                    definidos pela unidade.
+                    Todas as reservas seguem critérios pedagógicos e
+                    operacionais definidos pela unidade.
                   </span>
                 </p>
 
@@ -565,18 +614,16 @@ export default function HomeAlunos() {
             <div className="h-px w-full" />
           </div>
 
-          {/* mantém seu espaço antes do rodapé */}
           <div className="relative z-10 max-w-6xl mx-auto px-5 sm:px-6 md:px-8 lg:px-10 pb-[460px] md:pb-[520px]" />
 
-            {/* onda grudada no footer */}
           <div className="pointer-events-none select-none absolute inset-x-0 bottom-0 h-[160px] md:h-[200px]">
-          <motion.img
-            src={OndaRodape}
-            alt=""
-            className="absolute bottom-0 right-0 w-[120%] md:w-[110%] max-w-none"
-            animate={{ y: [0, -8, 0] }}
-            transition={{ duration: 6, ease: "easeInOut", repeat: Infinity }}
-          />
+            <motion.img
+              src={OndaRodape}
+              alt=""
+              className="absolute bottom-0 right-0 w-[120%] md:w-[110%] max-w-none"
+              animate={{ y: [0, -8, 0] }}
+              transition={{ duration: 6, ease: "easeInOut", repeat: Infinity }}
+            />
           </div>
         </section>
       </main>
