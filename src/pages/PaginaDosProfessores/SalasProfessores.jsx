@@ -16,7 +16,6 @@ import ImgComputadores from "../../assets/Computadores.svg";
 import ImgImpressora3D from "../../assets/Impressora3D.svg";
 import ImgAuditorio from "../../assets/Impressora3D.svg";
 
-// trocado: agora usa o service de usuário
 import { buscarMeuPerfil } from "../../service/usuario";
 import { buscarTurmas } from "../../service/turma";
 
@@ -53,7 +52,6 @@ function Input({ value, onChange, placeholder, readOnly, className = "" }) {
   );
 }
 
-// ainda deixei o Select aqui caso use em outro lugar depois
 function Select({ value, onChange, disabled, children }) {
   return (
     <select
@@ -76,7 +74,6 @@ function Select({ value, onChange, disabled, children }) {
   );
 }
 
-/* helpers de data */
 function formatDateBr(iso) {
   if (!iso) return "—";
   const [y, m, d] = String(iso).split("-");
@@ -88,7 +85,7 @@ function TurmaCard({ turma }) {
   const { id, titulo, duracao, datas, tipo, nome } = turma;
 
   return (
-    <div className="rounded-2xl border border-black/10 dark:border-white/10 bg-white dark:bg-[#151515] shadow-sm overflow-hidden">
+    <div className="rounded-2xl border border-black/10 dark:border-white/10 bg-white dark:bg-[#151515] shadow-sm overflow-hidden h-full flex flex-col">
       <div className="px-5 py-3 border-b border-black/10 dark:border-white/10 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span
@@ -112,14 +109,10 @@ function TurmaCard({ turma }) {
         </div>
       </div>
 
-      <div className="p-5 grid grid-cols-2 sm:grid-cols-3 gap-4">
+      <div className="p-5 grid grid-cols-2 sm:grid-cols-3 gap-4 flex-1">
         <div>
           <Lbl>Duração</Lbl>
-          <Input
-            value={duracao}
-            placeholder="Ex: 40 alunos"
-            readOnly={true}
-          />
+          <Input value={duracao} placeholder="Ex: 40 alunos" readOnly={true} />
         </div>
         <div>
           <Lbl>Data de início</Lbl>
@@ -149,46 +142,46 @@ function TurmaCard({ turma }) {
 
 function CardReservar({ item }) {
   return (
-    <article className="mx-auto max-w-[360px] rounded-xl bg-white dark:bg-[#151515] border border-black/10 dark:border-white/10 shadow-sm">
-      <div className="p-4">
-        <div className="h-[130px] w-full rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10">
-          <img
-            src={item.img}
-            alt={item.title}
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <div className="mt-3">
-          <span className="inline-block text-[11px] font-semibold bg-[#B10000] text-white px-2 py-[2px] rounded">
-            {item.title}
-          </span>
-          <p className="mt-2 text-[13px] leading-relaxed text-[#1E1E1E] dark:text-gray-200">
-            {item.desc}
-          </p>
-        </div>
-        <div className="mt-3 flex justify-center">
-          <Link to={item.to} className="inline-flex">
-            <button
-              className="px-6 h-8 rounded-md text-white text-[13px] font-semibold shadow-sm hover:brightness-[.98] active:scale-[.99] transition"
-              style={{ backgroundColor: COR }}
-            >
-              Agendar
-            </button>
-          </Link>
+    <article className="h-full">
+      <div className="mx-auto h-full max-w-[360px] rounded-xl bg-white dark:bg-[#151515] border border-black/10 dark:border-white/10 shadow-sm flex flex-col">
+        <div className="p-4 flex flex-col h-full">
+          <div className="h-[130px] w-full rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10">
+            <img
+              src={item.img}
+              alt={item.title}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="mt-3">
+            <span className="inline-block text-[11px] font-semibold bg-[#B10000] text-white px-2 py-[2px] rounded">
+              {item.title}
+            </span>
+            <p className="mt-2 text-[13px] leading-relaxed text-[#1E1E1E] dark:text-gray-200">
+              {item.desc}
+            </p>
+          </div>
+          <div className="mt-auto pt-3 flex justify-center">
+            <Link to={item.to} className="inline-flex">
+              <button
+                className="px-6 h-8 rounded-md text-white text-[13px] font-semibold shadow-sm hover:brightness-[.98] active:scale-[.99] transition"
+                style={{ backgroundColor: COR }}
+              >
+                Agendar
+              </button>
+            </Link>
+          </div>
         </div>
       </div>
     </article>
   );
 }
 
-/* ----------------- Página ----------------- */
 export default function SalasProfessores() {
   const [turmas, setTurmas] = useState([]);
   const list = useMemo(() => turmas, [turmas]);
 
   const [displayName, setDisplayName] = useState("Professor(a)");
 
-  // pega nome do back (/usuario/meu-perfil), igual outras telas
   useEffect(() => {
     let alive = true;
 
@@ -222,7 +215,7 @@ export default function SalasProfessores() {
           id: t.id,
           titulo: t.curso || "Módulo",
           duracao: t.capacidade ? `${t.capacidade} alunos` : "—",
-          datas: formatDateBr(t.dataInicio), // só data de início
+          datas: formatDateBr(t.dataInicio),
           tipo: t.modalidade || "—",
           nome: t.nome || "",
         }));
@@ -281,7 +274,6 @@ export default function SalasProfessores() {
       <Header />
 
       <main className="bg-white dark:bg-[#0B0B0B] min-h-screen overflow-hidden relative">
-        {/* trilha */}
         <nav className="max-w-6xl mx-auto px-5 sm:px-6 md:px-8 lg:px-10 mt-3">
           <ol className="flex items-center gap-2 text-sm">
             <li>
@@ -297,7 +289,6 @@ export default function SalasProfessores() {
           </ol>
         </nav>
 
-        {/* Onda topo */}
         <motion.img
           src={OndaTopo}
           alt="Onda"
@@ -307,7 +298,6 @@ export default function SalasProfessores() {
           transition={{ duration: 6, ease: "easeInOut", repeat: Infinity }}
         />
 
-        {/* Avatar */}
         <section className="relative -mt-6 sm:-mt-8">
           <div className="max-w-6xl mx-auto px-5 sm:px-6 md:px-8 lg:px-10">
             <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full mx-auto bg-white dark:bg-[#121212] ring-1 ring-black/10 dark:ring-white/10 overflow-hidden shadow-sm">
@@ -324,7 +314,6 @@ export default function SalasProfessores() {
           </div>
         </section>
 
-        {/* Faixa vermelha */}
         <section className="mt-4">
           <div className="bg-[#B10000] text-white">
             <div className="max-w-6xl mx-auto px-5 sm:px-6 md:px-8 py-6 sm:py-7 text-center">
@@ -339,8 +328,7 @@ export default function SalasProfessores() {
           </div>
         </section>
 
-        {/* Ações */}
-        <section className="max-w-6xl mx_auto px-5 sm:px-6 md:px-8 lg:px-10 mt-6">
+        <section className="max-w-6xl mx-auto px-5 sm:px-6 md:px-8 lg:px-10 mt-6">
           <div className="flex items-center gap-3">
             <Link
               to="/professores/turmas/nova"
@@ -362,10 +350,9 @@ export default function SalasProfessores() {
           </div>
         </section>
 
-        {/* Turmas */}
         <section className="max-w-6xl mx-auto px-5 sm:px-6 md:px-8 lg:px-10 mt-4">
           {list.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 auto-rows-fr">
               {list.map((t) => (
                 <TurmaCard key={t.id} turma={t} />
               ))}
@@ -384,7 +371,6 @@ export default function SalasProfessores() {
           )}
         </section>
 
-        {/* Reservar */}
         <section className="relative max-w-6xl mx-auto px-5 sm:px-6 md:px-8 lg:px-10 pt-8 pb-10">
           <div className="grid place-items-center">
             <div className="text-center">
@@ -397,14 +383,13 @@ export default function SalasProfessores() {
               />
             </div>
           </div>
-          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6 auto-rows-fr">
             {reservarCards.map((it) => (
               <CardReservar key={it.id} item={it} />
             ))}
           </div>
         </section>
 
-        {/* Onda footer */}
         <section className="relative w-full overflow-visible -mt-20 -bottom-5">
           <div className="pointer-events-none select-none relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] z-0">
             <motion.img

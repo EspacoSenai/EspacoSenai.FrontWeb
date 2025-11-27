@@ -531,7 +531,7 @@ export default function HomeAlunos() {
 
         <section className="w-full">
           <div className="max-w-6xl mx-auto px-5 sm:px-6 md:px-8 lg:px-10 pt-2 pb-10 md:pb-14">
-            <h3 className="text-center text-[20px] sm:text-[22px] font-semibold text-[#1E1E1E] dark:text:white">
+            <h3 className="text-center text-[20px] sm:text-[22px] font-semibold text-[#1E1E1E] dark:text-white">
               Lembretes
             </h3>
 

@@ -1,4 +1,3 @@
-// src/components/Home/HeaderGlobal.jsx
 import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
@@ -8,8 +7,7 @@ import LogoLight from "../../assets/EspacoSenai.svg";
 import LogoDark from "../../assets/logodark.svg";
 import IconSun from "../../assets/Sol.svg";
 import IconMoon from "../../assets/noite.svg";
-
-const AVATAR_FALLBACK = "src/assets/AvatarPadrao.svg";
+import AVATAR_FALLBACK from "../../assets/AvatarPadrao.svg";
 
 function getInitialDark() {
   try {
@@ -25,10 +23,7 @@ function getInitialDark() {
   }
 }
 
-/**
- * Fallback de nome conforme o perfil selecionado
- * (ADMIN, COORDENADOR, PROFESSOR, ALUNO).
- */
+
 function getProfileFallbackName() {
   try {
     const profile = localStorage.getItem("selected_profile") || "ALUNO";
@@ -58,10 +53,10 @@ export default function HeaderGlobal() {
     () => localStorage.getItem("avatar_url") || ""
   );
 
-  // fallback inicial vem do perfil (ADMIN, PROFESSOR, etc)
+  
   const [displayName, setDisplayName] = useState(getProfileFallbackName);
 
-  // carrega nome a partir do back (/usuario/meu-perfil) com fallback pelo perfil
+ 
   const loadName = useCallback(async () => {
     const fallback = getProfileFallbackName();
     try {
@@ -77,7 +72,7 @@ export default function HeaderGlobal() {
     loadName();
   }, [loadName]);
 
-  // sincroniza token/sessão/avatar/perfil
+
   useEffect(() => {
     const onStorage = (e) => {
       if (
@@ -119,7 +114,7 @@ export default function HeaderGlobal() {
     };
   }, []);
 
-  // atualiza avatar quando fecha o menu (após navegação)
+
   useEffect(() => {
     if (!menuOpen) {
       setAvatarLocal(localStorage.getItem("avatar_url") || "");
@@ -132,7 +127,7 @@ export default function HeaderGlobal() {
   const logoSrc = isDarkMode ? LogoDark : LogoLight;
   const avatarUrl = avatarLocal || AVATAR_FALLBACK;
 
-  // ações
+
   const goToNotifications = () => {
     setMenuOpen(false);
     navigate("/notificacoes");
@@ -145,7 +140,6 @@ export default function HeaderGlobal() {
 
   const handleLogout = () => {
     try {
-      // limpa tudo que está relacionado à sessão/login
       localStorage.removeItem("token");
       localStorage.removeItem("roles");
       localStorage.removeItem("selected_profile");
@@ -158,7 +152,6 @@ export default function HeaderGlobal() {
 
     setMenuOpen(false);
 
-    // avisa o contexto (se existir)
     try {
       signOut && signOut();
       refresh && refresh();
@@ -166,10 +159,8 @@ export default function HeaderGlobal() {
       console.error("[HeaderGlobal] erro ao chamar signOut/refresh:", e);
     }
 
-    // volta para a landingpage
     navigate("/");
 
-    // garante que qualquer proteção de rota seja recalculada
     window.location.reload();
   };
 

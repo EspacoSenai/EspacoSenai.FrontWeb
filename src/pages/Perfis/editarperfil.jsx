@@ -1,7 +1,7 @@
-// src/pages/Perfil/EditarPerfil.jsx
 import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../../service/api";
+import { buscarMeuPerfil } from "../../service/usuario";
 
 import setaLeft from "../../assets/setaleft.svg";
 import avatarImg from "../../assets/avatar.svg";
@@ -18,6 +18,7 @@ function b64urlDecode(str) {
     return "";
   }
 }
+
 function parseJwtLocal(token) {
   try {
     const [, payload] = String(token || "").split(".");
@@ -39,13 +40,20 @@ export default function EditarPerfil() {
   const loadMe = useCallback(async () => {
     setLoading(true);
     try {
-      // tenta pelo back (GET /auth/me)
-      const me = await api.get("/auth/me");
-      const data = me?.data || me;
-      setNome(String(data?.nome || "").trim());
-      setEmail(String(data?.email || "").trim());
+      // 1) tenta pelo service padrão do projeto
+      const me = await buscarMeuPerfil();
+      const nomeBack =
+        me?.nome ||
+        me?.nomeCompleto ||
+        me?.nomeUsuario ||
+        me?.tag ||
+        "";
+      const emailBack = me?.email || "";
+
+      setNome(String(nomeBack).trim());
+      setEmail(String(emailBack).trim());
     } catch {
-      // fallback: lê do token (seu TokenService já inclui nome/email)
+      // 2) fallback: lê do token (caso o back não esteja respondendo)
       const token = localStorage.getItem("access_token") || "";
       const claims = parseJwtLocal(token);
       setNome(String(claims?.nome || "").trim());
@@ -65,14 +73,12 @@ export default function EditarPerfil() {
 
     setSaving(true);
     try {
-      // Atualiza apenas nome e email
       await api.postRaw("/usuario/atualizar", {
         nome: nome.trim(),
         email: email.trim(),
         _method: "PUT",
       });
 
-      // Sincroniza nome exibido no app (Header/Home)
       try {
         localStorage.setItem("display_name", nome.trim());
         localStorage.setItem("aluno_nome_cache", nome.trim());
@@ -90,6 +96,7 @@ export default function EditarPerfil() {
       console.error("Erro ao salvar perfil:", err);
       const msg =
         err?.data?.message ||
+        err?.response?.data?.message ||
         err?.message ||
         "Não foi possível salvar as alterações.";
       alert(msg);
@@ -143,7 +150,10 @@ export default function EditarPerfil() {
         </div>
 
         {/* Formulário */}
-        <form className="flex flex-col gap-8 items-start w-full" onSubmit={salvarPerfil}>
+        <form
+          className="flex flex-col gap-8 items-start w-full"
+          onSubmit={salvarPerfil}
+        >
           <div className="w-full">
             <label
               htmlFor="nome"
@@ -187,7 +197,6 @@ export default function EditarPerfil() {
             />
           </div>
 
-          {/* Link para a tela própria de alteração de senha */}
           <div className="w-full">
             <label
               htmlFor="senha-alterar"

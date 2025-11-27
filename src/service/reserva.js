@@ -1,7 +1,4 @@
-// src/service/reserva.js
 import { api } from "./api";
-
-/* ===== Helpers de data/hora ===== */
 
 const toLocalYMD = (dateLike) => {
   const d = new Date(dateLike);
@@ -29,7 +26,6 @@ const addMinutesHHMM = (hhmm, minutes) => {
   const H = base.getHours();
   const M = base.getMinutes();
 
-  // trava em 20:59 para não estourar regra do back
   if (H > 20 || (H === 20 && M > 59) || H >= 21) {
     return "20:59";
   }
@@ -37,10 +33,7 @@ const addMinutesHHMM = (hhmm, minutes) => {
   return `${String(H).padStart(2, "0")}:${String(M).padStart(2, "0")}`;
 };
 
-/* ===== Salvar reserva (usado no agendamento) ===== */
-
 export async function salvarReservaFormatoBack(p) {
-  // catálogo: pode vir como catalogoId ou idCatalogo
   const catalogoIdRaw = p.catalogoId ?? p.idCatalogo;
   const catalogoId = catalogoIdRaw != null ? Number(catalogoIdRaw) : null;
 
@@ -48,13 +41,11 @@ export async function salvarReservaFormatoBack(p) {
     throw new Error("Catálogo (catalogoId) obrigatório.");
   }
 
-  // hora de início em HH:mm (ex: "13:30")
   const inicioHHMM = p.horaInicioHHMM;
   if (!inicioHHMM) {
     throw new Error("horaInicioHHMM obrigatório.");
   }
 
-  // se não vier horaFim, soma 30 minutos em cima do início
   const fimHHMM =
     p.horaFimHHMM && p.horaFimHHMM.trim()
       ? p.horaFimHHMM
@@ -71,21 +62,19 @@ export async function salvarReservaFormatoBack(p) {
 
   console.log("[salvarReservaFormatoBack] payload enviado:", payload);
 
-  // no seu api, o .post já retorna data direto
   const data = await api.post("/reserva/salvar", payload);
   return data;
 }
 
-/* ===== Reservas aprovadas (Home Coordenador) ===== */
-
 export async function buscarReservasAprovadas() {
-  // Se o endpoint do back for outro (ex: /reserva/buscar-aprovadas),
-  // é só trocar aqui:
   const data = await api.get("/reserva/buscar");
   return data ?? [];
 }
 
-/* ===== config base para chamadas com fetch (cancelar/aprovar/pendentes) ===== */
+export async function buscarMinhasReservas() {
+  const { data } = await api.get("/reserva/minhas-reservas");
+  return data;
+}
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
@@ -96,8 +85,6 @@ const buildUrl = (path) => {
   const base = String(API_BASE_URL || "").replace(/\/$/, "");
   return `${base}${path}`;
 };
-
-/* ===== Cancelar reserva ===== */
 
 export async function cancelarReserva(id, motivo = "") {
   const token = localStorage.getItem("access_token") || "";
@@ -127,8 +114,6 @@ export async function cancelarReserva(id, motivo = "") {
     return null;
   }
 }
-
-/* ===== Reservas pendentes (tela Reservas Pendentes) ===== */
 
 export async function buscarReservasPendentes() {
   const token = localStorage.getItem("access_token") || "";
@@ -160,8 +145,6 @@ export async function buscarReservasPendentes() {
     return [];
   }
 }
-
-/* ===== Aprovar reserva ===== */
 
 export async function aprovarReserva(id) {
   const token = localStorage.getItem("access_token") || "";

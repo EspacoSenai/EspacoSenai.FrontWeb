@@ -1,4 +1,3 @@
-// src/pages/Home/HomeProfessor.jsx
 import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -14,24 +13,23 @@ import {
   COR,
   pages,
   pagesCount,
-  lembretesData,
   ArrowBtn,
   Card,
-  LembreteCard,
 } from "../../components/ComponentsHome/FuncoesHome";
 
-
 import { buscarMeuPerfil } from "../../service/usuario";
+import { buscarMinhasReservas } from "../../service/reserva";
 
 export default function HomeProfessor() {
   const [page, setPage] = useState(0);
-  const [lembretes] = useState(lembretesData);
 
-  // nome vindo do back
   const [displayName, setDisplayName] = useState("");
   const nome = displayName || "Professor(a)";
 
-  // mesmas regras da HomeAlunos
+  const [reservas, setReservas] = useState([]);
+  const [carregandoReservas, setCarregandoReservas] = useState(true);
+  const [erroReservas, setErroReservas] = useState("");
+
   const isLongName = nome.length > 18;
 
   const mobileTitleClass = isLongName
@@ -46,7 +44,6 @@ export default function HomeProfessor() {
     ? "text-[30px] lg:text-[36px]"
     : "text-[40px] lg:text-[46px]";
 
-  // busca nome no /usuario/meu-perfil
   useEffect(() => {
     let alive = true;
     (async () => {
@@ -72,6 +69,33 @@ export default function HomeProfessor() {
     };
   }, []);
 
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        setCarregandoReservas(true);
+        setErroReservas("");
+        const data = await buscarMinhasReservas();
+        if (alive) {
+          setReservas(Array.isArray(data) ? data : []);
+        }
+      } catch (err) {
+        console.error("[HomeProfessor] Erro ao buscar minhas reservas:", err);
+        if (alive) {
+          setErroReservas(
+            "Erro ao carregar suas reservas. Tente novamente mais tarde."
+          );
+          setReservas([]);
+        }
+      } finally {
+        if (alive) setCarregandoReservas(false);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   const nextPage = useCallback(
     () => setPage((p) => (p + 1) % pagesCount),
     []
@@ -90,10 +114,54 @@ export default function HomeProfessor() {
     return () => window.removeEventListener("keydown", onKey);
   }, [nextPage, prevPage]);
 
+  function getStatusClasse(status) {
+    const s = String(status || "").toUpperCase();
+    if (s.includes("APROV")) return "bg-emerald-100 text-emerald-800";
+    if (s.includes("PEND")) return "bg-amber-100 text-amber-800";
+    if (s.includes("REJE") || s.includes("CANCEL")) return "bg-red-100 text-red-800";
+    return "bg-gray-100 text-gray-700";
+  }
+
+  function montarInfoReserva(r) {
+    const nomeEspaco =
+      r.nomeEspaco ||
+      r.nomeSala ||
+      r.sala ||
+      r.catalogoNome ||
+      r.catalogo ||
+      "Espaço reservado";
+
+    const data =
+      r.data ||
+      r.dataReserva ||
+      r.dia ||
+      r.dataInicio ||
+      r.dataHora ||
+      "";
+
+    const inicio =
+      r.horarioInicio ||
+      r.horaInicio ||
+      r.inicio ||
+      r.horaInicial ||
+      "";
+
+    const fim =
+      r.horarioFim ||
+      r.horaFim ||
+      r.fim ||
+      r.horaFinal ||
+      "";
+
+    const turma = r.turma || r.nomeTurma || r.curso || "";
+
+    return { nomeEspaco, data, inicio, fim, turma };
+  }
+
   return (
     <>
       <Header />
-      <main className="bg-white dark:bg-[#0B0B0B]  w-full">
+      <main className="bg-white dark:bg-[#0B0B0B] w-full">
         {/* HERO */}
         <section className="relative w-full -mt-px">
           {/* Mobile */}
@@ -208,25 +276,70 @@ export default function HomeProfessor() {
 
         <div className="border-t-2 border-gray-300 mx-8 mt-0 mb-3" />
 
-        {/* LEMBRETES */}
+        {/* LEMBRETES = MINHAS RESERVAS */}
         <section className="w-full">
           <div className="max-w-6xl mx-auto px-5 sm:px-6 md:px-8 lg:px-10 pt-2 pb-10 md:pb-14">
             <h3 className="text-center text-[20px] sm:text-[22px] font-semibold text-[#1E1E1E] dark:text-white">
-              Lembretes
+              Lembretes de reservas
             </h3>
             <div
-              className="mx-auto mt-1 mb-6 h-[3px] w-24 rounded-full"
+              className="mx-auto mt-1 mb-6 h-[3px] w-40 rounded-full"
               style={{ backgroundColor: COR }}
             />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
-              {lembretes.length === 0 ? (
-                <div className="col-span-full text-center text-gray-500 dark:text-gray-400 py-8">
-                  Você ainda não tem lembretes de agendamento.
-                </div>
-              ) : (
-                lembretes.map((it) => <LembreteCard key={it.id} item={it} />)
-              )}
-            </div>
+
+            {carregandoReservas ? (
+              <div className="col-span-full text-center text-gray-500 dark:text-gray-400 py-8">
+                Carregando suas reservas...
+              </div>
+            ) : erroReservas ? (
+              <div className="col-span-full text-center text-red-600 dark:text-red-400 py-8">
+                {erroReservas}
+              </div>
+            ) : reservas.length === 0 ? (
+              <div className="col-span-full text-center text-gray-500 dark:text-gray-400 py-8">
+                Você ainda não tem reservas cadastradas.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+                {reservas.map((r) => {
+                  const { nomeEspaco, data, inicio, fim, turma } =
+                    montarInfoReserva(r);
+                  return (
+                    <div
+                      key={r.id}
+                      className="rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-[#151515] shadow-sm p-4 flex flex-col gap-2"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <h4 className="font-semibold text-[15px] text-[#1E1E1E] dark:text-white">
+                          {nomeEspaco}
+                        </h4>
+                        <span
+                          className={`text-[11px] px-2 py-1 rounded-full font-medium ${getStatusClasse(
+                            r.status
+                          )}`}
+                        >
+                          {r.status || "—"}
+                        </span>
+                      </div>
+                      {turma && (
+                        <p className="text-[13px] text-gray-600 dark:text-gray-300">
+                          Turma: <span className="font-medium">{turma}</span>
+                        </p>
+                      )}
+                      <p className="text-[13px] text-gray-600 dark:text-gray-300">
+                        Data: <span className="font-medium">{data || "—"}</span>
+                      </p>
+                      <p className="text-[13px] text-gray-600 dark:text-gray-300">
+                        Horário:{" "}
+                        <span className="font-medium">
+                          {inicio && fim ? `${inicio} - ${fim}` : "—"}
+                        </span>
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </section>
 
@@ -256,7 +369,9 @@ export default function HomeProfessor() {
                       <ellipse cx="88" cy="74" rx="24" ry="14" fill="#93C5FD" />
                     </svg>
                   </div>
-                  <div className="text-center mt-2 font-semibold">Manhã</div>
+                  <div className="text-center mt-2 font-semibold text-[#1E1E1E] dark:text-white">
+                    Manhã
+                  </div>
                   <div className="flex justify-center mt-4">
                     <a
                       href="/arquivos/horarios-manha.pdf"
@@ -302,7 +417,9 @@ export default function HomeProfessor() {
                       <ellipse cx="84" cy="60" rx="22" ry="14" fill="#F59E0B" />
                     </svg>
                   </div>
-                  <div className="text-center mt-2 font-semibold">Tarde</div>
+                  <div className="text-center mt-2 font-semibold text-[#1E1E1E] dark:text-white">
+                    Tarde
+                  </div>
                   <div className="flex justify-center mt-4">
                     <a
                       href="/arquivos/horarios-tarde.pdf"
@@ -339,9 +456,9 @@ export default function HomeProfessor() {
           </div>
         </section>
 
-        <div className="h-px w-full bg-gray-200 dark:bg:white/10" />
+        <div className="h-px w-full bg-gray-200 dark:bg-white/10" />
 
-        <section className="relative w-full overflow-visible pt-12 ">
+        <section className="relative w-full overflow-visible pt-12">
           <div className="relative z-10 max-w-6xl mx-auto px-5 sm:px-6 md:px-8 lg:px-10 pb-[460px] md:pb-[520px]">
             <div className="text-center">
               <h3 className="text-[20px] sm:text-[22px] font-semibold text-[#1E1E1E] dark:text-white">
@@ -355,7 +472,7 @@ export default function HomeProfessor() {
                 turmas de forma rápida e organizada.
               </p>
 
-              <div className="mx-auto mt-6 w-[300px] sm:w-[320px] rounded-[10px] bg:black/10 dark:bg:white/10 p-4 shadow-sm">
+              <div className="mx-auto mt-6 w-[300px] sm:w-[320px] rounded-[10px] bg-black/10 dark:bg-white/10 p-4 shadow-sm">
                 <Link
                   to="/pre-cadastrar"
                   className="inline-flex items-center justify-center w-full h-11 rounded-md

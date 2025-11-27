@@ -30,7 +30,7 @@ import ImgImpressora3D from "../../assets/Impressora3D.svg";
 
 import { buscarMeuPerfil } from "../../service/usuario";
 import {
-  buscarReservasAprovadas,
+  buscarMinhasReservas,
   cancelarReserva,
 } from "../../service/reserva";
 
@@ -316,13 +316,13 @@ export default function HomeCoordenador() {
 
   const carregarReservas = useCallback(async () => {
     try {
-      const data = await buscarReservasAprovadas();
+      const data = await buscarMinhasReservas();
       const arr = Array.isArray(data) ? data : [];
       const mapped = arr.map(mapReservaParaLembrete);
       setLembretes(mapped);
       setLembretesPage(0);
     } catch (err) {
-      console.error("[HomeCoordenador] Erro ao buscar reservas aprovadas:", err);
+      console.error("[HomeCoordenador] Erro ao buscar minhas reservas:", err);
       setLembretes([]);
     }
   }, []);
@@ -514,12 +514,12 @@ export default function HomeCoordenador() {
         <section className="w-full">
           <div className="max-w-6xl mx-auto px-5 sm:px-6 md:px-8 lg:px-10 pt-2 pb-10 md:pb-14">
             <h3 className="text-center text-[20px] sm:text-[22px] font-semibold text-[#1E1E1E] dark:text-white underline decoration-[#AE0000] underline-offset-[6px]">
-              Lembretes
+              Lembretes de reservas
             </h3>
 
             {lembretes.length === 0 ? (
               <div className="mt-6 text-center text-gray-500 dark:text-gray-400 py-8">
-                Você ainda não tem lembretes de agendamento.
+                Você ainda não tem reservas cadastradas.
               </div>
             ) : (
               <div className="relative mt-6">
@@ -576,7 +576,7 @@ export default function HomeCoordenador() {
 
             <div className="mt-8 max-w-3xl mx-auto text-center">
               <p className="text-[14px] sm:text-[15px] text-[#1E1E1E] dark:text-gray-200">
-                Acompanhe o status das reservas em tempo real e mantenha a
+                Acompanhe o status das suas reservas em tempo real e mantenha a
                 agenda atualizada.
               </p>
 

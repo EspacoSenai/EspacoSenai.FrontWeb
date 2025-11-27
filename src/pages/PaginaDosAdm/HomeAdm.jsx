@@ -19,7 +19,7 @@ import {
 } from "../../components/ComponentsHome/FuncoesHome";
 
 import ReservasConfirmadas from "../../components/ComponentsHome/ReservasConfirmadas.jsx";
-import { buscarMeuPerfil } from "../../service/usuario"; // Corrigir para buscar o perfil
+import { buscarMeuPerfil } from "../../service/usuario"; 
 
 export default function HomeAdm() {
   const [page, setPage] = useState(0);
