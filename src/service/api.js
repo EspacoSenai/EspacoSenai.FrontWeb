@@ -1,6 +1,6 @@
 const API_URL = (import.meta.env.VITE_API_URL || "https://espacosenai.azurewebsites.net").replace(/\/+$/, "");
 
-//const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:8080").replace(/\/+$/, "");
+// const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:8080").replace(/\/+$/, "");
 
 function ensurePath(path = "") {
   const p = String(path || "");
@@ -10,11 +10,16 @@ function ensurePath(path = "") {
 function getAuthToken() {
   const strip = (t) => String(t || "").replace(/^Bearer\s+/i, "").trim();
 
-  const direct = localStorage.getItem("access_token");
+  // tenta em várias chaves diretas
+  const direct =
+    localStorage.getItem("access_token") ||
+    localStorage.getItem("token");
+
   if (direct) return strip(direct);
 
+  // tenta dentro da sessão salva
   try {
-    const sess = JSON.parse(localStorage.getItem("espsn.session") || "null");
+    const sess = JSON.parse(localStorage.getItem("espns.session") || "null");
     if (sess?.token) return strip(sess.token);
   } catch {}
 
@@ -41,6 +46,38 @@ function normalizeHeaders(headers) {
   }
 }
 
+/* ===== helpers de logout automático ===== */
+
+function clearAuthTokens() {
+  try {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("token");
+    localStorage.removeItem("espns.session");
+    localStorage.removeItem("espsn.session"); // caso antigo com typo
+    localStorage.removeItem("roles");
+    localStorage.removeItem("selected_profile");
+  } catch {}
+}
+
+function handleAuthError() {
+  clearAuthTokens();
+
+  try {
+    // avisa outros listeners que o token mudou
+    window.dispatchEvent(
+      new StorageEvent("storage", { key: "access_token", newValue: null })
+    );
+  } catch {}
+
+  if (typeof window !== "undefined") {
+    if (window.location.pathname !== "/landing") {
+      window.location.href = "/landing";
+    }
+  }
+}
+
+/* ===== construção de headers ===== */
+
 function buildHeaders({ path, options, isFormData }) {
   const token = getAuthToken();
   const skipAuth = Boolean(options?.skipAuth) || isPublicAuthPath(path);
@@ -54,6 +91,8 @@ function buildHeaders({ path, options, isFormData }) {
     ...(options?.headers || {}),
   };
 }
+
+/* ===== request padrão ===== */
 
 async function request(path, options = {}) {
   const url = `${API_URL}${ensurePath(path)}`;
@@ -78,19 +117,28 @@ async function request(path, options = {}) {
   const data = isJson ? await response.json().catch(() => null) : null;
 
   if (!response.ok) {
+    const status = response.status;
+
+    // se for 401/403 fora das rotas públicas de auth → auto logout + redirect
+    if ((status === 401 || status === 403) && !isPublicAuthPath(path)) {
+      handleAuthError();
+    }
+
     throw {
-      status: response.status,
+      status,
       data,
       message:
         data?.message ||
         data?.error ||
         data?.details ||
-        `Erro ao comunicar com o servidor. [${response.status}]`,
+        `Erro ao comunicar com o servidor. [${status}]`,
     };
   }
 
   return data;
 }
+
+/* ===== request "raw" (com status/headers) ===== */
 
 async function requestRaw(path, options = {}) {
   const url = `${API_URL}${ensurePath(path)}`;
@@ -115,14 +163,20 @@ async function requestRaw(path, options = {}) {
   const data = isJson ? await response.json().catch(() => null) : null;
 
   if (!response.ok) {
+    const status = response.status;
+
+    if ((status === 401 || status === 403) && !isPublicAuthPath(path)) {
+      handleAuthError();
+    }
+
     throw {
-      status: response.status,
+      status,
       data,
       message:
         data?.message ||
         data?.error ||
         data?.details ||
-        `Erro ao comunicar com o servidor. [${response.status}]`,
+        `Erro ao comunicar com o servidor. [${status}]`,
     };
   }
 
@@ -132,6 +186,8 @@ async function requestRaw(path, options = {}) {
     headers: normalizeHeaders(response.headers),
   };
 }
+
+/* ===== API "bonitinha" ===== */
 
 export const api = {
   // básicas
@@ -163,15 +219,18 @@ export function setAuthToken(token) {
     if (clean) {
       localStorage.setItem("access_token", clean);
       localStorage.setItem(
-        "espsn.session",
+        "espns.session",
         JSON.stringify({ token: clean, user: null })
       );
     } else {
       localStorage.removeItem("access_token");
-      localStorage.removeItem("espsn.session");
+      localStorage.removeItem("espns.session");
     }
     window.dispatchEvent(
-      new StorageEvent("storage", { key: "access_token", newValue: clean || null })
+      new StorageEvent("storage", {
+        key: "access_token",
+        newValue: clean || null,
+      })
     );
   } catch {}
 }
