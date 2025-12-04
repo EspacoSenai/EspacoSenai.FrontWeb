@@ -1,4 +1,3 @@
-// src/pages/Agendamento/AgendamentoPS5.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import sucessoIcon from "../../assets/sucesso.svg";
@@ -17,9 +16,10 @@ import {
 
 import { salvarReservaFormatoBack } from "../../service/reserva";
 import { api } from "../../service/api";
+import { buscarTodosAmbientes } from "../../service/ambiente";
 
-const PS5_AMBIENTE_ID = 2;
-const PS5_CATALOGO_FALLBACK_ID = 2;
+// Nome do ambiente para buscar no backend
+const AMBIENTE_NOME = "PS5";
 
 const DIAS_BACK = [
   "DOMINGO",
@@ -108,6 +108,7 @@ export default function AgendamentoPS5() {
   const [horaTerminoFiltro, setHoraTerminoFiltro] = useState("");
 
   const [catalogoPS5, setCatalogoPS5] = useState([]);
+  const [ambienteId, setAmbienteId] = useState(null);
 
   const [modal, setModal] = useState({
     aberto: false,
@@ -179,33 +180,69 @@ export default function AgendamentoPS5() {
     setModal((m) => ({ ...m, aberto: false }));
   }
 
+  // Busca os ambientes e o catálogo, filtrando pelo nome do ambiente
   useEffect(() => {
     let cancelado = false;
 
-    async function carregarCatalogoPS5() {
+    async function carregarDados() {
       try {
-        const resp = await api.get("/catalogo/buscar");
-        const data = Array.isArray(resp?.data) ? resp.data : resp;
+        // 1. Buscar todos os ambientes para encontrar o ID do PS5
+        console.log(`[AgendamentoPS5] Buscando ambientes...`);
+        const ambientes = await buscarTodosAmbientes();
+        console.log("[AgendamentoPS5] Ambientes recebidos:", ambientes);
 
-        if (!Array.isArray(data)) {
-          console.warn(
-            "[AgendamentoPS5] /catalogo/buscar não retornou array:",
-            data
-          );
+        if (!Array.isArray(ambientes)) {
+          console.warn("[AgendamentoPS5] /ambiente/buscar não retornou array:", ambientes);
           return;
         }
 
-        const mapeado = data.map((item) => {
+        // Log todos os ambientes para debug
+        console.log("[AgendamentoPS5] Lista de ambientes:", ambientes.map(a => ({ id: a?.id, nome: a?.nome })));
+
+        // Encontrar o ambiente PS5 pelo nome (case-insensitive)
+        const ambientePS5 = ambientes.find((amb) => {
+          const nome = String(amb?.nome || "").toLowerCase();
+          const match = nome.includes("ps5") || nome.includes("playstation");
+          console.log(`[AgendamentoPS5] Verificando ambiente: "${amb?.nome}" -> match: ${match}`);
+          return match;
+        });
+
+        if (!ambientePS5) {
+          console.warn("[AgendamentoPS5] Ambiente PS5 não encontrado. Ambientes disponíveis:", 
+            ambientes.map(a => a?.nome));
+          return;
+        }
+
+        const idAmbientePS5 = ambientePS5.id;
+        console.log(`[AgendamentoPS5] Ambiente PS5 encontrado - ID: ${idAmbientePS5}, Nome: ${ambientePS5.nome}`);
+        
+        if (!cancelado) {
+          setAmbienteId(idAmbientePS5);
+        }
+
+        // 2. Buscar o catálogo
+        console.log(`[AgendamentoPS5] Buscando catálogo...`);
+        const resp = await api.get("/catalogo/buscar");
+        const catalogoData = Array.isArray(resp?.data) ? resp.data : resp;
+
+        console.log("[AgendamentoPS5] Catálogo completo recebido:", catalogoData?.length, "itens");
+
+        if (!Array.isArray(catalogoData)) {
+          console.warn("[AgendamentoPS5] /catalogo/buscar não retornou array:", catalogoData);
+          return;
+        }
+
+        // 3. Filtrar o catálogo pelo ID do ambiente PS5
+        const catalogoFiltrado = catalogoData.filter((item) => {
+          const ambienteIdItem = item?.ambiente?.id ?? item?.ambienteId ?? item?.idAmbiente ?? null;
+          return ambienteIdItem === idAmbientePS5;
+        });
+
+        console.log(`[AgendamentoPS5] Catálogo filtrado para PS5 (ID ${idAmbientePS5}):`, catalogoFiltrado.length, "itens");
+        console.log(`[AgendamentoPS5] Itens filtrados:`, catalogoFiltrado);
+
+        const mapeado = catalogoFiltrado.map((item) => {
           const catalogoIdItem = item?.id ?? null;
-
-          const ambienteId =
-            item?.ambiente?.id ?? item?.ambienteId ?? item?.idAmbiente ?? null;
-
-          const nomeAmbiente = String(
-            item?.ambiente?.nome || item?.ambienteNome || ""
-          )
-            .trim()
-            .toLowerCase();
 
           const disponibilidadeItem = String(
             item?.disponibilidade || item?.ambiente?.disponibilidade || ""
@@ -215,11 +252,6 @@ export default function AgendamentoPS5() {
             .trim()
             .toUpperCase();
 
-          const isPS5 =
-            ambienteId === PS5_AMBIENTE_ID ||
-            nomeAmbiente.includes("ps5") ||
-            nomeAmbiente.includes("playstation");
-
           const isDisponivel =
             !disponibilidadeItem || disponibilidadeItem === "DISPONIVEL";
 
@@ -228,16 +260,17 @@ export default function AgendamentoPS5() {
             diaSemana: diaSemanaNormalizado,
             horaInicio: toHHMM(item.horaInicio),
             horaFim: toHHMM(item.horaFim),
-            isPS5,
             isDisponivel,
           };
         });
 
-        const apenasPS5 = mapeado.filter((it) => it.isPS5 && it.isDisponivel);
+        const catalogoDisponivel = mapeado.filter((it) => it.isDisponivel);
+
+        console.log(`[AgendamentoPS5] Catálogo disponível final:`, catalogoDisponivel);
 
         if (!cancelado) {
           setCatalogoPS5(
-            apenasPS5.map((it) => ({
+            catalogoDisponivel.map((it) => ({
               id: it.id,
               diaSemana: it.diaSemana,
               horaInicio: it.horaInicio,
@@ -246,11 +279,11 @@ export default function AgendamentoPS5() {
           );
         }
       } catch (err) {
-        console.error("Erro ao buscar catálogo do PS5:", err);
+        console.error("[AgendamentoPS5] Erro ao carregar dados:", err);
       }
     }
 
-    carregarCatalogoPS5();
+    carregarDados();
 
     return () => {
       cancelado = true;
@@ -384,7 +417,7 @@ export default function AgendamentoPS5() {
       return;
     }
 
-    const catalogoId = faixaQueCobre.id || PS5_CATALOGO_FALLBACK_ID;
+    const catalogoId = faixaQueCobre.id;
 
     try {
       await salvarReservaFormatoBack({

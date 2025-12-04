@@ -98,7 +98,7 @@ export default function GestaoTurmas({ cor = COR }) {
   });
 
   const CLASSES_INPUT =
-    "w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-[14px] outline-none focus:ring-2 focus:ring-[#B10404] focus:border-[#B10404]";
+    "w-full rounded-md border border-neutral-300 bg-white px-3 py-2 text-[14px] text-black outline-none focus:ring-2 focus:ring-[#B10404] focus:border-[#B10404]";
 
   async function carregarTurmas() {
     try {

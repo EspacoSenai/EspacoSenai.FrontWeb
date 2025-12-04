@@ -16,9 +16,10 @@ import {
 
 import { salvarReservaFormatoBack } from "../../service/reserva";
 import { api } from "../../service/api";
+import { buscarTodosAmbientes } from "../../service/ambiente";
 
-const AUDITORIO_AMBIENTE_ID = 6;
-const AUDITORIO_CATALOGO_FALLBACK_ID = 6;
+// Nome do ambiente - usado para buscar o ID dinamicamente
+const AMBIENTE_NOME = "Auditório";
 
 const DIAS_BACK = [
   "DOMINGO",
@@ -133,6 +134,10 @@ export default function AgendamentoAuditorio() {
 
   const [catalogoAuditorio, setCatalogoAuditorio] = useState([]);
 
+  // Estado para armazenar o ID do ambiente buscado dinamicamente
+  const [ambienteId, setAmbienteId] = useState(null);
+  const [loadingAmbiente, setLoadingAmbiente] = useState(true);
+
   const [modal, setModal] = useState({
     aberto: false,
     tipo: "success",
@@ -157,6 +162,44 @@ export default function AgendamentoAuditorio() {
       setNowMinutes(n.getHours() * 60 + n.getMinutes());
     }, 30_000);
     return () => clearInterval(id);
+  }, []);
+
+  // Buscar o ID do ambiente pelo nome ao montar
+  useEffect(() => {
+    let cancelado = false;
+    async function fetchAmbiente() {
+      try {
+        console.log(`[AgendamentoAuditorio] Buscando ambientes...`);
+        const ambientes = await buscarTodosAmbientes();
+        
+        if (!Array.isArray(ambientes)) {
+          console.warn("[AgendamentoAuditorio] /ambiente/buscar não retornou array:", ambientes);
+          return;
+        }
+
+        console.log("[AgendamentoAuditorio] Lista de ambientes:", ambientes.map(a => ({ id: a?.id, nome: a?.nome })));
+
+        // Encontrar o ambiente Auditório pelo nome (case-insensitive)
+        const ambienteAuditorio = ambientes.find((amb) => {
+          const nome = String(amb?.nome || "").toLowerCase();
+          return nome.includes("auditório") || nome.includes("auditorio");
+        });
+
+        if (!cancelado && ambienteAuditorio?.id) {
+          setAmbienteId(ambienteAuditorio.id);
+          console.log(`[AgendamentoAuditorio] Ambiente encontrado - ID: ${ambienteAuditorio.id}, Nome: ${ambienteAuditorio.nome}`);
+        } else {
+          console.warn("[AgendamentoAuditorio] Ambiente Auditório não encontrado. Ambientes disponíveis:", 
+            ambientes.map(a => a?.nome));
+        }
+      } catch (err) {
+        console.error(`[AgendamentoAuditorio] Erro ao buscar ambientes:`, err);
+      } finally {
+        if (!cancelado) setLoadingAmbiente(false);
+      }
+    }
+    fetchAmbiente();
+    return () => { cancelado = true; };
   }, []);
 
   const isHoje = useMemo(() => {
@@ -213,12 +256,18 @@ export default function AgendamentoAuditorio() {
   }
 
   useEffect(() => {
+    // Aguarda o ambienteId ser carregado antes de buscar o catálogo
+    if (!ambienteId) return;
+    
     let cancelado = false;
 
     async function carregarCatalogoAuditorio() {
       try {
+        console.log(`[AgendamentoAuditorio] Buscando catálogo para ambienteId: ${ambienteId}`);
         const resp = await api.get("/catalogo/buscar");
         const data = Array.isArray(resp?.data) ? resp.data : resp;
+
+        console.log("[AgendamentoAuditorio] Catálogo completo recebido:", data?.length, "itens");
 
         if (!Array.isArray(data)) {
           console.warn(
@@ -228,16 +277,16 @@ export default function AgendamentoAuditorio() {
           return;
         }
 
-        const mapeado = data.map((item) => {
-          const catalogoIdItem = item?.id ?? null;
-          const ambienteId =
-            item?.ambiente?.id ?? item?.ambienteId ?? item?.idAmbiente ?? null;
+        // Filtra pelo ID do ambiente
+        const catalogoFiltrado = data.filter((item) => {
+          const ambienteIdItem = item?.ambiente?.id ?? item?.ambienteId ?? item?.idAmbiente ?? null;
+          return ambienteIdItem === ambienteId;
+        });
 
-          const nomeAmbiente = String(
-            item?.ambiente?.nome || item?.ambienteNome || ""
-          )
-            .trim()
-            .toLowerCase();
+        console.log(`[AgendamentoAuditorio] Catálogo filtrado (ID ${ambienteId}):`, catalogoFiltrado.length, "itens");
+
+        const mapeado = catalogoFiltrado.map((item) => {
+          const catalogoIdItem = item?.id ?? null;
 
           const disponibilidadeItem = String(
             item?.disponibilidade || item?.ambiente?.disponibilidade || ""
@@ -246,11 +295,6 @@ export default function AgendamentoAuditorio() {
           const diaSemanaNormalizado = String(item.diaSemana || "")
             .trim()
             .toUpperCase();
-
-          const isAuditorio =
-            ambienteId === AUDITORIO_AMBIENTE_ID ||
-            nomeAmbiente.includes("auditório") ||
-            nomeAmbiente.includes("auditorio");
 
           const isDisponivel =
             !disponibilidadeItem || disponibilidadeItem === "DISPONIVEL";
@@ -263,23 +307,20 @@ export default function AgendamentoAuditorio() {
             diaSemana: diaSemanaNormalizado,
             horaInicio,
             horaFim,
-            isAuditorio,
             isDisponivel,
           };
         });
 
-        const apenasAuditorio = mapeado.filter(
-          (it) => it.isAuditorio && it.isDisponivel
-        );
+        const catalogoDisponivel = mapeado.filter((it) => it.isDisponivel);
 
         console.log(
-          "[AgendamentoAuditorio] faixas AUDITÓRIO (disponíveis):",
-          apenasAuditorio
+          "[AgendamentoAuditorio] Catálogo disponível final:",
+          catalogoDisponivel
         );
 
         if (!cancelado) {
           setCatalogoAuditorio(
-            apenasAuditorio.map((it) => ({
+            catalogoDisponivel.map((it) => ({
               id: it.id,
               diaSemana: it.diaSemana,
               horaInicio: it.horaInicio,
@@ -300,7 +341,7 @@ export default function AgendamentoAuditorio() {
     return () => {
       cancelado = true;
     };
-  }, []);
+  }, [ambienteId]);
 
   const diaSemanaBackSelecionado = useMemo(() => {
     const dia = diasDaSemana[diaSelecionado]?.dataCompleta;
@@ -438,8 +479,7 @@ export default function AgendamentoAuditorio() {
       return;
     }
 
-    const catalogoId =
-      catalogoSelecionado.id || AUDITORIO_CATALOGO_FALLBACK_ID;
+    const catalogoId = catalogoSelecionado.id;
 
     const msgUsuario = `Reserva do Auditório para a turma ${turma.trim()}.`;
 
@@ -500,7 +540,7 @@ export default function AgendamentoAuditorio() {
         </div>
 
         <div className="mb-8">
-          <label className="block text-black dark:text:white font-medium mb-2">
+          <label className="block text-black dark:text-white font-medium mb-2">
             Nome da turma:
           </label>
 

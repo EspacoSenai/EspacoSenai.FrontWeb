@@ -1,5 +1,10 @@
 import { api } from "./api";
 
+export async function buscarTodosAmbientes() {
+  const resp = await api.get("/ambiente/buscar");
+  return resp?.data ?? resp;
+}
+
 export async function buscarAmbiente(id) {
   const resp = await api.get(`/ambiente/buscar/${id}`);
   return resp?.data ?? resp;
