@@ -1,5 +1,6 @@
 // src/pages/Agendamentos/AgendamentoComputadores.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ adicionado
 
 import sucessoIcon from "../../assets/sucesso.svg";
 
@@ -92,6 +93,7 @@ function gerarSlotsComPasso15(faixas) {
 }
 
 export default function AgendamentoComputadores() {
+  const navigate = useNavigate(); // ✅ navegação
   const [semanaSelecionada, setSemanaSelecionada] = useState("essa");
   const [diaSelecionado, setDiaSelecionado] = useState(0);
 
@@ -103,6 +105,8 @@ export default function AgendamentoComputadores() {
   const [computadorSelecionado, setComputadorSelecionado] = useState(null);
 
   const [catalogoComputadores, setCatalogoComputadores] = useState([]);
+
+  const [loading, setLoading] = useState(false); // ✅ loading
 
   const [modal, setModal] = useState({
     aberto: false,
@@ -172,10 +176,7 @@ export default function AgendamentoComputadores() {
   }
 
   function cancelar() {
-    setDiaSelecionado(0);
-    setHoraInicio(null);
-    setHoraInicioFiltro("");
-    setComputadorSelecionado(null);
+    navigate(-1); // ✅ volta pra tela anterior
   }
 
   useEffect(() => {
@@ -298,86 +299,89 @@ export default function AgendamentoComputadores() {
   const temHorariosParaDia = horariosInicioDisponiveis.length > 0;
 
   async function confirmar() {
-    if (!horaInicio || !computadorSelecionado) {
-      abrirModal(
-        "error",
-        "Dados incompletos",
-        "Escolha o horário de início e um computador para continuar."
-      );
-      return;
-    }
-
-    const dia = diasDaSemana[diaSelecionado];
-    if (!dia || dia.desabilitado) {
-      abrirModal("error", "Data inválida", "Selecione uma data válida.");
-      return;
-    }
-
-    if (isHoje) {
-      abrirModal(
-        "error",
-        "Data não permitida",
-        "As reservas de computadores só são aceitas a partir de amanhã."
-      );
-      return;
-    }
-
-    if (!horariosInicioDisponiveis.includes(horaInicio)) {
-      abrirModal(
-        "error",
-        "Horário indisponível",
-        "O horário selecionado não está disponível para este dia."
-      );
-      return;
-    }
-
-    if (!validaIntervalo(horaInicio, horaTermino)) {
-      abrirModal(
-        "error",
-        "Horários inconsistentes",
-        `O início precisa ser antes de ${horaTermino}.`
-      );
-      return;
-    }
-
-    const hostId = getUserIdFromToken();
-    if (!hostId) {
-      abrirModal(
-        "error",
-        "Sessão inválida",
-        "Não foi possível identificar o usuário logado."
-      );
-      return;
-    }
-
-    const faixaQueCobre = faixasDoDia.find((f) => {
-      const iniFaixa = paraMinutos(f.horaInicio);
-      const fimFaixa = paraMinutos(f.horaFim);
-      const iniSel = paraMinutos(horaInicio);
-      const fimSel = paraMinutos(horaTermino);
-      return iniSel >= iniFaixa && fimSel <= fimFaixa;
-    });
-
-    if (!faixaQueCobre?.id) {
-      console.error(
-        "[AgendamentoComputadores] Não encontrou faixa que cubra o intervalo",
-        diaSemanaBackSelecionado,
-        horaInicio,
-        horaTermino,
-        faixasDoDia
-      );
-      abrirModal(
-        "error",
-        "Configuração inválida",
-        "Não foi possível localizar o catálogo correspondente para esse horário. Avise o coordenador."
-      );
-      return;
-    }
-
-    const catalogoId =
-      faixaQueCobre.id || COMPUTADORES_CATALOGO_FALLBACK_ID;
+    if (loading) return;
+    setLoading(true); // ✅ começa loading
 
     try {
+      if (!horaInicio || !computadorSelecionado) {
+        abrirModal(
+          "error",
+          "Dados incompletos",
+          "Escolha o horário de início e um computador para continuar."
+        );
+        return;
+      }
+
+      const dia = diasDaSemana[diaSelecionado];
+      if (!dia || dia.desabilitado) {
+        abrirModal("error", "Data inválida", "Selecione uma data válida.");
+        return;
+      }
+
+      if (isHoje) {
+        abrirModal(
+          "error",
+          "Data não permitida",
+          "As reservas de computadores só são aceitas a partir de amanhã."
+        );
+        return;
+      }
+
+      if (!horariosInicioDisponiveis.includes(horaInicio)) {
+        abrirModal(
+          "error",
+          "Horário indisponível",
+          "O horário selecionado não está disponível para este dia."
+        );
+        return;
+      }
+
+      if (!validaIntervalo(horaInicio, horaTermino)) {
+        abrirModal(
+          "error",
+          "Horários inconsistentes",
+          `O início precisa ser antes de ${horaTermino}.`
+        );
+        return;
+      }
+
+      const hostId = getUserIdFromToken();
+      if (!hostId) {
+        abrirModal(
+          "error",
+          "Sessão inválida",
+          "Não foi possível identificar o usuário logado."
+        );
+        return;
+      }
+
+      const faixaQueCobre = faixasDoDia.find((f) => {
+        const iniFaixa = paraMinutos(f.horaInicio);
+        const fimFaixa = paraMinutos(f.horaFim);
+        const iniSel = paraMinutos(horaInicio);
+        const fimSel = paraMinutos(horaTermino);
+        return iniSel >= iniFaixa && fimSel <= fimFaixa;
+      });
+
+      if (!faixaQueCobre?.id) {
+        console.error(
+          "[AgendamentoComputadores] Não encontrou faixa que cubra o intervalo",
+          diaSemanaBackSelecionado,
+          horaInicio,
+          horaTermino,
+          faixasDoDia
+        );
+        abrirModal(
+          "error",
+          "Configuração inválida",
+          "Não foi possível localizar o catálogo correspondente para esse horário. Avise o coordenador."
+        );
+        return;
+      }
+
+      const catalogoId =
+        faixaQueCobre.id || COMPUTADORES_CATALOGO_FALLBACK_ID;
+
       await salvarReservaFormatoBack({
         idUsuario: hostId,
         catalogoId,
@@ -399,6 +403,8 @@ export default function AgendamentoComputadores() {
         err?.message ||
         `Erro ao comunicar com o servidor. [${err?.status || ""}]`;
       abrirModal("error", "Falha ao reservar", msg);
+    } finally {
+      setLoading(false); // ✅ termina loading
     }
   }
 
@@ -507,17 +513,32 @@ export default function AgendamentoComputadores() {
           <button
             type="button"
             onClick={cancelar}
-            className="px-6 py-3 rounded-md bg-[#EDEDED] text-[#1E1E1E] outline-none focus:ring-0 hover:bg-[#AE0000] hover:text-white transition-colors duration-150"
+            disabled={loading}
+            className={`px-6 py-3 rounded-md bg-[#EDEDED] text-[#1E1E1E] ${
+              loading
+                ? "opacity-60 cursor-not-allowed"
+                : "hover:bg-[#AE0000] hover:text-white"
+            } transition-colors duration-150`}
           >
             Cancelar
           </button>
           <button
             type="button"
             onClick={confirmar}
-            className="px-6 py-3 rounded-md text-white outline-none focus:ring-0 transition-colors duration-150"
+            disabled={loading}
+            className={`px-6 py-3 rounded-md text-white flex items-center justify-center gap-2 ${
+              loading ? "opacity-80 cursor-wait" : ""
+            }`}
             style={{ backgroundColor: COR_VERMELHO }}
           >
-            Confirmar
+            {loading ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin drop-shadow-[0_0_6px_rgba(255,255,255,0.6)]"></div>
+                <span className="animate-pulse">Processando...</span>
+              </>
+            ) : (
+              "Confirmar"
+            )}
           </button>
         </div>
       </div>

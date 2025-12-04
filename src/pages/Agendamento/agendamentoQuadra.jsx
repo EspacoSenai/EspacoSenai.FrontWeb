@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import sucessoIcon from "../../assets/sucesso.svg";
 
@@ -107,15 +108,15 @@ function gerarSlotsPorFaixas(faixas, passoMinutos = 15) {
 }
 
 export default function AgendamentoQuadra() {
+  const navigate = useNavigate();
   const [semanaSelecionada, setSemanaSelecionada] = useState("essa");
   const [diaSelecionado, setDiaSelecionado] = useState(0);
   const [horaInicio, setHoraInicio] = useState(null);
   const [horaTermino, setHoraTermino] = useState(null);
-
   const [horaInicioFiltro, setHoraInicioFiltro] = useState("");
   const [horaTerminoFiltro, setHoraTerminoFiltro] = useState("");
-
   const [catalogoQuadra, setCatalogoQuadra] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const [modal, setModal] = useState({
     aberto: false,
@@ -181,47 +182,31 @@ export default function AgendamentoQuadra() {
 
   useEffect(() => {
     let cancelado = false;
-
     async function carregarCatalogoQuadra() {
       try {
         const resp = await api.get("/catalogo/buscar");
         const data = Array.isArray(resp?.data) ? resp.data : resp;
-
-        if (!Array.isArray(data)) {
-          console.warn(
-            "[AgendamentoQuadra] /catalogo/buscar não retornou array:",
-            data
-          );
-          return;
-        }
-
+        if (!Array.isArray(data)) return;
         const mapeado = data.map((item) => {
           const catalogoIdItem = item?.id ?? null;
-
           const ambienteId =
             item?.ambiente?.id ?? item?.ambienteId ?? item?.idAmbiente ?? null;
-
           const nomeAmbiente = String(
             item?.ambiente?.nome || item?.ambienteNome || ""
           )
             .trim()
             .toLowerCase();
-
           const disponibilidadeItem = String(
             item?.disponibilidade || item?.ambiente?.disponibilidade || ""
           ).toUpperCase();
-
           const diaSemanaNormalizado = String(item.diaSemana || "")
             .trim()
             .toUpperCase();
-
           const isQuadra =
             ambienteId === QUADRA_AMBIENTE_ID ||
             nomeAmbiente.includes("quadra");
-
           const isDisponivel =
             !disponibilidadeItem || disponibilidadeItem === "DISPONIVEL";
-
           return {
             id: catalogoIdItem,
             diaSemana: diaSemanaNormalizado,
@@ -231,18 +216,9 @@ export default function AgendamentoQuadra() {
             isDisponivel,
           };
         });
-
-        console.log("[AgendamentoQuadra] catálogo completo:", mapeado);
-
         const apenasQuadra = mapeado.filter(
           (it) => it.isQuadra && it.isDisponivel
         );
-
-        console.log(
-          "[AgendamentoQuadra] apenas quadra (ambiente 1):",
-          apenasQuadra
-        );
-
         if (!cancelado) {
           setCatalogoQuadra(
             apenasQuadra.map((it) => ({
@@ -257,9 +233,7 @@ export default function AgendamentoQuadra() {
         console.error("Erro ao buscar catálogo da quadra:", err);
       }
     }
-
     carregarCatalogoQuadra();
-
     return () => {
       cancelado = true;
     };
@@ -273,15 +247,9 @@ export default function AgendamentoQuadra() {
 
   const faixasDoDia = useMemo(() => {
     if (!diaSemanaBackSelecionado) return [];
-    const faixas = catalogoQuadra.filter(
+    return catalogoQuadra.filter(
       (c) => c.diaSemana === diaSemanaBackSelecionado
     );
-    console.log(
-      "[AgendamentoQuadra] faixasDoDia para",
-      diaSemanaBackSelecionado,
-      faixas
-    );
-    return faixas;
   }, [catalogoQuadra, diaSemanaBackSelecionado]);
 
   useEffect(() => {
@@ -309,102 +277,25 @@ export default function AgendamentoQuadra() {
   }
 
   function cancelar() {
-    setDiaSelecionado(0);
-    setHoraInicio(null);
-    setHoraTermino(null);
-    setHoraInicioFiltro("");
-    setHoraTerminoFiltro("");
+    navigate(-1);
   }
 
   async function confirmar() {
-    if (!horaInicio || !horaTermino) {
-      abrirModal(
-        "error",
-        "Selecione os horários",
-        "Escolha o horário de início e o de término para continuar."
-      );
-      return;
-    }
-
-    if (
-      !horariosInicioDisponiveis.includes(horaInicio) ||
-      !horariosTerminoDisponiveis.includes(horaTermino)
-    ) {
-      abrirModal(
-        "error",
-        "Horário indisponível",
-        "O horário selecionado não está disponível para esse dia."
-      );
-      return;
-    }
-
-    const dia = diasDaSemana[diaSelecionado];
-    if (!dia || dia.desabilitado) {
-      abrirModal(
-        "error",
-        "Data inválida",
-        "Selecione uma data válida para agendar."
-      );
-      return;
-    }
-
-    if (!validaIntervalo(horaInicio, horaTermino)) {
-      abrirModal(
-        "error",
-        "Horários inconsistentes",
-        "O horário de término precisa ser depois do início e respeitar a duração mínima."
-      );
-      return;
-    }
-
-    if (isHoje && timeToMin(horaInicio) <= nowMinutes) {
-      abrirModal(
-        "error",
-        "Horário não permitido",
-        "Escolha um horário de início que ainda não tenha passado."
-      );
-      return;
-    }
-
-    const hostId = getUserIdFromToken();
-    if (!hostId) {
-      abrirModal(
-        "error",
-        "Sessão inválida",
-        "Não foi possível identificar o usuário logado."
-      );
-      return;
-    }
-
-    const inicioMin = timeToMin(horaInicio);
-    const terminoMin = timeToMin(horaTermino);
-
-    const catalogoSelecionado = catalogoQuadra.find((c) => {
-      if (c.diaSemana !== diaSemanaBackSelecionado) return false;
-      const cIni = timeToMin(c.horaInicio);
-      const cFim = timeToMin(c.horaFim);
-      return inicioMin >= cIni && terminoMin <= cFim;
-    });
-
-    if (!catalogoSelecionado?.id) {
-      console.error(
-        "[AgendamentoQuadra] Não encontrou catálogo para",
-        diaSemanaBackSelecionado,
-        horaInicio,
-        horaTermino
-      );
-      abrirModal(
-        "error",
-        "Configuração inválida",
-        "Não foi possível localizar o catálogo correspondente para esse horário. Avise o coordenador."
-      );
-      return;
-    }
-
-    const catalogoId =
-      catalogoSelecionado.id || QUADRA_CATALOGO_FALLBACK_ID;
-
+    if (loading) return;
+    setLoading(true);
     try {
+      const hostId = getUserIdFromToken();
+      if (!hostId) throw new Error("Usuário não identificado.");
+
+      const dia = diasDaSemana[diaSelecionado];
+      if (!dia) throw new Error("Selecione um dia válido.");
+
+      const catalogoSelecionado = catalogoQuadra.find(
+        (c) => c.diaSemana === diaSemanaBackSelecionado
+      );
+      const catalogoId =
+        catalogoSelecionado?.id || QUADRA_CATALOGO_FALLBACK_ID;
+
       await salvarReservaFormatoBack({
         idUsuario: hostId,
         catalogoId,
@@ -420,12 +311,9 @@ export default function AgendamentoQuadra() {
         "Sua solicitação foi enviada e está aguardando aprovação."
       );
     } catch (err) {
-      console.error("ERRO SALVAR RESERVA [QUADRA]:", err);
-      const msg =
-        err?.data?.message ||
-        err?.message ||
-        `Erro ao comunicar com o servidor. [${err?.status || ""}]`;
-      abrirModal("error", "Falha ao reservar", msg);
+      abrirModal("error", "Falha ao reservar", err.message);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -492,17 +380,33 @@ export default function AgendamentoQuadra() {
           <button
             type="button"
             onClick={cancelar}
-            className="px-6 py-3 rounded-md bg-[#EDEDED] text-[#1E1E1E] outline-none focus:ring-0 hover:bg-[#AE0000] hover:text-white transition-colors duration-150"
+            disabled={loading}
+            className={`px-6 py-3 rounded-md bg-[#EDEDED] text-[#1E1E1E] ${
+              loading
+                ? "opacity-60 cursor-not-allowed"
+                : "hover:bg-[#AE0000] hover:text-white"
+            } transition-colors duration-150`}
           >
             Cancelar
           </button>
+
           <button
             type="button"
             onClick={confirmar}
-            className="px-6 py-3 rounded-md text-white outline-none focus:ring-0 transition-colors duração-150"
+            disabled={loading}
+            className={`px-6 py-3 rounded-md text-white flex items-center justify-center gap-2 ${
+              loading ? "opacity-80 cursor-wait" : ""
+            }`}
             style={{ backgroundColor: COR_VERMELHO }}
           >
-            Confirmar
+            {loading ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin drop-shadow-[0_0_6px_rgba(255,255,255,0.6)]"></div>
+                <span className="animate-pulse">Processando...</span>
+              </>
+            ) : (
+              "Confirmar"
+            )}
           </button>
         </div>
       </div>

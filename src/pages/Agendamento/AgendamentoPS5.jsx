@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ adicionado
 
 import sucessoIcon from "../../assets/sucesso.svg";
 
@@ -18,7 +19,6 @@ import { salvarReservaFormatoBack } from "../../service/reserva";
 import { api } from "../../service/api";
 import { buscarTodosAmbientes } from "../../service/ambiente";
 
-// Nome do ambiente para buscar no backend
 const AMBIENTE_NOME = "PS5";
 
 const DIAS_BACK = [
@@ -99,6 +99,7 @@ function gerarSlotsComPasso15(faixas) {
 }
 
 export default function AgendamentoPS5() {
+  const navigate = useNavigate(); // ✅
   const [semanaSelecionada, setSemanaSelecionada] = useState("essa");
   const [diaSelecionado, setDiaSelecionado] = useState(0);
   const [horaInicio, setHoraInicio] = useState(null);
@@ -106,9 +107,9 @@ export default function AgendamentoPS5() {
 
   const [horaInicioFiltro, setHoraInicioFiltro] = useState("");
   const [horaTerminoFiltro, setHoraTerminoFiltro] = useState("");
-
   const [catalogoPS5, setCatalogoPS5] = useState([]);
   const [ambienteId, setAmbienteId] = useState(null);
+  const [loading, setLoading] = useState(false); // ✅
 
   const [modal, setModal] = useState({
     aberto: false,
@@ -180,111 +181,39 @@ export default function AgendamentoPS5() {
     setModal((m) => ({ ...m, aberto: false }));
   }
 
-  // Busca os ambientes e o catálogo, filtrando pelo nome do ambiente
   useEffect(() => {
     let cancelado = false;
-
     async function carregarDados() {
       try {
-        // 1. Buscar todos os ambientes para encontrar o ID do PS5
-        console.log(`[AgendamentoPS5] Buscando ambientes...`);
         const ambientes = await buscarTodosAmbientes();
-        console.log("[AgendamentoPS5] Ambientes recebidos:", ambientes);
+        const ambientePS5 = ambientes.find((a) =>
+          String(a?.nome || "").toLowerCase().includes("ps5")
+        );
+        if (!ambientePS5) return;
+        setAmbienteId(ambientePS5.id);
 
-        if (!Array.isArray(ambientes)) {
-          console.warn("[AgendamentoPS5] /ambiente/buscar não retornou array:", ambientes);
-          return;
-        }
-
-        // Log todos os ambientes para debug
-        console.log("[AgendamentoPS5] Lista de ambientes:", ambientes.map(a => ({ id: a?.id, nome: a?.nome })));
-
-        // Encontrar o ambiente PS5 pelo nome (case-insensitive)
-        const ambientePS5 = ambientes.find((amb) => {
-          const nome = String(amb?.nome || "").toLowerCase();
-          const match = nome.includes("ps5") || nome.includes("playstation");
-          console.log(`[AgendamentoPS5] Verificando ambiente: "${amb?.nome}" -> match: ${match}`);
-          return match;
-        });
-
-        if (!ambientePS5) {
-          console.warn("[AgendamentoPS5] Ambiente PS5 não encontrado. Ambientes disponíveis:", 
-            ambientes.map(a => a?.nome));
-          return;
-        }
-
-        const idAmbientePS5 = ambientePS5.id;
-        console.log(`[AgendamentoPS5] Ambiente PS5 encontrado - ID: ${idAmbientePS5}, Nome: ${ambientePS5.nome}`);
-        
-        if (!cancelado) {
-          setAmbienteId(idAmbientePS5);
-        }
-
-        // 2. Buscar o catálogo
-        console.log(`[AgendamentoPS5] Buscando catálogo...`);
         const resp = await api.get("/catalogo/buscar");
-        const catalogoData = Array.isArray(resp?.data) ? resp.data : resp;
+        const data = Array.isArray(resp?.data) ? resp.data : resp;
+        const catalogoFiltrado = data.filter(
+          (i) =>
+            (i?.ambiente?.id ?? i?.ambienteId ?? i?.idAmbiente) ===
+            ambientePS5.id
+        );
 
-        console.log("[AgendamentoPS5] Catálogo completo recebido:", catalogoData?.length, "itens");
+        const disponiveis = catalogoFiltrado.map((i) => ({
+          id: i.id,
+          diaSemana: String(i.diaSemana).toUpperCase(),
+          horaInicio: toHHMM(i.horaInicio),
+          horaFim: toHHMM(i.horaFim),
+          isDisponivel: true,
+        }));
 
-        if (!Array.isArray(catalogoData)) {
-          console.warn("[AgendamentoPS5] /catalogo/buscar não retornou array:", catalogoData);
-          return;
-        }
-
-        // 3. Filtrar o catálogo pelo ID do ambiente PS5
-        const catalogoFiltrado = catalogoData.filter((item) => {
-          const ambienteIdItem = item?.ambiente?.id ?? item?.ambienteId ?? item?.idAmbiente ?? null;
-          return ambienteIdItem === idAmbientePS5;
-        });
-
-        console.log(`[AgendamentoPS5] Catálogo filtrado para PS5 (ID ${idAmbientePS5}):`, catalogoFiltrado.length, "itens");
-        console.log(`[AgendamentoPS5] Itens filtrados:`, catalogoFiltrado);
-
-        const mapeado = catalogoFiltrado.map((item) => {
-          const catalogoIdItem = item?.id ?? null;
-
-          const disponibilidadeItem = String(
-            item?.disponibilidade || item?.ambiente?.disponibilidade || ""
-          ).toUpperCase();
-
-          const diaSemanaNormalizado = String(item.diaSemana || "")
-            .trim()
-            .toUpperCase();
-
-          const isDisponivel =
-            !disponibilidadeItem || disponibilidadeItem === "DISPONIVEL";
-
-          return {
-            id: catalogoIdItem,
-            diaSemana: diaSemanaNormalizado,
-            horaInicio: toHHMM(item.horaInicio),
-            horaFim: toHHMM(item.horaFim),
-            isDisponivel,
-          };
-        });
-
-        const catalogoDisponivel = mapeado.filter((it) => it.isDisponivel);
-
-        console.log(`[AgendamentoPS5] Catálogo disponível final:`, catalogoDisponivel);
-
-        if (!cancelado) {
-          setCatalogoPS5(
-            catalogoDisponivel.map((it) => ({
-              id: it.id,
-              diaSemana: it.diaSemana,
-              horaInicio: it.horaInicio,
-              horaFim: it.horaFim,
-            }))
-          );
-        }
+        if (!cancelado) setCatalogoPS5(disponiveis);
       } catch (err) {
-        console.error("[AgendamentoPS5] Erro ao carregar dados:", err);
+        console.error(err);
       }
     }
-
     carregarDados();
-
     return () => {
       cancelado = true;
     };
@@ -298,15 +227,7 @@ export default function AgendamentoPS5() {
 
   const faixasDoDia = useMemo(() => {
     if (!diaSemanaBackSelecionado) return [];
-    const faixas = catalogoPS5.filter(
-      (c) => c.diaSemana === diaSemanaBackSelecionado
-    );
-    console.log(
-      "[AgendamentoPS5] faixasDoDia para",
-      diaSemanaBackSelecionado,
-      faixas
-    );
-    return faixas;
+    return catalogoPS5.filter((c) => c.diaSemana === diaSemanaBackSelecionado);
   }, [catalogoPS5, diaSemanaBackSelecionado]);
 
   useEffect(() => {
@@ -326,121 +247,37 @@ export default function AgendamentoPS5() {
     horariosTerminoDisponiveis.length > 0;
 
   function cancelar() {
-    setDiaSelecionado(0);
-    setHoraInicio(null);
-    setHoraTermino(null);
-    setHoraInicioFiltro("");
-    setHoraTerminoFiltro("");
+    navigate(-1); // ✅ volta pra tela anterior
   }
 
   async function confirmar() {
-    if (!horaInicio || !horaTermino) {
-      abrirModal(
-        "error",
-        "Selecione os horários",
-        "Escolha o horário de início e o de término para continuar."
-      );
-      return;
-    }
-
-    if (
-      !horariosInicioDisponiveis.includes(horaInicio) ||
-      !horariosTerminoDisponiveis.includes(horaTermino)
-    ) {
-      abrirModal(
-        "error",
-        "Horário indisponível",
-        "O horário selecionado não está disponível para esse dia."
-      );
-      return;
-    }
-
-    const dia = diasDaSemana[diaSelecionado];
-    if (!dia || dia.desabilitado) {
-      abrirModal(
-        "error",
-        "Data inválida",
-        "Selecione uma data válida para agendar."
-      );
-      return;
-    }
-
-    if (!validaIntervalo(horaInicio, horaTermino)) {
-      abrirModal(
-        "error",
-        "Horários inconsistentes",
-        "O horário de término precisa ser depois do início e respeitar a duração mínima."
-      );
-      return;
-    }
-
-    if (isHoje && paraMinutos(horaInicio) <= nowMinutes) {
-      abrirModal(
-        "error",
-        "Horário não permitido",
-        "Escolha um horário de início que ainda não tenha passado."
-      );
-      return;
-    }
-
-    const hostId = getUserIdFromToken();
-    if (!hostId) {
-      abrirModal(
-        "error",
-        "Sessão inválida",
-        "Não foi possível identificar o usuário logado."
-      );
-      return;
-    }
-
-    const faixaQueCobre = faixasDoDia.find((f) => {
-      const iniFaixa = paraMinutos(f.horaInicio);
-      const fimFaixa = paraMinutos(f.horaFim);
-      const iniSel = paraMinutos(horaInicio);
-      const fimSel = paraMinutos(horaTermino);
-      return iniSel >= iniFaixa && fimSel <= fimFaixa;
-    });
-
-    if (!faixaQueCobre?.id) {
-      console.error(
-        "[AgendamentoPS5] Não encontrou faixa que cubra o intervalo",
-        diaSemanaBackSelecionado,
-        horaInicio,
-        horaTermino,
-        faixasDoDia
-      );
-      abrirModal(
-        "error",
-        "Configuração inválida",
-        "Não foi possível localizar o catálogo correspondente para esse horário. Avise o coordenador."
-      );
-      return;
-    }
-
-    const catalogoId = faixaQueCobre.id;
-
+    if (loading) return;
+    setLoading(true);
     try {
+      const hostId = getUserIdFromToken();
+      const dia = diasDaSemana[diaSelecionado];
+      const faixa = faixasDoDia.find(
+        (f) =>
+          paraMinutos(horaInicio) >= paraMinutos(f.horaInicio) &&
+          paraMinutos(horaTermino) <= paraMinutos(f.horaFim)
+      );
       await salvarReservaFormatoBack({
         idUsuario: hostId,
-        catalogoId,
+        catalogoId: faixa.id,
         dataJS: dia.dataCompleta,
         horaInicioHHMM: horaInicio,
         horaFimHHMM: horaTermino,
         msgUsuario: "Reserva do PS5",
       });
-
       abrirModal(
         "success",
         "Reserva realizada com sucesso!",
         "Sua solicitação foi enviada e está aguardando aprovação."
       );
     } catch (err) {
-      console.error("ERRO SALVAR RESERVA [PS5]:", err);
-      const msg =
-        err?.data?.message ||
-        err?.message ||
-        `Erro ao comunicar com o servidor. [${err?.status || ""}]`;
-      abrirModal("error", "Falha ao reservar", msg);
+      abrirModal("error", "Falha ao reservar", err.message);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -507,17 +344,33 @@ export default function AgendamentoPS5() {
           <button
             type="button"
             onClick={cancelar}
-            className="px-6 py-3 rounded-md bg-[#EDEDED] text-[#1E1E1E] outline-none focus:ring-0 hover:bg-[#AE0000] hover:text-white transition-colors duration-150"
+            disabled={loading}
+            className={`px-6 py-3 rounded-md bg-[#EDEDED] text-[#1E1E1E] ${
+              loading
+                ? "opacity-60 cursor-not-allowed"
+                : "hover:bg-[#AE0000] hover:text-white"
+            } transition-colors duration-150`}
           >
             Cancelar
           </button>
+
           <button
             type="button"
             onClick={confirmar}
-            className="px-6 py-3 rounded-md text-white outline-none focus:ring-0 transition-colors duration-150"
+            disabled={loading}
+            className={`px-6 py-3 rounded-md text-white flex items-center justify-center gap-2 ${
+              loading ? "opacity-80 cursor-wait" : ""
+            }`}
             style={{ backgroundColor: COR_VERMELHO }}
           >
-            Confirmar
+            {loading ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin drop-shadow-[0_0_6px_rgba(255,255,255,0.6)]"></div>
+                <span className="animate-pulse">Processando...</span>
+              </>
+            ) : (
+              "Confirmar"
+            )}
           </button>
         </div>
       </div>

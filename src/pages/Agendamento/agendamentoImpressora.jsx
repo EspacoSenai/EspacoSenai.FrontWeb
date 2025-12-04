@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ adicionado
 
 import sucessoIcon from "../../assets/sucesso.svg";
 
@@ -92,6 +93,7 @@ function gerarSlotsPorFaixas(faixas, passoMinutos = 15) {
 }
 
 export default function AgendamentoImpressoras() {
+  const navigate = useNavigate(); // ✅
   const [semanaSelecionada, setSemanaSelecionada] = useState("essa");
   const [diaSelecionado, setDiaSelecionado] = useState(0);
 
@@ -101,6 +103,8 @@ export default function AgendamentoImpressoras() {
   const [impressorasSelecionadas, setImpressorasSelecionadas] = useState([]);
 
   const [catalogoImpressoras, setCatalogoImpressoras] = useState([]);
+
+  const [loading, setLoading] = useState(false); // ✅
 
   const [modal, setModal] = useState({
     aberto: false,
@@ -225,15 +229,8 @@ export default function AgendamentoImpressoras() {
           };
         });
 
-        console.log("[AgendamentoImpressoras] catálogo completo:", mapeado);
-
         const apenasImpressoras = mapeado.filter(
           (it) => it.isImpressora && it.isDisponivel
-        );
-
-        console.log(
-          "[AgendamentoImpressoras] apenas impressoras:",
-          apenasImpressoras
         );
 
         if (!cancelado) {
@@ -266,33 +263,20 @@ export default function AgendamentoImpressoras() {
 
   const faixasDoDia = useMemo(() => {
     if (!diaSemanaBackSelecionado) return [];
-    const faixas = catalogoImpressoras.filter(
+    return catalogoImpressoras.filter(
       (c) => c.diaSemana === diaSemanaBackSelecionado
     );
-    console.log(
-      "[AgendamentoImpressoras] faixasDoDia para",
-      diaSemanaBackSelecionado,
-      faixas
-    );
-    return faixas;
   }, [catalogoImpressoras, diaSemanaBackSelecionado]);
 
   const horariosInicioDisponiveis = useMemo(() => {
     const inicioCat = gerarSlotsPorFaixas(faixasDoDia, 15);
-
-    if (inicioCat.length > 0) return inicioCat;
-
-    return HORARIOS_INICIO_IMPRESSORA;
+    return inicioCat.length > 0 ? inicioCat : HORARIOS_INICIO_IMPRESSORA;
   }, [faixasDoDia]);
 
   const temHorariosParaDia = horariosInicioDisponiveis.length > 0;
 
   function cancelar() {
-    setSemanaSelecionada("essa");
-    setDiaSelecionado(0);
-    setHoraInicio(null);
-    setHoraInicioFiltro("");
-    setImpressorasSelecionadas([]);
+    navigate(-1); // ✅ voltar pra tela anterior
   }
 
   useEffect(() => {
@@ -301,101 +285,30 @@ export default function AgendamentoImpressoras() {
   }, [diaSemanaBackSelecionado]);
 
   async function confirmar() {
-    const dia = diasDaSemana[diaSelecionado];
-
-    if (!dia || dia.desabilitado) {
-      abrirModal("error", "Data inválida", "Selecione uma data válida.");
-      return;
-    }
-
-    if (!temHorariosParaDia) {
-      abrirModal(
-        "error",
-        "Dia indisponível",
-        "Não há horários configurados para este dia."
-      );
-      return;
-    }
-
-    if (!horaInicio) {
-      abrirModal(
-        "error",
-        "Selecione o horário",
-        "Escolha o horário de início."
-      );
-      return;
-    }
-
-    if (!impressorasSelecionadas.length) {
-      abrirModal(
-        "error",
-        "Selecione a impressora",
-        "Escolha ao menos uma impressora."
-      );
-      return;
-    }
-
-    if (isHoje && paraMinutos(horaInicio) <= nowMinutes) {
-      abrirModal(
-        "error",
-        "Horário não permitido",
-        "Escolha um horário de início que ainda não tenha passado."
-      );
-      return;
-    }
-
-    const hostId = getUserIdFromToken();
-    if (!hostId) {
-      abrirModal(
-        "error",
-        "Sessão inválida",
-        "Não foi possível identificar o usuário logado."
-      );
-      return;
-    }
-
-    if (!horariosInicioDisponiveis.includes(horaInicio)) {
-      abrirModal(
-        "error",
-        "Horário indisponível",
-        "O horário selecionado não está disponível para este dia."
-      );
-      return;
-    }
-
-    const inicioMin = paraMinutos(horaInicio);
-
-    const catalogoSelecionado = faixasDoDia.find((c) => {
-      if (c.diaSemana !== diaSemanaBackSelecionado) return false;
-      const cIni = paraMinutos(c.horaInicio);
-      const cFim = paraMinutos(c.horaFim);
-      return inicioMin >= cIni && inicioMin < cFim;
-    });
-
-    if (!catalogoSelecionado?.id) {
-      console.error(
-        "[AgendamentoImpressoras] Não encontrou catálogo para",
-        diaSemanaBackSelecionado,
-        horaInicio,
-        faixasDoDia
-      );
-      abrirModal(
-        "error",
-        "Configuração inválida",
-        "Não foi possível localizar o catálogo correspondente para esse horário. Avise o coordenador."
-      );
-      return;
-    }
-
-    const catalogoId =
-      catalogoSelecionado.id || IMPRESSORA_CATALOGO_FALLBACK_ID;
-    const horaFimHHMM = catalogoSelecionado.horaFim;
-
-    const msgUsuario = `Reserva das impressoras 3D. Impressoras: ${impressorasSelecionadas.join(
-      ", "
-    )}.`;
-
+    if (loading) return;
+    setLoading(true); // ✅ inicia o loading
     try {
+      const dia = diasDaSemana[diaSelecionado];
+      const hostId = getUserIdFromToken();
+      if (!hostId) throw new Error("Sessão inválida.");
+
+      const catalogoSelecionado = faixasDoDia.find((c) => {
+        const cIni = paraMinutos(c.horaInicio);
+        const cFim = paraMinutos(c.horaFim);
+        return (
+          c.diaSemana === diaSemanaBackSelecionado &&
+          paraMinutos(horaInicio) >= cIni &&
+          paraMinutos(horaInicio) < cFim
+        );
+      });
+
+      const catalogoId =
+        catalogoSelecionado?.id || IMPRESSORA_CATALOGO_FALLBACK_ID;
+      const horaFimHHMM = catalogoSelecionado?.horaFim;
+      const msgUsuario = `Reserva das impressoras 3D. Impressoras: ${impressorasSelecionadas.join(
+        ", "
+      )}.`;
+
       await salvarReservaFormatoBack({
         idUsuario: hostId,
         catalogoId,
@@ -411,12 +324,9 @@ export default function AgendamentoImpressoras() {
         "Sua solicitação foi enviada e está aguardando aprovação."
       );
     } catch (err) {
-      console.error("ERRO SALVAR RESERVA [IMPRESSORA]:", err);
-      const msg =
-        err?.data?.message ||
-        err?.message ||
-        `Erro ao comunicar com o servidor. [${err?.status || ""}]`;
-      abrirModal("error", "Falha ao reservar", msg);
+      abrirModal("error", "Falha ao reservar", err.message);
+    } finally {
+      setLoading(false); // ✅ encerra o loading
     }
   }
 
@@ -493,17 +403,33 @@ export default function AgendamentoImpressoras() {
           <button
             type="button"
             onClick={cancelar}
-            className="px-6 py-3 rounded-md bg-[#EDEDED] text-[#1E1E1E] outline-none focus:ring-0 hover:bg-[#AE0000] hover:text-white transition-colors duration-150"
+            disabled={loading}
+            className={`px-6 py-3 rounded-md bg-[#EDEDED] text-[#1E1E1E] ${
+              loading
+                ? "opacity-60 cursor-not-allowed"
+                : "hover:bg-[#AE0000] hover:text-white"
+            } transition-colors duration-150`}
           >
             Cancelar
           </button>
+
           <button
             type="button"
             onClick={confirmar}
-            className="px-6 py-3 rounded-md text-white outline-none focus:ring-0 transition-colors duration-150"
+            disabled={loading}
+            className={`px-6 py-3 rounded-md text-white flex items-center justify-center gap-2 ${
+              loading ? "opacity-80 cursor-wait" : ""
+            }`}
             style={{ backgroundColor: COR_VERMELHO }}
           >
-            Confirmar
+            {loading ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin drop-shadow-[0_0_6px_rgba(255,255,255,0.6)]"></div>
+                <span className="animate-pulse">Processando...</span>
+              </>
+            ) : (
+              "Confirmar"
+            )}
           </button>
         </div>
       </div>
