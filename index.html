@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <script src="https://cdn.userway.org/widget.js" data-account="pc2eB3bkRX"></script>
+
+  <link rel="icon" type="image/png" href="/logo.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Espaço Senai</title>
+  <meta name="author" content="Vitor Aguiar" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet" />
+
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#121212" media="(prefers-color-scheme: dark)" />
+
+  <style>
+    #userwayAccessibilityIcon,
+    .uwy.userway_p1 {
+      position: fixed !important;
+      left: -30px !important;
+      bottom: -380px !important;
+      top: auto !important;
+      right: auto !important;
+      z-index: 99999 !important;
+    }
+  </style>
+
+  <script>
+    (() => {
+      try {
+        const saved = localStorage.getItem("theme");
+        const prefersDark =
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches;
+        const isDark = saved ? saved === "dark" : prefersDark;
+        document.documentElement.classList.toggle("dark", isDark);
+      } catch { }
+    })();
+  </script>
+</head>
+
+<body class="bg-white text-[#1E1E1E] dark:bg-[#121212] dark:text-white">
+  <div id="root"></div>
+
+  <script type="module" src="/src/main.jsx"></script>
+
+  <div vw class="enabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+      <div class="vw-plugin-top-wrapper"></div>
+    </div>
+  </div>
+
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>
+    new window.VLibras.Widget("https://vlibras.gov.br/app");
+  </script>
+</body>
+
+</html>
