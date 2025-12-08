@@ -15,6 +15,7 @@ import {
   ehAmbienteComputador,
   filtrarAmbientesComputador,
 } from "../../utils/ambientes";
+import { getSalasPageByProfile } from "../../utils/navigation";
 
 const FONT_BASE = "font-poppins";
 const TXT_LABEL = "text-sm font-medium text-gray-700 block w-full text-left mb-1 " + FONT_BASE;
@@ -82,9 +83,8 @@ export default function EditarSala() {
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState("");
 
-  // Detectar perfil do usuário para rota de voltar
-  const isAdmin = localStorage.getItem("userRole")?.includes("ADMIN");
-  const rotaVoltar = isAdmin ? "/salas-adm" : "/salas-coordenadores";
+  // Rota de voltar baseada no perfil atual (centralizada)
+  const rotaVoltar = getSalasPageByProfile();
 
   // Estados do catálogo
   const [catalogos, setCatalogos] = useState([]);
