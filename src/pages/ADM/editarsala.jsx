@@ -18,7 +18,7 @@ import {
 import { getSalasPageByProfile } from "../../utils/navigation";
 
 const FONT_BASE = "font-poppins";
-const TXT_LABEL = "text-sm font-medium text-gray-700 block w-full text-left mb-1 " + FONT_BASE;
+const TXT_LABEL = "text-sm font-medium text-gray-700 dark:text-gray-300 block w-full text-left mb-1 " + FONT_BASE;
 
 const CL_INPUT =
   "w-full h-10 rounded-md bg-gray-100 border border-gray-200 px-3 text-[15px] text-black shadow-sm outline-none focus:ring-2 focus:ring-[#B10404] " +
@@ -29,14 +29,14 @@ const CL_TEXTAREA =
   FONT_BASE;
 
 const CL_SELECT =
-  "w-full h-10 rounded-md bg-gray-100 border border-gray-200 px-3 text-[15px] text-black shadow-sm outline-none focus:ring-2 focus:ring-[#B10404] appearance-none cursor-pointer " +
+  "w-full h-10 rounded-md bg-gray-100 dark:bg-[#222] border border-gray-200 dark:border-gray-700 px-3 text-[15px] text-black dark:text-white shadow-sm outline-none focus:ring-2 focus:ring-[#B10404] appearance-none cursor-pointer " +
   FONT_BASE;
 
 const CL_TAG_BASE =
   "px-3 py-2 rounded-md border text-sm shadow-sm cursor-pointer transition-colors " +
   FONT_BASE;
 const CL_TAG_ON = "bg-[#B10404] text-white border-[#B10404]";
-const CL_TAG_OFF = "bg-white text-gray-700 border-gray-200";
+const CL_TAG_OFF = "bg-white dark:bg-[#222] text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700";
 
 const DIAS_SEMANA = [
   { value: "", label: "-- Selecione --" },
@@ -76,6 +76,7 @@ export default function EditarSala() {
   const [descricao, setDescricao] = useState("");
   const [disponibilidade, setDisponibilidade] = useState("DISPONIVEL");
   const [aprovacao, setAprovacao] = useState("MANUAL");
+  const [recurso, setRecurso] = useState("false"); // true / false
   const [ambienteDetalhes, setAmbienteDetalhes] = useState(null);
 
   const [salvando, setSalvando] = useState(false);
@@ -191,6 +192,12 @@ export default function EditarSala() {
             ambienteEncontrado?.tipoAprovacao ||
             "MANUAL"
           ).toUpperCase()
+        );
+        
+        setRecurso(
+          ambienteEncontrado?.recurso === true || ambienteEncontrado?.recurso === "true" 
+            ? "true" 
+            : "false"
         );
 
         // Se slug for "Computadores" ou ambiente for um PC, tratar como grupo
@@ -389,6 +396,7 @@ export default function EditarSala() {
         descricao: descricao.trim(),
         disponibilidade,
         aprovacao,
+        recurso: recurso === "true", // converte string para boolean
       });
 
       setSucesso("Sala atualizada com sucesso!");
@@ -538,15 +546,15 @@ export default function EditarSala() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5] flex flex-col">
+    <div className="min-h-screen bg-[#F5F5F5] dark:bg-[#0f0f10] flex flex-col">
       {/* Cabeçalho simples */}
-      <header className="w-full bg-[#B10404]">
+      <header className="w-full bg-[#B10404] dark:bg-[#8a0303]">
         <div className="mx-auto max-w-4xl h-14 flex items-center justify-center px-4 relative">
           <Link to={rotaVoltar} className="absolute left-4">
             <img
               src="/src/assets/sairdomodal.svg"
               alt="Voltar"
-              className="w-7 h-7"
+              className="w-7 h-7 dark:brightness-90"
             />
           </Link>
           <h1 className="text-white text-lg font-medium">Editar Sala</h1>
@@ -555,15 +563,15 @@ export default function EditarSala() {
 
       {/* Conteúdo */}
       <main className="flex-1 flex flex-col items-center justify-start mt-10 px-4 pb-12 gap-8">
-        <div className="w-full max-w-3xl bg-white rounded-2xl shadow-lg px-8 py-7">
+        <div className="w-full max-w-3xl bg-white dark:bg-[#18181b] rounded-2xl shadow-lg px-8 py-7">
           {erro && (
-            <p className="text-sm text-red-600 mb-4">{erro}</p>
+            <p className="text-sm text-red-600 dark:text-red-400 mb-4">{erro}</p>
           )}
           {sucesso && (
-            <p className="text-sm text-green-700 mb-4">{sucesso}</p>
+            <p className="text-sm text-green-700 dark:text-green-400 mb-4">{sucesso}</p>
           )}
           {carregando && (
-            <p className="text-sm text-gray-500 mb-4">Carregando dados da sala...</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Carregando dados da sala...</p>
           )}
           {!carregando && (
             <form onSubmit={handleSubmit} className="space-y-5">
@@ -571,7 +579,7 @@ export default function EditarSala() {
               <div>
                 <label className={TXT_LABEL}>Nome *</label>
                 <input
-                  className={CL_INPUT}
+                  className={`${CL_INPUT} dark:bg-[#222] dark:text-white dark:border-gray-700`}
                   placeholder="Ex.: Quadra de esportes"
                   value={nome}
                   onChange={(e) => setNome(e.target.value)}
@@ -583,7 +591,7 @@ export default function EditarSala() {
               <div>
                 <label className={TXT_LABEL}>Descrição *</label>
                 <textarea
-                  className={CL_TEXTAREA}
+                  className={`${CL_TEXTAREA} dark:bg-[#222] dark:text-white dark:border-gray-700`}
                   placeholder="Ex.: Espaço ao ar livre para práticas esportivas."
                   value={descricao}
                   onChange={(e) => setDescricao(e.target.value)}
@@ -644,6 +652,35 @@ export default function EditarSala() {
                     </button>
                   </div>
                 </div>
+
+                <div>
+                  <p className={TXT_LABEL}>Recurso *</p>
+                  <div className="flex gap-3">
+                    <button
+                      type="button"
+                      className={`${CL_TAG_BASE} ${
+                        recurso === "true" ? CL_TAG_ON : CL_TAG_OFF
+                      }`}
+                      onClick={() => setRecurso("true")}
+                      disabled={salvando}
+                    >
+                      True
+                    </button>
+                    <button
+                      type="button"
+                      className={`${CL_TAG_BASE} ${
+                        recurso === "false" ? CL_TAG_ON : CL_TAG_OFF
+                      }`}
+                      onClick={() => setRecurso("false")}
+                      disabled={salvando}
+                    >
+                      False
+                    </button>
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {recurso === "true" ? "É um recurso, tipo: bola de basquete" : "É uma sala"}
+                  </p>
+                </div>
               </div>
 
               {/* Botão Salvar Ambiente */}
@@ -651,7 +688,7 @@ export default function EditarSala() {
                 <button
                   type="submit"
                   disabled={!formValido || salvando}
-                  className={`min-w-[130px] rounded-md bg-[#B10404] text-white py-2 px-5 text-sm md:text-base shadow-sm transition-opacity ${!formValido || salvando
+                  className={`min-w-[130px] rounded-md bg-[#B10404] dark:bg-[#8a0303] text-white py-2 px-5 text-sm md:text-base shadow-sm transition-opacity ${!formValido || salvando
                     ? "opacity-60 cursor-not-allowed"
                     : "hover:opacity-95"
                     }`}
@@ -665,8 +702,8 @@ export default function EditarSala() {
 
         {/* Seletor de PC Individual - Aparece apenas para grupo de computadores */}
         {isGrupoComputadores && ambientesSincronizados.length > 0 && (
-          <div className="w-full max-w-3xl bg-white rounded-2xl shadow-lg px-8 py-7">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">
+          <div className="w-full max-w-3xl bg-white dark:bg-[#18181b] rounded-2xl shadow-lg px-8 py-7">
+            <h2 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
               Selecione o Computador para Visualizar/Editar Catálogo
             </h2>
             
@@ -696,14 +733,14 @@ export default function EditarSala() {
               </div>
 
               {carregandoCatalogos && (
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <div className="w-4 h-4 border-2 border-gray-600 border-t-transparent rounded-full animate-spin" />
+                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                  <div className="w-4 h-4 border-2 border-gray-600 dark:border-gray-400 border-t-transparent rounded-full animate-spin" />
                   Carregando catálogo do PC selecionado...
                 </div>
               )}
 
-              <p className="text-sm text-gray-600">
-                <span className="font-semibold text-[#B10404]">OBS:</span>{" "}
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                <span className="font-semibold text-[#B10404] dark:text-[#e40505]">OBS:</span>{" "}
                 Os horários cadastrados abaixo serão exibidos e podem ser editados para o PC selecionado.
               </p>
             </div>
@@ -711,12 +748,12 @@ export default function EditarSala() {
         )}
 
         {/* Seção: Adicionar/Editar Horário */}
-        <div className="w-full max-w-3xl bg-white rounded-2xl shadow-lg px-8 py-7">
+        <div className="w-full max-w-3xl bg-white dark:bg-[#18181b] rounded-2xl shadow-lg px-8 py-7">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg font-medium text-gray-900">
+            <h2 className="text-lg font-medium text-gray-900 dark:text-white">
               {catalogoEditando ? "Editar Horário do Catálogo" : "Adicionar Novo Horário ao Catálogo"}
               {isGrupoComputadores && pcSelecionado && (
-                <span className="text-sm font-normal text-gray-600 ml-2">
+                <span className="text-sm font-normal text-gray-600 dark:text-gray-400 ml-2">
                   ({ambientesSincronizados.find(pc => Number(pc.id) === pcSelecionado)?.nome || `PC ${pcSelecionado}`})
                 </span>
               )}
@@ -725,7 +762,7 @@ export default function EditarSala() {
               <button
                 type="button"
                 onClick={limparFormCatalogo}
-                className="px-4 py-2 bg-[#B10404] text-white text-sm font-medium rounded-md hover:brightness-95 transition"
+                className="px-4 py-2 bg-[#B10404] dark:bg-[#8a0303] text-white text-sm font-medium rounded-md hover:brightness-95 transition"
               >
                 Cancelar edição
               </button>
@@ -758,7 +795,7 @@ export default function EditarSala() {
                   type="time"
                   value={horaInicio}
                   onChange={(e) => setHoraInicio(e.target.value)}
-                  className={CL_INPUT}
+                  className={`${CL_INPUT} dark:bg-[#222] dark:text-white dark:border-gray-700`}
                   disabled={salvandoCatalogo || carregando}
                 />
               </div>
@@ -769,7 +806,7 @@ export default function EditarSala() {
                   type="time"
                   value={horaFim}
                   onChange={(e) => setHoraFim(e.target.value)}
-                  className={CL_INPUT}
+                  className={`${CL_INPUT} dark:bg-[#222] dark:text-white dark:border-gray-700`}
                   disabled={salvandoCatalogo || carregando}
                 />
               </div>
@@ -793,7 +830,7 @@ export default function EditarSala() {
             <button
               type="submit"
               disabled={!formCatalogoValido || salvandoCatalogo || carregando}
-              className={`min-w-[130px] rounded-md bg-[#B10404] text-white py-2 px-5 text-sm md:text-base shadow-sm transition-opacity ${!formCatalogoValido || salvandoCatalogo || carregando
+              className={`min-w-[130px] rounded-md bg-[#B10404] dark:bg-[#8a0303] text-white py-2 px-5 text-sm md:text-base shadow-sm transition-opacity ${!formCatalogoValido || salvandoCatalogo || carregando
                 ? "opacity-60 cursor-not-allowed"
                 : "hover:opacity-95"
                 }`}
@@ -806,12 +843,12 @@ export default function EditarSala() {
         </div>
 
         {/* Seção: Catálogos Criados */}
-        <div className="w-full max-w-3xl bg-white rounded-2xl shadow-lg px-8 py-7">
+        <div className="w-full max-w-3xl bg-white dark:bg-[#18181b] rounded-2xl shadow-lg px-8 py-7">
           <div className="mb-4">
-            <h2 className="text-lg font-medium text-gray-900">
+              <h2 className="text-lg font-medium text-gray-900 dark:text-white">
               Catálogos Criados ({catalogos.length})
               {isGrupoComputadores && pcSelecionado && (
-                <span className="text-sm font-normal text-gray-600 ml-2">
+                <span className="text-sm font-normal text-gray-600 dark:text-gray-400 ml-2">
                   - {ambientesSincronizados.find(pc => Number(pc.id) === pcSelecionado)?.nome || `PC ${pcSelecionado}`}
                 </span>
               )}
@@ -819,15 +856,15 @@ export default function EditarSala() {
           </div>
 
           {sincronizandoCatalogos && (
-            <p className="text-xs text-gray-500 mb-4">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
               Sincronizando horários com os demais computadores...
             </p>
           )}
 
           {carregandoCatalogos ? (
-            <p className="text-gray-400">Carregando...</p>
+            <p className="text-gray-500 dark:text-gray-400">Carregando...</p>
           ) : catalogos.length === 0 ? (
-            <p className="text-gray-400">
+            <p className="text-gray-500 dark:text-gray-400">
               Nenhum horário cadastrado para este ambiente.
             </p>
           ) : (
@@ -836,10 +873,10 @@ export default function EditarSala() {
                 <div key={dia}>
                   {/* Tag do dia */}
                   <div className="flex items-center gap-3 mb-3">
-                    <span className="bg-[#B10404] text-white text-sm px-3 py-1 rounded-full font-medium">
+                    <span className="bg-[#B10404] dark:bg-[#8a0303] text-white text-sm px-3 py-1 rounded-full font-medium">
                       {DIAS_LABELS[dia] || dia}
                     </span>
-                    <span className="text-gray-600 text-sm">
+                    <span className="text-gray-600 dark:text-gray-400 text-sm">
                       ({itens.length} horário{itens.length > 1 ? "s" : ""})
                     </span>
                   </div>
@@ -849,11 +886,11 @@ export default function EditarSala() {
                     {itens.map((cat) => (
                       <div
                         key={cat.id}
-                        className="bg-white rounded-lg p-4 border border-gray-200"
+                        className="bg-white dark:bg-[#222] rounded-lg p-4 border border-gray-200 dark:border-gray-700"
                       >
                         <div className="flex flex-wrap items-center justify-between gap-4">
                           <div className="flex items-center gap-2">
-                            <span className="bg-[#B10404] text-white text-xs px-2 py-1 rounded font-medium">
+                            <span className="bg-[#B10404] dark:bg-[#8a0303] text-white text-xs px-2 py-1 rounded font-medium">
                               {DIAS_LABELS[cat.diaSemana] || cat.diaSemana}
                             </span>
                             <span className="text-xs px-2 py-1 rounded font-medium border"
@@ -886,24 +923,24 @@ export default function EditarSala() {
                             </span>
                           </div>
 
-                          <div className="flex items-center gap-6 text-sm">
+                            <div className="flex items-center gap-6 text-sm">
                             <div className="flex items-center gap-2">
-                              <span className="text-gray-500">Início</span>
-                              <span className="text-gray-900 font-medium">
+                              <span className="text-gray-500 dark:text-gray-400">Início</span>
+                              <span className="text-gray-900 dark:text-white font-medium">
                                 {formatarHora(cat.horaInicio)}
                               </span>
                             </div>
 
                             <div className="flex items-center gap-2">
-                              <span className="text-gray-500">Fim</span>
-                              <span className="text-gray-900 font-medium">
+                              <span className="text-gray-500 dark:text-gray-400">Fim</span>
+                              <span className="text-gray-900 dark:text-white font-medium">
                                 {formatarHora(cat.horaFim)}
                               </span>
                             </div>
 
                             <div className="flex items-center gap-2">
-                              <span className="text-gray-500">Duração</span>
-                              <span className="text-gray-900 font-medium">
+                              <span className="text-gray-500 dark:text-gray-400">Duração</span>
+                              <span className="text-gray-900 dark:text-white font-medium">
                                 {calcularDuracao(
                                   formatarHora(cat.horaInicio),
                                   formatarHora(cat.horaFim)
@@ -917,13 +954,13 @@ export default function EditarSala() {
                         <div className="mt-4 flex gap-3">
                           <button
                             onClick={() => handleEditarCatalogo(cat)}
-                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors"
+                            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white text-sm font-medium rounded-md transition-colors"
                           >
                             Editar
                           </button>
                           <button
                             onClick={() => handleRemoverCatalogo(cat.id)}
-                            className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md transition-colors"
+                            className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-800 text-white text-sm font-medium rounded-md transition-colors"
                           >
                             Remover
                           </button>

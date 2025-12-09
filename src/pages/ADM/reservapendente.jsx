@@ -11,8 +11,9 @@ import setinha from "../../assets/setawhiteleft.svg";
 import {
   buscarReservasPendentes,
   aprovarReserva,
-  cancelarReserva,
+  deletarReserva,
 } from "../../service/reserva";
+import { removeEmojis } from "../../utils/text";
 
 const AMBIENTE_LABELS = {
   1: "Quadra",
@@ -120,15 +121,15 @@ const FeedbackModal = ({ open, type, title, message, onClose }) => {
           className={`${iconBg} ${iconColor} w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-4`}
         >
           <span className="text-2xl sm:text-3xl leading-none">
-            {isError ? "✕" : "✓"}
+            {isError ? "Erro" : "Sucesso"}
           </span>
         </div>
 
         <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-50 mb-2">
-          {title}
+          {removeEmojis(title)}
         </h2>
         <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-200 mb-6 whitespace-pre-line">
-          {message}
+          {removeEmojis(message)}
         </p>
 
         <button
@@ -249,10 +250,11 @@ function ReservaPendente() {
       const arr = Array.isArray(lista) ? lista : [];
 
       const mapeadas = arr.map((r) => {
-        const salaNome = obterNomeSala(r);
+        const salaNome = removeEmojis(obterNomeSala(r));
 
-        const ambienteNome =
-          r.ambienteNome || r.nomeAmbiente || salaNome || "Ambiente";
+        const ambienteNome = removeEmojis(
+          r.ambienteNome || r.nomeAmbiente || salaNome || "Ambiente"
+        );
 
         const horaInicio =
           r.horaInicio || r.horaInicioReserva || r.inicio || r.horarioInicio;
@@ -262,10 +264,11 @@ function ReservaPendente() {
         const dataRaw =
           r.data || r.dataReserva || r.dataAgendada || r.dataInicio || r.dia;
 
-        const solicitante = obterNomeSolicitante(r);
+        const solicitante = removeEmojis(obterNomeSolicitante(r));
 
-        const turma =
-          r.turma || r.nomeTurma || r.curso || r.nomeCurso || null;
+        const turma = removeEmojis(
+          r.turma || r.nomeTurma || r.curso || r.nomeCurso || null
+        );
 
         return {
           id: r.id,
@@ -369,7 +372,7 @@ function ReservaPendente() {
       setProcessingCancel(true);
 
       await Promise.all(
-        reservasSelecionadas.map((id) => cancelarReserva(id, cancelMotivo))
+        reservasSelecionadas.map((id) => deletarReserva(id))
       );
 
       const restantes = reservasPendentes.filter(
@@ -386,11 +389,30 @@ function ReservaPendente() {
       );
     } catch (err) {
       console.error("Erro ao cancelar reservas:", err);
-      abrirFeedback(
-        "error",
-        "Falha ao cancelar reservas",
-        "Ocorreu um erro ao cancelar as reservas. Tente novamente."
-      );
+
+      // Verifica se alguma reserva já foi cancelada
+      const errorMessage = err.message || "";
+      if (errorMessage.includes("já foi cancelada") || errorMessage.includes("Esta reserva já foi cancelada")) {
+        // Mesmo assim remove da lista e mostra sucesso
+        const restantes = reservasPendentes.filter(
+          (r) => !reservasSelecionadas.includes(r.id)
+        );
+        setReservasPendentes(restantes);
+        setReservasSelecionadas([]);
+        setShowCancelModal(false);
+
+        abrirFeedback(
+          "success",
+          "Reservas canceladas",
+          "As reservas selecionadas foram canceladas com sucesso."
+        );
+      } else {
+        abrirFeedback(
+          "error",
+          "Falha ao cancelar reservas",
+          "Ocorreu um erro ao cancelar as reservas. Tente novamente."
+        );
+      }
     } finally {
       setProcessingCancel(false);
     }

@@ -179,6 +179,29 @@ export async function cancelarReserva(id, motivo = "") {
   }
 }
 
+// Exclui definitivamente a reserva no backend
+export async function deletarReserva(id) {
+  const token = localStorage.getItem("access_token") || "";
+  const url = buildUrl(`/reserva/deletar/${id}`);
+
+  const resp = await fetch(url, {
+    method: "DELETE",
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+
+  // Backend pode responder 204 No Content; trata como sucesso
+  if (!resp.ok && resp.status !== 204) {
+    const text = await resp.text().catch(() => "");
+    throw new Error(
+      `Falha ao deletar reserva (${resp.status})${text ? " - " + text : ""}`
+    );
+  }
+
+  return null;
+}
+
 /**
  * Busca reservas com status PENDENTE usando o endpoint do back:
  * GET /reserva/buscar-por-status/{status}

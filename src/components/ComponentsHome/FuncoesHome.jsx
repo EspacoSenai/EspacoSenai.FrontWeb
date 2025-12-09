@@ -9,7 +9,40 @@ import ImgAuditorio from "../../assets/auditorio.svg";
 
 export const COR = "#AE0000";
 
-export const items = [
+// Espaços comuns para TODOS os perfis (sem Auditório)
+export const itemsAlunos = [
+  {
+    title: "PS5",
+    img: ImgPS5,
+    desc:
+      "Agora você pode aproveitar toda a emoção dos games com o PlayStation 5 na biblioteca!",
+    link: "/salas-alunos",
+  },
+  {
+    title: "Quadra",
+    img: ImgQuadra,
+    desc:
+      "A quadra é um espaço essencial para a prática de esportes, lazer e atividades físicas.",
+    link: "/salas-alunos",
+  },
+  {
+    title: "Computadores",
+    img: ImgComputadores,
+    desc:
+      "Espaço equipado com computadores para estudos, pesquisas e projetos em grupo.",
+    link: "/salas-alunos",
+  },
+  {
+    title: "Impressão 3D",
+    img: ImgImpressora3D,
+    desc:
+      "Área com impressoras 3D para prototipagem e atividades de inovação e tecnologia.",
+    link: "/salas-alunos",
+  },
+];
+
+// Espaços completos para ADM, PROFESSOR e COORDENADOR (com Auditório)
+export const itemsStaff = [
   {
     title: "PS5",
     img: ImgPS5,
@@ -47,12 +80,27 @@ export const items = [
   },
 ];
 
-export const pages = [
-  [items[0], items[1]],
-  [items[2], items[3]],
-  [items[4]],
+// Para manter compatibilidade com código antigo
+export const items = itemsStaff;
+
+// Páginas para ALUNOS (sem Auditório)
+export const pagesAlunos = [
+  [itemsAlunos[0], itemsAlunos[1]],
+  [itemsAlunos[2], itemsAlunos[3]],
 ];
+
+// Páginas para STAFF (ADM, Professor, Coordenador - com Auditório)
+export const pagesStaff = [
+  [itemsStaff[0], itemsStaff[1]],
+  [itemsStaff[2], itemsStaff[3]],
+  [itemsStaff[4]],
+];
+
+// Para manter compatibilidade
+export const pages = pagesStaff;
 export const pagesCount = pages.length;
+export const pagesCountAlunos = pagesAlunos.length;
+export const pagesCountStaff = pagesStaff.length;
 
 export const lembretesData = [
   {
@@ -169,7 +217,7 @@ export function Card({ title, img, desc, link }) {
           <div className="mt-3 sm:mt-4 flex justify-end">
             <span className="inline-flex items-center gap-2 bg-white dark:bg-[#0f0f0f] text-[#1E1E1E] dark:text-white border border-black/10 dark:border-white/10 rounded-lg px-4 py-2 text-sm font-semibold group-hover:translate-x-[2px] transition">
               Ver espaços
-              <svg className="w-4 h-4" viewBox="0 0 20 20" fill="none">
+              <svg className="w-4 h-4 text-[#1E1E1E] dark:text-white" viewBox="0 0 20 20" fill="none">
                 <path
                   d="M7 5l6 5-6 5"
                   stroke="currentColor"
@@ -204,13 +252,13 @@ export function Kebab({ onClick, ariaControls, ariaExpanded }) {
       aria-expanded={ariaExpanded}
       onMouseDown={(e) => e.preventDefault()}
       onClick={onClick}
-      className="h-12 w-12 grid place-items-center rounded-xl bg-transparent text-neutral-700 hover:bg-black/5 transition outline-none"
+      className="h-12 w-12 grid place-items-center rounded-xl bg-transparent text-neutral-700 dark:text-white hover:bg-black/5 dark:hover:bg-white/5 transition outline-none"
       style={{
         WebkitTapHighlightColor: "transparent",
         touchAction: "manipulation",
       }}
     >
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-[#1E1E1E] dark:text-white">
         <circle cx="12" cy="6" r="2" fill="currentColor" />
         <circle cx="12" cy="12" r="2" fill="currentColor" />
         <circle cx="12" cy="18" r="2" fill="currentColor" />
@@ -267,14 +315,14 @@ export function LembreteCard({ item }) {
             id={`menu-${item.id}`}
             role="menu"
             className="absolute bottom-12 right-0 w-56 overflow-hidden select-none z-[9999]
-                       bg-white text-slate-900 rounded-xl border border-black/10 shadow-2xl"
+                       bg-white dark:bg-[#1B1B1B] text-slate-900 dark:text-gray-200 rounded-xl border border-black/10 dark:border-white/10 shadow-2xl"
           >
             {/* Editar reserva */}
             <button
               type="button"
               role="menuitem"
               onClick={handleEditar}
-              className="w-full flex items-center gap-3 px-4 py-3 text-[15px] hover:bg-black/5 transition text-slate-900"
+              className="w-full flex items-center gap-3 px-4 py-3 text-[15px] hover:bg-black/5 dark:hover:bg-white/5 transition text-slate-900 dark:text-gray-200"
               style={{ background: "transparent" }}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -289,17 +337,17 @@ export function LembreteCard({ item }) {
                   strokeWidth="1.6"
                 />
               </svg>
-              <span className="font-medium text-slate-900">Editar reserva</span>
+              <span className="font-medium text-slate-900 dark:text-gray-200">Editar reserva</span>
             </button>
 
-            <div className="h-px bg-black/10" />
+            <div className="h-px bg-black/10 dark:bg-white/10" />
 
             {/* Cancelar reserva */}
             <button
               type="button"
               role="menuitem"
               onClick={handleCancelar}
-              className="w-full flex items-center gap-3 px-4 py-3 text-[15px] hover:bg-black/5 transition text-red-700"
+              className="w-full flex items-center gap-3 px-4 py-3 text-[15px] hover:bg-black/5 dark:hover:bg-white/5 transition text-red-700 dark:text-red-400"
               style={{ background: "transparent" }}
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -316,7 +364,7 @@ export function LembreteCard({ item }) {
                   strokeWidth="1.8"
                 />
               </svg>
-              <span className="font-semibold">Cancelar reserva</span>
+              <span className="font-semibold text-red-700 dark:text-red-400">Cancelar reserva</span>
             </button>
           </div>
         )}

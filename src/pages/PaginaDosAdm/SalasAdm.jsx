@@ -57,8 +57,30 @@ export default function SalasAdm() {
       }
     })();
 
+    // Recarrega quando voltar o foco ou a visibilidade após editar/gestão
+    const onFocus = async () => {
+      try {
+        const ambientes = await buscarTodosAmbientes();
+        const lista = Array.isArray(ambientes) ? ambientes : [];
+        setAmbientes(lista);
+      } catch (err) {
+        console.error("[SalasAdm] Erro ao recarregar ambientes:", err);
+      }
+    };
+
+    const onVisibility = async () => {
+      if (document.visibilityState === "visible") {
+        await onFocus();
+      }
+    };
+
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVisibility);
+
     return () => {
       alive = false;
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisibility);
     };
   }, []);
 

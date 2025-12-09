@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ adicionado
+import { useNavigate } from "react-router-dom"; // adicionado
 
 import sucessoIcon from "../../assets/sucesso.svg";
 
@@ -94,7 +94,7 @@ function gerarSlotsPorFaixas(faixas, passoMinutos = 15) {
 }
 
 export default function AgendamentoImpressoras() {
-  const navigate = useNavigate(); // ✅
+  const navigate = useNavigate(); // navegação
   const [semanaSelecionada, setSemanaSelecionada] = useState("essa");
   const [diaSelecionado, setDiaSelecionado] = useState(0);
 
@@ -105,7 +105,7 @@ export default function AgendamentoImpressoras() {
 
   const [catalogoImpressoras, setCatalogoImpressoras] = useState([]);
 
-  const [loading, setLoading] = useState(false); // ✅
+  const [loading, setLoading] = useState(false); // loading
 
   const [modal, setModal] = useState({
     aberto: false,
@@ -277,7 +277,7 @@ export default function AgendamentoImpressoras() {
   const temHorariosParaDia = horariosInicioDisponiveis.length > 0;
 
   function cancelar() {
-    navigate(-1); // ✅ voltar pra tela anterior
+    navigate(-1); // voltar pra tela anterior
   }
 
   useEffect(() => {
@@ -287,7 +287,7 @@ export default function AgendamentoImpressoras() {
 
   async function confirmar() {
     if (loading) return;
-    setLoading(true); // ✅ inicia o loading
+    setLoading(true); // inicia o loading
     try {
       const dia = diasDaSemana[diaSelecionado];
       const hostId = getUserIdFromToken();
@@ -327,7 +327,7 @@ export default function AgendamentoImpressoras() {
     } catch (err) {
       abrirModal("error", "Falha ao reservar", err.message);
     } finally {
-      setLoading(false); // ✅ encerra o loading
+      setLoading(false); // encerra o loading
     }
   }
 
@@ -414,7 +414,7 @@ export default function AgendamentoImpressoras() {
             type="button"
             onClick={cancelar}
             disabled={loading}
-            className={`px-6 py-3 rounded-md bg-[#EDEDED] text-[#1E1E1E] ${
+            className={`px-6 py-3 rounded-md bg-[#EDEDED] dark:bg-[#1a1a1a] text-[#1E1E1E] dark:text-white ${
               loading
                 ? "opacity-60 cursor-not-allowed"
                 : "hover:bg-[#AE0000] hover:text-white"

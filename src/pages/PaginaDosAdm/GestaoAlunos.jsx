@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import AvatarDefault from "../../assets/AvatarPadrao.svg";
-import { api } from "../../service/api";
+
+// usa os services prontos
+import { buscarEstudantes } from "../../service/usuario";
+import { buscarTurmas } from "../../service/turma";
 
 const COR_PADRAO = "#AE0000";
 
@@ -48,35 +51,77 @@ function AlunoCard({ aluno, cor = COR_PADRAO }) {
 
 export default function GestaoAlunos({ cor = COR_PADRAO }) {
   const [estudantes, setEstudantes] = useState([]);
+  const [turmas, setTurmas] = useState([]);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
 
   useEffect(() => {
-    let alive = true;
+    let vivo = true;
+
     (async () => {
       try {
         setLoading(true);
         setErro("");
-        const resp = await api.get("/usuario/buscar-estudantes");
-        const data = resp?.data ?? resp;
-        const arr = Array.isArray(data) ? data : [];
 
-        if (!alive) return;
-        setEstudantes(arr);
-      } catch (err) {
-        console.error("[GestaoAlunos] Erro ao buscar estudantes:", err);
-        if (!alive) return;
+        // 1) busca alunos (se der erro aqui, mostra msg)
+        const respAlunos = await buscarEstudantes();
+        const arrAlunos = Array.isArray(respAlunos) ? respAlunos : [];
+
+        if (!vivo) return;
+        setEstudantes(arrAlunos);
+
+        // 2) busca turmas (se der erro, só ignora e deixa turmas como [])
+        try {
+          const respTurmas = await buscarTurmas();
+          const arrTurmas = Array.isArray(respTurmas) ? respTurmas : [];
+          if (vivo) setTurmas(arrTurmas);
+        } catch (e) {
+          console.error("[GestaoAlunos] Erro ao buscar turmas (ignorado):", e);
+          if (vivo) setTurmas([]);
+        }
+      } catch (e) {
+        console.error("[GestaoAlunos] Erro ao buscar alunos:", e);
+        if (!vivo) return;
         setErro("Não foi possível carregar os alunos.");
         setEstudantes([]);
       } finally {
-        if (alive) setLoading(false);
+        if (vivo) setLoading(false);
       }
     })();
 
     return () => {
-      alive = false;
+      vivo = false;
     };
   }, []);
+
+  // monta Set com ids de alunos que estão em QUALQUER turma (usando estudantesIds)
+  const idsAlunosComTurma = useMemo(() => {
+    const ids = new Set();
+
+    turmas.forEach((turma) => {
+      const estudantesTurma = Array.isArray(turma.estudantesIds)
+        ? turma.estudantesIds
+        : [];
+
+      estudantesTurma.forEach((item) => {
+        if (!item) return;
+
+        if (typeof item === "number") {
+          ids.add(item);
+        } else if (item.id != null) {
+          ids.add(item.id);
+        }
+      });
+    });
+
+    return ids;
+  }, [turmas]);
+
+  // aqui ficam só os alunos SEM turma
+  const estudantesSemTurma = useMemo(
+    () => estudantes.filter((aluno) => !idsAlunosComTurma.has(aluno.id)),
+    [estudantes, idsAlunosComTurma]
+  );
 
   return (
     <section className="w-full">
@@ -84,12 +129,15 @@ export default function GestaoAlunos({ cor = COR_PADRAO }) {
         <div className="flex justify-center mb-6">
           <div className="text-center">
             <h3 className="text-[18px] md:text-[20px] font-semibold text-neutral-900 dark:text-neutral-100">
-              Gestão de alunos
+            Gestão de alunos
             </h3>
-            <div
-              className="mt-2 mx-auto w-24 h-[3px] rounded-full"
-              style={{ backgroundColor: cor }}
-            />
+            <span className="block mt-1 text-sm text-neutral-500 dark:text-neutral-300">
+            Estudantes que ainda não possuem turma vinculada
+            </span>
+          <div
+            className="mt-2 mx-auto w-24 h-[3px] rounded-full"
+            style={{ backgroundColor: cor }}
+          />
           </div>
         </div>
 
@@ -99,20 +147,15 @@ export default function GestaoAlunos({ cor = COR_PADRAO }) {
           </div>
         ) : erro ? (
           <div className="py-10 text-center text-sm text-red-600">{erro}</div>
-        ) : estudantes.length === 0 ? (
+        ) : estudantesSemTurma.length === 0 ? (
           <div className="py-10 text-center text-sm text-neutral-600 dark:text-neutral-300">
-            Nenhum aluno cadastrado ainda.
+            Nenhum aluno sem turma no momento.
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {estudantes
-              .filter((aluno) => {
-                const turmas = aluno.turmas || [];
-                return turmas.length === 0;
-              })
-              .map((aluno) => (
-                <AlunoCard key={aluno.id} aluno={aluno} cor={cor} />
-              ))}
+            {estudantesSemTurma.map((aluno) => (
+              <AlunoCard key={aluno.id} aluno={aluno} cor={cor} />
+            ))}
           </div>
         )}
       </div>

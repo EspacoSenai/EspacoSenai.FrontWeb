@@ -1,5 +1,6 @@
 // src/pages/Salas/SalasProfessores.jsx
 import React, { useMemo, useState, useEffect } from "react";
+import { removeEmojis } from "../../utils/text";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -82,7 +83,7 @@ function formatDateBr(iso) {
 }
 
 function TurmaCard({ turma }) {
-  const { id, titulo, duracao, datas, tipo, nome } = turma;
+  const { id, titulo, duracao, datas, tipo, nome, curso, capacidade } = turma;
 
   return (
     <div className="rounded-2xl border border-black/10 dark:border-white/10 bg-white dark:bg-[#151515] shadow-sm overflow-hidden h-full flex flex-col">
@@ -123,6 +124,14 @@ function TurmaCard({ turma }) {
           />
         </div>
         <div>
+          <Lbl>Curso</Lbl>
+          <Input
+            value={curso}
+            placeholder="Ex: Desenvolvimento de Sistemas"
+            readOnly={true}
+          />
+        </div>
+        <div>
           <Lbl>Tipo</Lbl>
           <Input
             value={tipo}
@@ -135,6 +144,9 @@ function TurmaCard({ turma }) {
 
       <div className="px-5 pb-5">
         <Input value={nome} placeholder="Nome da Turma" readOnly={true} />
+        <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-300">
+          Capacidade: {capacidade ? `${capacidade} alunos` : "—"}
+        </p>
       </div>
     </div>
   );
@@ -213,11 +225,13 @@ export default function SalasProfessores() {
 
         const mapped = (data || []).map((t) => ({
           id: t.id,
-          titulo: t.curso || "Módulo",
+          titulo: removeEmojis(t.curso || "Módulo"),
           duracao: t.capacidade ? `${t.capacidade} alunos` : "—",
           datas: formatDateBr(t.dataInicio),
           tipo: t.modalidade || "—",
-          nome: t.nome || "",
+          nome: removeEmojis(t.nome || ""),
+          curso: removeEmojis(t.curso || ""),
+          capacidade: t.capacidade ?? null,
         }));
 
         setTurmas(mapped);
@@ -226,7 +240,27 @@ export default function SalasProfessores() {
       }
     };
 
+    // Carrega inicialmente
     loadTurmas();
+
+    // Recarrega ao voltar o foco para a aba (ex: após editar e voltar)
+    const onFocus = () => {
+      loadTurmas();
+    };
+    window.addEventListener("focus", onFocus);
+
+    // Recarrega quando a página ficar visível novamente
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") {
+        loadTurmas();
+      }
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, []);
 
   const primeiroNome = displayName.split(" ")[0];

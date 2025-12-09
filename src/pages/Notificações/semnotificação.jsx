@@ -1,9 +1,12 @@
 import React from 'react';
 import sino from '../../assets/sem notificações 1.svg';
+import sinoVazioDark from '../../assets/semnotificacoesdark.svg';
+import setawhiteleft from '../../assets/setawhiteleft.svg';
 import setaLeft from '../../assets/setaleft.svg';
 import sinodenoti from '../../assets/sinodenoti.svg';
 
 export default function SemNotificacao() {
+  const isDark = document.documentElement.classList.contains('dark');
 	return (
 		<div className="min-h-screen w-screen bg-white font-sans flex flex-col items-center box-border p-0">
 			{/* Barra superior */}
@@ -21,7 +24,7 @@ export default function SemNotificacao() {
 							- p-0 flex items-center: alinha o ícone
 						*/}
 						<button className="bg-transparent border-0 p-0 flex items-center cursor-pointer" onClick={() => window.history.back()}>
-							<img src={setaLeft} alt="Voltar" className="w-8 h-8 block bg-transparent text-gray-800" />
+							<img src={isDark ? setawhiteleft : setaLeft} alt="Voltar" className="w-8 h-8 block bg-transparent text-gray-800" />
 						</button>
 						{/*
 							titleContainer: centraliza o título horizontalmente usando absolute
@@ -51,7 +54,12 @@ export default function SemNotificacao() {
 				<div className="w-full max-w-[720px] mx-auto flex flex-col items-center">
 					{/* Bell image: ocupa largura responsiva dentro do container central */}
 					<div className="flex items-center justify-center mt-10 mb-9 w-full">
-						<img src={sino} alt="Sem notificações" className="block mx-auto bg-transparent" style={{ width: 'min(50vw, 320px)', height: 'auto' }} />
+						<img
+							src={isDark ? sinoVazioDark : sino}
+							alt="Sem notificações"
+							className="block mx-auto bg-transparent"
+							style={{ width: 'min(50vw, 320px)', height: 'auto' }}
+						/>
 					</div>
 
 					{/* Text block: usa a mesma largura do container para alinhamento perfeito */}

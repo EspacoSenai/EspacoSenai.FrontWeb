@@ -22,17 +22,31 @@ export default function EditarUsuario() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [senhaOriginal, setSenhaOriginal] = useState(""); // Senha hash do backend
   const [status, setStatus] = useState("ATIVO");
   const [statusOriginal, setStatusOriginal] = useState("ATIVO"); // Para comparar se mudou
   const [rolesIds, setRolesIds] = useState([]);
 
-  // Roles disponíveis (exceto ADMIN que não pode ser atribuído)
-  const rolesDisponiveis = [
-    { id: 2, nome: "COORDENADOR", label: "Coordenador" },
-    { id: 3, nome: "PROFESSOR", label: "Professor" },
-    { id: 4, nome: "ESTUDANTE", label: "Estudante" },
-  ];
+  // Roles disponíveis baseado no tipo de usuário
+  const rolesDisponiveis = (() => {
+    // Se for ALUNO/ESTUDANTE, só pode ser Estudante
+    if (tipoUsuario === "ALUNO" || tipoUsuario === "ESTUDANTE") {
+      return [{ id: 4, nome: "ESTUDANTE", label: "Estudante" }];
+    }
+    // Se for PROFESSOR ou COORDENADOR, pode ser Professor ou Coordenador
+    // (eles podem ter ambos perfis para ingressar em turmas)
+    if (tipoUsuario === "PROFESSOR" || tipoUsuario === "COORDENADOR") {
+      return [
+        { id: 2, nome: "COORDENADOR", label: "Coordenador" },
+        { id: 3, nome: "PROFESSOR", label: "Professor" },
+      ];
+    }
+    // Caso genérico (não deve acontecer, mas mantém todas exceto ADMIN)
+    return [
+      { id: 2, nome: "COORDENADOR", label: "Coordenador" },
+      { id: 3, nome: "PROFESSOR", label: "Professor" },
+      { id: 4, nome: "ESTUDANTE", label: "Estudante" },
+    ];
+  })();
 
   // Carrega dados do usuário
   useEffect(() => {
@@ -43,7 +57,6 @@ export default function EditarUsuario() {
           // Usa dados passados via navegação
           setNome(usuarioInicial.nome || "");
           setEmail(usuarioInicial.email || "");
-          setSenhaOriginal(usuarioInicial.senha || ""); // Guarda senha hash
           const statusInicial = usuarioInicial.status || "ATIVO";
           setStatus(statusInicial);
           setStatusOriginal(statusInicial);
@@ -62,7 +75,6 @@ export default function EditarUsuario() {
           const usuario = await buscarPorId(id);
           setNome(usuario.nome || "");
           setEmail(usuario.email || "");
-          setSenhaOriginal(usuario.senha || ""); // Guarda senha hash
           const statusInicial = usuario.status || "ATIVO";
           setStatus(statusInicial);
           setStatusOriginal(statusInicial);
@@ -98,22 +110,19 @@ export default function EditarUsuario() {
       return;
     }
 
-    // Se digitou nova senha, validar tamanho (8-15 caracteres)
-    if (senha.trim() && (senha.trim().length < 8 || senha.trim().length > 15)) {
-      alert("A nova senha deve ter entre 8 e 15 caracteres");
-      return;
-    }
-
     setSaving(true);
     try {
       // Atualiza dados básicos (nome, email, senha, roles)
-      // Se não digitou nova senha, envia a senha original (hash) do backend
       const payload = {
         nome: nome.trim(),
         email: email.trim(),
-        senha: senha.trim() || senhaOriginal, // Usa nova senha ou mantém a original
         rolesIds: rolesIds,
       };
+
+      // Adiciona senha ao payload apenas se foi preenchida
+      if (senha.trim()) {
+        payload.senha = senha.trim();
+      }
 
       await atualizarUsuario(id, payload);
 
@@ -175,184 +184,174 @@ export default function EditarUsuario() {
   };
 
   return (
-    <div className="min-h-screen bg-white font-sans">
-      {/* Header */}
-      <div className="relative flex items-center justify-center px-3 py-3 border-b border-gray-200">
-        <button
-          onClick={() => navigate(-1)}
-          className="absolute left-3 top-0 bg-white rounded-md border border-gray-300 shadow-sm p-1 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#AE0000]"
-          aria-label="Voltar"
-        >
-          <img src={setaLeft} alt="Voltar" className="w-9 h-8" />
-        </button>
-
-        <h1 className="text-lg font-medium w-full text-center pointer-events-none text-black">
-          {getTitulo()}
-        </h1>
-
-        <img
-          src={iconeEditar}
-          alt="Editar"
-          className="absolute right-8 top-3 w-9 h-7"
-        />
-      </div>
-
-      {/* Faixa colorida no topo */}
-      <div 
-        className="w-full h-20" 
-        style={{ backgroundColor: getCor() }}
-      />
-
-      <main className="max-w-xl mx-auto px-6 py-8">
-        {/* Avatar */}
-        <div className="flex flex-col items-center mb-12 -mt-20">
-          <img
-            src={avatarImg}
-            alt="Avatar"
-            className="w-28 h-28 object-cover mb-3 rounded-full shadow"
-          />
-          <span 
-            className="text-white px-4 py-1 text-sm mt-1 shadow-md rounded-lg"
-            style={{ backgroundColor: getCor() }}
-          >
-            {tipoUsuario}
-          </span>
-        </div>
-
-        {/* Formulário */}
-        <form
-          className="flex flex-col gap-8 items-start w-full"
-          onSubmit={salvarUsuario}
-        >
-          <div className="w-full">
-            <label
-              htmlFor="nome"
-              className="text-sm font-medium mb-1 block text-black text-left"
-            >
-              Nome:
-            </label>
-            <input
-              id="nome"
-              name="nome"
-              type="text"
-              placeholder="Nome do usuário"
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-              disabled={loading}
-              className="rounded-lg p-3 w-full text-black bg-[#EEEEEE]"
-            />
-          </div>
-
-          <div className="w-full relative">
-            <label
-              htmlFor="email"
-              className="text-sm font-medium mb-1 block text-black text-left"
-            >
-              Email:
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={loading}
-              className="rounded-lg p-3 w-full text-black bg-[#EEEEEE]"
-            />
-            <img
-              src={lapis}
-              alt="Editar email"
-              className="w-5 h-5 absolute right-3 top-12 -translate-y-1/2 pointer-events-none"
-            />
-          </div>
-
-          <div className="w-full">
-            <label
-              htmlFor="senha"
-              className="text-sm font-medium mb-1 block text-black text-left"
-            >
-              Nova senha (opcional):
-            </label>
-            <input
-              id="senha"
-              name="senha"
-              type="password"
-              placeholder="Deixe em branco para manter a senha atual"
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
-              disabled={loading}
-              className="rounded-lg p-3 w-full text-black bg-[#EEEEEE]"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              Se preenchido, deve ter entre 8 e 15 caracteres
-            </p>
-          </div>
-
-          <div className="w-full">
-            <label
-              htmlFor="status"
-              className="text-sm font-medium mb-1 block text-black text-left"
-            >
-              Status:
-            </label>
-            <select
-              id="status"
-              name="status"
-              value={status}
-              onChange={(e) => setStatus(e.target.value)}
-              disabled={loading}
-              className="rounded-lg p-3 w-full text-black bg-[#EEEEEE]"
-            >
-              <option value="ATIVO">Ativo</option>
-              <option value="BLOQUEADO">Bloqueado</option>
-            </select>
-          </div>
-
-          {/* Campo de Perfis/Roles */}
-          <div className="w-full">
-            <label className="text-sm font-medium mb-2 block text-black text-left">
-              Perfis do usuário:
-            </label>
-            <p className="text-xs text-gray-500 mb-3">
-              Um usuário pode ter múltiplos perfis (ex: Professor e Coordenador)
-            </p>
-            <div className="flex flex-wrap gap-3">
-              {rolesDisponiveis.map((role) => (
-                <button
-                  key={role.id}
-                  type="button"
-                  onClick={() => toggleRole(role.id)}
-                  disabled={loading}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border-2 ${
-                    rolesIds.includes(role.id)
-                      ? "bg-red-700 text-white border-red-700"
-                      : "bg-white text-gray-700 border-gray-300 hover:border-red-400"
-                  }`}
-                >
-                  {role.label}
-                  {rolesIds.includes(role.id) && (
-                    <span className="ml-2">✓</span>
-                  )}
-                </button>
-              ))}
-            </div>
-            {rolesIds.length === 0 && (
-              <p className="text-xs text-red-500 mt-2">
-                Selecione pelo menos um perfil
-              </p>
-            )}
-          </div>
-
+    <div className="min-h-screen bg-[#F5F5F5] dark:bg-[#0f0f10] flex flex-col">
+      {/* HEADER */}
+      <header className="w-full border-b border-[#960000] bg-[#AE0000] dark:bg-[#8a0303] text-white">
+        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
           <button
-            type="submit"
-            disabled={saving || loading || !nome.trim() || !email.trim() || rolesIds.length === 0 || (senha.trim() && (senha.trim().length < 8 || senha.trim().length > 15))}
-            className="text-white px-5 py-2 rounded-md ml-auto mt-4 disabled:opacity-60 transition-colors"
-            style={{ backgroundColor: getCor() }}
+            onClick={() => navigate(-1)}
+            className="inline-flex items-center justify-center px-4 py-2 rounded-lg border border-white/80 bg-transparent text-sm font-medium text-white hover:bg-white/10 transition"
           >
-            {saving ? "Salvando..." : "Salvar Alterações"}
+            Voltar
           </button>
-        </form>
+          <h1 className="text-lg md:text-xl font-semibold">{getTitulo()}</h1>
+          <div className="w-16" />
+        </div>
+      </header>
+
+      {/* CONTEÚDO */}
+      <main className="flex-1 flex justify-center items-start md:items-center px-4 py-8">{loading ? (
+          <div className="text-center text-sm text-gray-700 dark:text-gray-300">Carregando...</div>
+        ) : (
+          <div className="w-full max-w-xl">
+            <div className="bg-white dark:bg-[#18181b] rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 px-6 py-6 md:px-8 md:py-8">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+                Informações do {tipoUsuario === "PROFESSOR" ? "professor" : tipoUsuario === "COORDENADOR" ? "coordenador" : "usuário"}
+              </h2>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                Atualize os dados cadastrais e o perfil do usuário.
+              </p>
+
+              <form onSubmit={salvarUsuario} className="space-y-5">
+                {/* NOME */}
+                <div>
+                  <label
+                    htmlFor="nome"
+                    className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1"
+                  >
+                    Nome
+                  </label>
+                  <input
+                    id="nome"
+                    type="text"
+                    value={nome}
+                    onChange={(e) => setNome(e.target.value)}
+                    disabled={loading}
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-[#EEEEEE] dark:bg-[#222] px-3 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-[#AE0000] focus:border-[#AE0000]"
+                    placeholder="Nome completo"
+                  />
+                </div>
+
+                {/* EMAIL */}
+                <div>
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1"
+                  >
+                    Email
+                  </label>
+                  <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={loading}
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-[#EEEEEE] dark:bg-[#222] px-3 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-[#AE0000] focus:border-[#AE0000]"
+                    placeholder="email@exemplo.com"
+                  />
+                </div>
+
+                {/* SENHA */}
+                <div>
+                  <label
+                    htmlFor="senha"
+                    className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1"
+                  >
+                    Senha
+                  </label>
+                  <input
+                    id="senha"
+                    type="password"
+                    value={senha}
+                    onChange={(e) => setSenha(e.target.value)}
+                    disabled={loading}
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-[#EEEEEE] dark:bg-[#222] px-3 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-[#AE0000] focus:border-[#AE0000]"
+                    placeholder="Nova senha (opcional)"
+                  />
+                  <p className="mt-1 text-[11px] text-gray-500 dark:text-gray-400">
+                    Se deixar em branco, a senha atual será mantida.
+                  </p>
+                </div>
+
+                {/* STATUS */}
+                <div>
+                  <label
+                    htmlFor="status"
+                    className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1"
+                  >
+                    Status
+                  </label>
+                  <select
+                    id="status"
+                    value={status}
+                    onChange={(e) => setStatus(e.target.value)}
+                    disabled={loading}
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-[#EEEEEE] dark:bg-[#222] px-3 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-[#AE0000] focus:border-[#AE0000]"
+                  >
+                    <option value="ATIVO">ATIVO</option>
+                    <option value="BLOQUEADO">BLOQUEADO</option>
+                  </select>
+                </div>
+
+                {/* PERFIS DO USUÁRIO */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-800 dark:text-gray-200 mb-1">
+                    Perfil do usuário
+                  </label>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+                    {rolesDisponiveis.length > 1 
+                      ? "Um usuário pode ter múltiplos perfis (ex: Professor e Coordenador)"
+                      : "Perfil do usuário"}
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    {rolesDisponiveis.map((role) => (
+                      <button
+                        key={role.id}
+                        type="button"
+                        onClick={() => toggleRole(role.id)}
+                        disabled={loading}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                          rolesIds.includes(role.id)
+                            ? "bg-[#AE0000] text-white"
+                            : "bg-gray-200 dark:bg-[#222] text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-700 hover:border-[#AE0000]"
+                        }`}
+                      >
+                        {role.label}
+                        {rolesIds.includes(role.id) && (
+                          <span className="ml-2">OK</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                  {rolesIds.length === 0 && (
+                    <p className="text-xs text-red-600 dark:text-red-400 mt-2">
+                      Selecione pelo menos um perfil
+                    </p>
+                  )}
+                </div>
+
+                {/* BOTÕES */}
+                <div className="pt-2 flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => navigate(-1)}
+                    className="px-4 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-700 bg-gray-200 dark:bg-[#222] text-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-[#2a2a2e] transition"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={saving || loading || !nome.trim() || !email.trim() || rolesIds.length === 0}
+                    className="px-5 py-2 text-sm rounded-md font-semibold text-white disabled:opacity-60 disabled:cursor-not-allowed hover:brightness-95 transition"
+                    style={{ backgroundColor: getCor() }}
+                  >
+                    {saving ? "Salvando..." : "Salvar alterações"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

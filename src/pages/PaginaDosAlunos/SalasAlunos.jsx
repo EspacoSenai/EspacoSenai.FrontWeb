@@ -17,6 +17,7 @@ import ImgImpressora3D from "../../assets/Impressora3D.svg";
 
 import { ingressarTurmaPorCodigo } from "../../service/turma";
 import { buscarMeuPerfil, buscarMinhasTurmas } from "../../service/usuario";
+import { removeEmojis } from "../../utils/text";
 
 const COR = "#AE0000";
 
@@ -131,20 +132,20 @@ export default function SalasAlunos() {
       >
         <div className="p-4">
           <div className="h-[140px] w-full rounded-lg overflow-hidden ring-1 ring-black/5 dark:ring-white/10 bg-neutral-50 dark:bg-neutral-900">
-            <img
+              <img
               src={data.img}
-              alt={data.title}
+              alt={removeEmojis(data.title)}
               className="w-full h-full object-cover"
               draggable={false}
             />
           </div>
 
           <div className="mt-3">
-            <span
+              <span
               className="inline-block text-[11px] font-semibold px-2 py-[2px] rounded text-white"
               style={{ backgroundColor: COR }}
             >
-              {data.title}
+              {removeEmojis(data.title)}
             </span>
             <p className="mt-2 text-[13px] leading-relaxed text-[#1E1E1E] dark:text-gray-200">
               {data.desc}
@@ -208,21 +209,21 @@ export default function SalasAlunos() {
   }
 
   function TurmaCard({ turma }) {
-    const titulo =
+    const titulo = removeEmojis(
       turma.nome ||
       turma.nomeTurma ||
       turma.titulo ||
-      `Turma #${turma.id}`;
-
-    const cursoNome =
-      turma?.curso?.nome || turma?.cursoNome || turma?.nomeCurso || "";
-
-    const professorNome =
+      `Turma #${turma.id}`
+    );
+    const cursoNome = removeEmojis(
+      turma?.curso?.nome || turma?.cursoNome || turma?.nomeCurso || ""
+    );
+    const professorNome = removeEmojis(
       turma?.professor?.nome ||
       turma?.professorNome ||
       turma?.nomeProfessor ||
-      "";
-
+      ""
+    );
     const codigoAcesso =
       turma.codigoAcesso ||
       turma.codigo ||

@@ -11,8 +11,8 @@ import Pessoa from "../../assets/HomeAdm.svg";
 
 import {
   COR,
-  pages,
-  pagesCount,
+  pagesStaff as pages,
+  pagesCountStaff as pagesCount,
   lembretesData,
   ArrowBtn,
   Card,

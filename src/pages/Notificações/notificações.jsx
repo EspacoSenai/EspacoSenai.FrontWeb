@@ -2,12 +2,17 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import setaLeft from "../../assets/setaleft.svg";
+import setawhiteleft from "../../assets/setawhiteleft.svg";
 import lixeira from "../../assets/lixeira.svg";
+import lixeiraDark from "../../assets/lixeira-dark.svg";
 import sinoSN from "../../assets/sinoSN.svg";
+import sinoDark from "../../assets/sinodark.svg";
 import lembrete from "../../assets/lembrete.svg";
 import sinoVazio from "../../assets/sem notificações 1.svg";
+import sinoVazioDark from "../../assets/semnotificacoesdark.svg";
 
 import { useAuth } from "../../context/AuthContext";
+import { removeEmojis } from "../../utils/text";
 
 import {
   buscarMinhasNotificacoes,
@@ -36,6 +41,9 @@ export default function Notificacoes() {
   const [notificacoes, setNotificacoes] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState(null);
+  const [isDark, setIsDark] = useState(
+    document.documentElement.classList.contains("dark")
+  );
 
   const deslocamentosRef = useRef({});
   const inicioXRef = useRef(0);
@@ -44,13 +52,28 @@ export default function Notificacoes() {
   const deslocamentoMinimoDragRef = useRef(5);
   const foiDragRef = useRef({}); 
 
+  /* ==================== OBSERVAR TEMA ==================== */
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      setIsDark(document.documentElement.classList.contains("dark"));
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+    return () => observer.disconnect();
+  }, []);
+
   /* ==================== CARREGAR DA API ==================== */
   useEffect(() => {
     let cancelado = false;
+    let intervaloId = null;
 
-    async function carregar() {
+    async function carregar(primeiraVez = false) {
       try {
-        setCarregando(true);
+        if (primeiraVez) {
+          setCarregando(true);
+        }
         setErro(null);
 
         const data = await buscarMinhasNotificacoes();
@@ -59,8 +82,8 @@ export default function Notificacoes() {
 
         const mapeadas = (data || []).map((n) => ({
           id: n.id,
-          title: n.titulo || n.title || "Notificação",
-          body: n.mensagem || n.body || "",
+          title: removeEmojis(n.titulo || n.title || "Notificação"),
+          body: removeEmojis(n.mensagem || n.body || ""),
           lida: n.lida ?? false,
           tipo: n.tipo || "INFO",
           dataCriacao: n.dataCriacao || null,
@@ -82,21 +105,34 @@ export default function Notificacoes() {
           setErro(null);
         } else {
           console.error("Erro ao carregar notificações", error);
-          setErro("Não foi possível carregar suas notificações.");
+          if (primeiraVez) {
+            setErro("Não foi possível carregar suas notificações.");
+          }
         }
       } finally {
-        if (!cancelado) {
+        if (!cancelado && primeiraVez) {
           setCarregando(false);
         }
       }
     }
 
-    carregar();
+    // Carrega imediatamente na primeira vez
+    carregar(true);
+
+    // Configura polling a cada 10 segundos para atualização automática
+    intervaloId = setInterval(() => {
+      if (!cancelado) {
+        carregar(false);
+      }
+    }, 10000);
 
     return () => {
       cancelado = true;
+      if (intervaloId) {
+        clearInterval(intervaloId);
+      }
     };
-  }, []);
+  }, [signOut]);
 
   /* ==================== AÇÕES ==================== */
 
@@ -135,10 +171,13 @@ export default function Notificacoes() {
   };
 
   const marcarComoLidaLocal = async (id) => {
+    // Atualiza localmente de forma otimista
     setNotificacoes((prev) =>
       prev.map((n) => (n.id === id ? { ...n, lida: true } : n))
     );
+    
     try {
+      // Envia para o backend para persistir no banco de dados
       await marcarNotificacaoComoLida(id);
     } catch (error) {
       const status = error?.status;
@@ -146,6 +185,10 @@ export default function Notificacoes() {
         signOut?.();
       } else {
         console.error("Erro ao marcar como lida", error);
+        // Reverte o estado local em caso de erro
+        setNotificacoes((prev) =>
+          prev.map((n) => (n.id === id ? { ...n, lida: false } : n))
+        );
       }
     }
   };
@@ -205,21 +248,25 @@ export default function Notificacoes() {
   /* ==================== RENDER ==================== */
 
   return (
-    <div className="min-h-screen bg-white text-[#111] font-sans">
+    <div className="min-h-screen bg-white dark:bg-[#0f0f10] text-[#111] dark:text-white font-sans">
       {/* Topbar */}
-      <header className="w-full bg-white border-b relative">
+      <header className="w-full bg-white dark:bg-[#0f0f10] border-b border-gray-200 dark:border-gray-700 relative">
         <button
           onClick={() => window.history.back()}
           className="absolute left-2 top-1/2 -translate-y-1/2 p-1 z-10
-                     rounded-md bg-white border border-gray-300 shadow-sm
-                     hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#AE0000]"
+                     rounded-md bg-white dark:bg-[#18181b] border border-gray-300 dark:border-gray-700 shadow-sm
+                     hover:bg-gray-50 dark:hover:bg-[#222] focus:outline-none focus:ring-2 focus:ring-[#AE0000]"
           aria-label="voltar"
         >
-          <img src={setaLeft} alt="voltar" className="w-6 h-6" />
+          <img
+            src={isDark ? setawhiteleft : setaLeft}
+            alt="voltar"
+            className="w-6 h-6"
+          />
         </button>
         <div className="max-w-5xl mx-auto flex items-center py-4 px-4 sm:px-6">
           <div className="mx-auto flex items-center gap-2">
-            <img src={sinoSN} alt="ícone" className="w-6 h-6" />
+            <img src={isDark ? sinoDark : sinoSN} alt="ícone" className="w-6 h-6" />
             <h1 className="text-lg font-semibold underline decoration-[#7c0c15] underline-offset-4">
               Suas notificações
             </h1>
@@ -229,7 +276,7 @@ export default function Notificacoes() {
 
       {/* Banner */}
       <section className="w-full mt-0">
-        <div className="bg-[#7c0c15] text-white p-6 text-center w-full">
+        <div className="bg-[#7c0c15] dark:bg-[#8a0303] text-white p-6 text-center w-full">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <h2 className="text-xl font-semibold">
               {carregando
@@ -250,7 +297,7 @@ export default function Notificacoes() {
       <main className="w-full mt-6 px-4 sm:px-6 pb-12">
         {erro && (
           <div className="max-w-3xl mx-auto mb-4">
-            <div className="p-4 rounded-md border border-red-300 bg-red-50 text-red-800 text-sm">
+            <div className="p-4 rounded-md border border-red-300 bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-300 text-sm">
               {erro}
             </div>
           </div>
@@ -262,7 +309,7 @@ export default function Notificacoes() {
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="w-full h-20 bg-gray-100 rounded-md animate-pulse"
+                className="w-full h-20 bg-gray-100 dark:bg-[#1f1f22] rounded-md animate-pulse"
               />
             ))}
           </div>
@@ -272,7 +319,7 @@ export default function Notificacoes() {
             <div className="w-full max-w-[720px] mx-auto flex flex-col items-center">
               <div className="flex items-center justify-center mt-10 mb-9 w-full">
                 <img
-                  src={sinoVazio}
+                  src={isDark ? sinoVazioDark : sinoVazio}
                   alt="Sem notificações"
                   className="block mx-auto bg-transparent"
                   style={{ width: "min(50vw, 320px)", height: "auto" }}
@@ -281,19 +328,19 @@ export default function Notificacoes() {
 
               <div className="text-center w-full px-4">
                 <h2
-                  className="font-semibold text-[#222] mb-6"
+                  className="font-semibold text-[#222] dark:text-white mb-6"
                   style={{ fontSize: "clamp(1rem, 2.5vw, 1.3rem)" }}
                 >
                   Tudo tranquilo por aqui!
                 </h2>
                 <div
-                  className="font-medium text-[#222] mb-3"
+                  className="font-medium text-[#222] dark:text-gray-200 mb-3"
                   style={{ fontSize: "1rem" }}
                 >
                   Parece que você não tem nenhuma notificação no momento.
                 </div>
                 <div
-                  className="font-normal text-[#222] whitespace-normal break-words leading-relaxed"
+                  className="font-normal text-[#222] dark:text-gray-300 whitespace-normal break-words leading-relaxed"
                   style={{ fontSize: "clamp(0.95rem, 2vw, 1rem)" }}
                 >
                   Avisaremos por aqui assim que houver novidades ou novos
@@ -315,8 +362,8 @@ export default function Notificacoes() {
                   key={n.id}
                   className={`w-full rounded-xl shadow-sm overflow-hidden transition-all duration-200 ${
                     !lida
-                      ? "bg-[#FFF8F8] border border-[#E35151]/70 hover:shadow-md cursor-pointer"
-                      : "bg-white border border-gray-200 hover:shadow-md cursor-default"
+                      ? "bg-[#FFF8F8] dark:bg-[#2a1b1b] border border-[#E35151]/70 hover:shadow-md cursor-pointer"
+                      : "bg-white dark:bg-[#18181b] border border-gray-200 dark:border-gray-700 hover:shadow-md cursor-default"
                   }`}
                   onClick={() => aoClicarNotificacao(n.id, lida)}
                 >
@@ -341,11 +388,11 @@ export default function Notificacoes() {
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
                         <h3
-                          className={`font-semibold text-[#111] text-left truncate ${
+                          className={`font-semibold text-[#111] dark:text-white text-left truncate ${
                             lida ? "opacity-80" : ""
                           }`}
                         >
-                          {n.title}
+                          {removeEmojis(n.title)}
                         </h3>
 
                         <div className="flex items-center gap-2 text-xs">
@@ -356,7 +403,7 @@ export default function Notificacoes() {
                             </span>
                           )}
                           {textoData && (
-                            <span className="text-gray-500">
+                            <span className="text-gray-500 dark:text-gray-400">
                               {textoData}
                             </span>
                           )}
@@ -364,11 +411,11 @@ export default function Notificacoes() {
                       </div>
 
                       <p
-                        className={`text-sm text-gray-700 mt-1 leading-relaxed text-left ${
+                        className={`text-sm text-gray-700 dark:text-gray-300 mt-1 leading-relaxed text-left ${
                           lida ? "opacity-75" : ""
                         }`}
                       >
-                        {n.body}
+                        {removeEmojis(n.body)}
                       </p>
                     </div>
 
@@ -377,8 +424,8 @@ export default function Notificacoes() {
                       {!lida && (
                         <button
                           onClick={() => marcarComoLidaLocal(n.id)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 text-[11px] font-medium rounded-full border border-gray-300 bg-white
-                                     hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#7c0c15]/30"
+                          className="inline-flex items-center gap-1.5 px-3 py-1 text-[11px] font-medium rounded-full border border-gray-300 bg-white dark:bg-[#18181b] text-[#111] dark:text-white
+                                     hover:bg-gray-50 dark:hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-[#7c0c15]/30"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -396,7 +443,7 @@ export default function Notificacoes() {
                         </button>
                       )}
 
-                      <button
+                        <button
                         onClick={(e) => {
                           e.stopPropagation();
                           e.preventDefault();
@@ -404,12 +451,16 @@ export default function Notificacoes() {
                         }}
                         onPointerDown={(e) => e.stopPropagation()}
                         onPointerUp={(e) => e.stopPropagation()}
-                        className="p-2 rounded-lg bg-white border border-red-300 shadow-sm
-                                   hover:bg-red-50 hover:border-red-400 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-red-300 transition-all"
+                        className="p-2 rounded-lg bg-white dark:bg-[#18181b] border border-red-300 dark:border-red-700 shadow-sm text-[#111] dark:text-white
+                                   hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-400 dark:hover:border-red-600 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-red-300 transition-all"
                         aria-label="Remover notificação"
                         title="Remover notificação"
-                      >
-                        <img src={lixeira} alt="remover" className="w-4 h-4" />
+                        >
+                        <img
+                          src={isDark ? lixeiraDark : lixeira}
+                          alt="remover"
+                          className="w-4 h-4"
+                        />
                       </button>
                     </div>
                   </div>

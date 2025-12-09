@@ -1,4 +1,5 @@
 import React, { useEffect, useLayoutEffect } from "react";
+import { applyThemeFromStorage } from "./utils/theme";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import AOS from "aos";
@@ -31,6 +32,7 @@ import SalasAlunos from "./pages/PaginaDosAlunos/SalasAlunos.jsx";
 import HomeProfessor from "./pages/PaginaDosProfessores/HomeProfessor.jsx";
 import SalasProfessores from "./pages/PaginaDosProfessores/SalasProfessores.jsx";
 import NovaTurma from "./pages/PaginaDosProfessores/NovaTurma.jsx";
+import PreCadastrarProfessor from "./pages/PaginaDosProfessores/precadastrar.jsx";
 import HomeCoordenador from "./pages/PaginaDosCoordenadores/HomeCoordenadores.jsx";
 import SalasCoordenadores from "./pages/PaginaDosCoordenadores/SalasCoordenadores.jsx";
 import HomeAdm from "./pages/PaginaDosAdm/HomeAdm.jsx";
@@ -95,13 +97,8 @@ export default function App() {
   const location = useLocation();
 
   useLayoutEffect(() => {
-    try {
-      const salvo = localStorage.getItem("theme") || "light";
-      if (salvo === "dark") document.documentElement.classList.add("dark");
-      else document.documentElement.classList.remove("dark");
-    } catch (e) {
-      console.error("Erro ao recuperar tema salvo:", e);
-    }
+    // Apply persisted theme globally on app mount
+    try { applyThemeFromStorage(); } catch {}
   }, []);
 
   useEffect(() => {
@@ -142,6 +139,7 @@ export default function App() {
           <Route path="/HomeProfessor" element={<PrivateRoute allowedRoles={["PROFESSOR", "ADMIN"]}><PageTransition><HomeProfessor /></PageTransition></PrivateRoute>} />
           <Route path="/salas-professores" element={<PrivateRoute allowedRoles={["PROFESSOR", "ADMIN"]}><PageTransition><SalasProfessores /></PageTransition></PrivateRoute>} />
           <Route path="/professores/turmas/nova" element={<PrivateRoute allowedRoles={["PROFESSOR", "ADMIN"]}><PageTransition><NovaTurma /></PageTransition></PrivateRoute>} />
+          <Route path="/professores/pre-cadastrar" element={<PrivateRoute allowedRoles={["PROFESSOR", "ADMIN"]}><PageTransition><PreCadastrarProfessor /></PageTransition></PrivateRoute>} />
 
           <Route path="/HomeCoordenador" element={<PrivateRoute allowedRoles={["COORDENADOR", "ADMIN"]}><PageTransition><HomeCoordenador /></PageTransition></PrivateRoute>} />
           <Route path="/salas-coordenadores" element={<PrivateRoute allowedRoles={["COORDENADOR", "ADMIN"]}><PageTransition><SalasCoordenadores /></PageTransition></PrivateRoute>} />

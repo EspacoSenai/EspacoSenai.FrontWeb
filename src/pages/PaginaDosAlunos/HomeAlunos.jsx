@@ -256,42 +256,83 @@ export default function HomeAlunos() {
           </div>
         </section>
 
-        <div className="border-t-2 border-gray-300 mx-8 mt-[0px] mb-3" />
+        <div className="border-t-2 border-gray-300 mx-8 mt-0 mb-3" />
 
-        {/* Espaços em destaque */}
-        <section className="w-full">
+        {/* ===== ESPAÇOS UTILIZADOS ===== */}
+        <section className="w-full" id="atalhos">
           <div className="max-w-6xl mx-auto px-5 sm:px-6 md:px-8 lg:px-10 py-8 md:py-10">
             <div className="flex items-center gap-3 mb-4">
               <span className="inline-block h-5 w-[6px] rounded-full bg-[#AE0000]" />
               <h2 className="text-[22px] sm:text-[24px] font-semibold text-[#1E1E1E] dark:text-white">
-                Espaços em <span className="text-[#AE0000]">Destaque</span>
+                Espaços <span className="text-[#AE0000]">Utilizados</span>
               </h2>
             </div>
 
             <div className="relative rounded-[14px] bg-[#E5E5E5] dark:bg-[#2A2A2A] p-3 sm:p-4 md:p-5 shadow-[inset_0_1px_0_rgba(0,0,0,0.05)]">
-              <div className="absolute right-0 top-0 bottom-0 w-3 rounded-r-[14px] bg-[#E5E5E5] dark:bg-[#2A2AA] z-10 pointer-events-none" />
-              <ArrowBtn onClick={nextPage} />
-
+              <div className="absolute left-0 top-0 bottom-0 w-3 rounded-l-[14px] bg-[#E5E5E5] dark:bg-[#2A2A2A] z-10 pointer-events-none" />
+              <div className="absolute right-0 top-0 bottom-0 w-3 rounded-r-[14px] bg-[#E5E5E5] dark:bg-[#2A2A2A] z-10 pointer-events-none" />
+              <button
+                type="button"
+                onClick={prevPage}
+                aria-label="Anterior"
+                className="absolute z-40 left-[-4px] md:left-[-15px] top-[48%] -translate-y-1/2 h-10 md:h-11 w-10 md:w-11 grid place-items-center rounded-full bg-transparent border-0 hover:scale-[1.06] active:scale-95 focus:outline-none select-none"
+                style={{ WebkitTapHighlightColor: "transparent" }}
+              >
+                <svg
+                  viewBox="0 0 20 37"
+                  className="w-5 h-5 text-[#1E1E1E] dark:text-white"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M18.625 35.375L1.75 18.5L18.625 1.625"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+              <button
+                type="button"
+                onClick={nextPage}
+                aria-label="Próximo"
+                className="absolute z-40 right-[-4px] md:right-[-5px] top-[48%] -translate-y-1/2 h-10 md:h-11 w-10 md:w-11 grid place-items-center rounded-full bg-transparent border-0 hover:scale-[1.06] active:scale-95 focus:outline-none select-none"
+                style={{ WebkitTapHighlightColor: "transparent" }}
+              >
+                <svg
+                  viewBox="0 0 20 37"
+                  className="w-5 h-5 text-[#1E1E1E] dark:text-white"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M1.375 1.625L18.25 18.5L1.375 35.375"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
               <div className="relative overflow-hidden">
                 <div
                   className="flex transition-transform duration-500 ease-[cubic-bezier(0.22,0.61,0.36,1)]"
                   style={{ transform: `translateX(-${page * 100}%)` }}
                 >
-                  <div className="w-full shrink-0">
-                    <div className="space-y-4 md:space-y-5">
-                      <Card {...pagesArr[0][0]} />
-                      <div className="h-px bg-gray-300 rounded-full mx-1" />
-                      <Card {...pagesArr[0][1]} />
+                  {pagesArr.map((pageItems, idx) => (
+                    <div key={idx} className="w-full shrink-0">
+                      <div className="space-y-4 md:space-y-5">
+                        <Card {...pageItems[0]} />
+                        <div className="h-px bg-gray-300 rounded-full mx-1" />
+                        {pageItems[1] ? (
+                          <Card {...pageItems[1]} />
+                        ) : (
+                          <div className="h-[200px]" />
+                        )}
+                      </div>
                     </div>
-                  </div>
-
-                  <div className="w-full shrink-0">
-                    <div className="space-y-4 md:space-y-5">
-                      <Card {...pagesArr[1][0]} />
-                      <div className="h-px bg-gray-300 rounded-full mx-1" />
-                      <Card {...pagesArr[1][1]} />
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
 
@@ -299,17 +340,18 @@ export default function HomeAlunos() {
                 {Array.from({ length: pagesCount }).map((_, i) => (
                   <span
                     key={i}
-                    className={`h-2 w-2 rounded-full transition ${
-                      page === i
-                        ? "bg-[#AE0000]"
-                        : "bg-gray-400/70 dark:bg-gray-500"
-                    }`}
+                    className={`h-2 w-2 rounded-full transition ${page === i
+                      ? "bg-[#AE0000]"
+                      : "bg-gray-400/70 dark:bg-gray-500"
+                      }`}
                   />
                 ))}
               </div>
             </div>
           </div>
         </section>
+
+        <div className="border-t-2 border-gray-300 mx-8 mt-0 mb-3" />
 
         {/* Lembretes – componente separado */}
         <LembretesReservas />

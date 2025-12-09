@@ -182,7 +182,7 @@ export default function CodigoConvidados({
             type="button"
             onClick={adicionarConvidado}
             className="w-10 h-10 sm:w-9 sm:h-9 md:w-8 md:h-8 flex items-center justify-center
-                       border border-gray-300 bg-white text-black rounded-md text-lg md:text-base
+                       border border-gray-300 bg-white text-black dark:text-white rounded-md text-lg md:text-base
                        outline-none hover:bg-[#AE0000] hover:text-white transition-colors duração-150 disabled:opacity-40"
             disabled={convidados.length >= maxConvidados}
             title="Adicionar convidado"
@@ -201,11 +201,11 @@ export default function CodigoConvidados({
             aria-label={selecionados.size === 0 ? "Selecione para remover" : "Remover selecionados"}
             title={selecionados.size === 0 ? "Selecione para remover" : "Remover selecionados"}
             className="group w-10 h-10 sm:w-9 sm:h-9 md:w-8 md:h-8 flex items-center justify-center
-                       border border-gray-300 bg-white rounded-md outline-none
+                       border border-gray-300 bg-white dark:bg-[#111] rounded-md outline-none
                        transition-colors duration-150 hover:bg-[#AE0000] focus-visible:ring-2 focus-visible:ring-[#AE0000]"
           >
             
-            <span className="text-black group-hover:text-white">
+            <span className="text-black dark:text-white group-hover:text-white">
               <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 md:w-4 md:h-4" aria-hidden="true">
                 <path d="M9 3v1H4v2h1v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V6h1V4h-5V3H9Zm-2 3h10v13H7V6Zm2 2v9h2V8H9Zm4 0v9h2V8h-2Z" />
               </svg>

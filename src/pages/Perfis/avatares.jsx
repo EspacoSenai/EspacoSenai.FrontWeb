@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import setaLeft from "../../assets/setaleft.svg";
+import setawhiteleft from "../../assets/setawhiteleft.svg";
 import avatar1 from "../../assets/avatar1.svg";
 import avatar2 from "../../assets/avatar2.svg";
 import avatar3 from "../../assets/avatar3.svg";
@@ -32,6 +33,7 @@ const avatars = [
 export default function Avatares() {
   const navigate = useNavigate();
   const [selected, setSelected] = useState(null);
+  const isDark = document.documentElement.classList.contains('dark');
 
   function handleConfirm() {
     const found = avatars.find((a) => a.id === selected);
@@ -55,7 +57,7 @@ export default function Avatares() {
                      hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#AE0000]"
           aria-label="Voltar"
         >
-          <img src={setaLeft} alt="Voltar" className="w-9 h-7 block" />
+          <img src={isDark ? setawhiteleft : setaLeft} alt="Voltar" className="w-9 h-7 block" />
         </button>
         <h1 className="text-black text-xl font-medium">Avatar</h1>
       </div>

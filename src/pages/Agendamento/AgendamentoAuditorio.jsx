@@ -606,7 +606,7 @@ export default function AgendamentoAuditorio() {
           <button
             type="button"
             onClick={cancelar}
-            className="px-6 py-3 rounded-md bg-[#EDEDED] text-[#1E1E1E] outline-none focus:ring-0 hover:bg-[#AE0000] hover:text-white transition-colors duration-150"
+            className="px-6 py-3 rounded-md bg-[#EDEDED] dark:bg-[#1a1a1a] text-[#1E1E1E] dark:text-white outline-none focus:ring-0 hover:bg-[#AE0000] hover:text-white transition-colors duration-150"
           >
             Cancelar
           </button>

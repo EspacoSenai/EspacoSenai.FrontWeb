@@ -1,83 +1,144 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 import OndaLandingpage from "../../assets/ondaLandinpage.svg";
 import OndaGestao from "../../assets/ondagestaoalunos.svg";
 import Header from "../../components/Home/HeaderGlobal";
 
+import { buscarEstudantes } from "../../service/usuario";
+import { buscarTurmas } from "../../service/turma";
+
 const GestaoDeAlunos = () => {
-  // Busca e dados (mock)
+  const navigate = useNavigate();
+
   const [query, setQuery] = useState("");
+  const [alunosData, setAlunosData] = useState([]);
+  const [turmas, setTurmas] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [erro, setErro] = useState("");
 
-  const alunosData = useMemo(
-    () => [
-      {
-        id: 1,
-        nome: "Gabriela Almeida",
-        email: "gabi@email.com",
-        statusReserva: "Pendente",
-        statusAluno: "Ativo",
-        turma: "Seduc1",
-      },
-      {
-        id: 2,
-        nome: "João Pedro",
-        email: "joao@email.com",
-        statusReserva: "Confirmada",
-        statusAluno: "Ativo",
-        turma: "Seduc1",
-      },
-      {
-        id: 3,
-        nome: "Marina Costa",
-        email: "marina@email.com",
-        statusReserva: "Pendente",
-        statusAluno: "Ativo",
-        turma: "Seduc2",
-      },
-      {
-        id: 4,
-        nome: "Rafael Souza",
-        email: "rafa@email.com",
-        statusReserva: "Cancelada",
-        statusAluno: "Inativo",
-        turma: "Seduc2",
-      },
-      {
-        id: 5,
-        nome: "Bianca Lima",
-        email: "bianca@email.com",
-        statusReserva: "Confirmada",
-        statusAluno: "Ativo",
-        turma: "FIC",
-      },
-      {
-        id: 6,
-        nome: "Carlos Nunes",
-        email: "carlos@email.com",
-        statusReserva: "Pendente",
-        statusAluno: "Ativo",
-        turma: "Seduc1",
-      },
-      {
-        id: 7,
-        nome: "Ana Silva",
-        email: "ana@email.com",
-        statusReserva: "Confirmada",
-        statusAluno: "Ativo",
-        turma: "FIC",
-      },
-      {
-        id: 8,
-        nome: "Pedro Santos",
-        email: "pedro@email.com",
-        statusReserva: "Pendente",
-        statusAluno: "Ativo",
-        turma: "Seduc2",
-      },
-    ],
-    []
-  );
+  // -------------------- helper: status pelas notificações --------------------
+  function extrairStatusReservaDoAluno(estudanteObj) {
+    const notificacoes = Array.isArray(estudanteObj?.notificacoes)
+      ? estudanteObj.notificacoes
+      : [];
 
+    if (!notificacoes.length) return "Sem reserva";
+
+    for (let i = notificacoes.length - 1; i >= 0; i--) {
+      const notif = notificacoes[i];
+      const titulo = String(notif?.titulo || "").toUpperCase();
+      const mensagem = String(notif?.mensagem || "").toUpperCase();
+      const texto = `${titulo} ${mensagem}`;
+
+      if (!texto.includes("RESERVA")) continue;
+
+      if (texto.includes("CANCELADA") || texto.includes("REJEITADA")) {
+        return "Cancelada";
+      }
+
+      if (texto.includes("APROVADA") || texto.includes("CONFIRMADA")) {
+        return "Confirmada";
+      }
+
+      if (texto.includes("CRIADA") || texto.includes("PENDENTE")) {
+        return "Pendente";
+      }
+    }
+
+    return "Sem reserva";
+  }
+
+  // -------------------- carregamento inicial --------------------
+  useEffect(() => {
+    let vivo = true;
+
+    (async () => {
+      try {
+        setLoading(true);
+        setErro("");
+
+        const [respAlunos, respTurmas] = await Promise.all([
+          buscarEstudantes(),
+          buscarTurmas(),
+        ]);
+
+        if (!vivo) return;
+
+        const arrAlunos = Array.isArray(respAlunos)
+          ? respAlunos
+          : Array.isArray(respAlunos?.data)
+          ? respAlunos.data
+          : [];
+
+        const arrTurmas = Array.isArray(respTurmas)
+          ? respTurmas
+          : Array.isArray(respTurmas?.data)
+          ? respTurmas.data
+          : [];
+
+        setTurmas(arrTurmas);
+
+        const mapaAlunos = new Map();
+        arrAlunos.forEach((a) => {
+          if (a && a.id != null) mapaAlunos.set(a.id, a);
+        });
+
+        const lista = [];
+
+        arrTurmas.forEach((turma) => {
+          const nomeTurma = turma.nome || turma.codigoacesso || "Turma";
+
+          const estudantesTurma = Array.isArray(turma.estudantesIds)
+            ? turma.estudantesIds
+            : [];
+
+          estudantesTurma.forEach((item) => {
+            let alunoId = null;
+            let alunoOrigem = null;
+
+            if (typeof item === "number") {
+              alunoId = item;
+              alunoOrigem = mapaAlunos.get(alunoId);
+            } else if (item && item.id != null) {
+              alunoId = item.id;
+              alunoOrigem = mapaAlunos.get(alunoId) || item;
+            }
+
+            if (!alunoId || !alunoOrigem) return;
+
+            const statusReserva = extrairStatusReservaDoAluno(item);
+
+            lista.push({
+              id: alunoOrigem.id,
+              nome: alunoOrigem.nome || alunoOrigem.email || "Aluno",
+              email: alunoOrigem.email || "",
+              statusReserva,
+              statusAluno: alunoOrigem.status || "ATIVO",
+              turma: nomeTurma,
+              turmaNome: nomeTurma,
+            });
+          });
+        });
+
+        setAlunosData(lista);
+      } catch (e) {
+        console.error("[GestaoDeAlunos] Erro ao carregar dados:", e);
+        if (!vivo) return;
+        setErro("Não foi possível carregar os alunos por turma.");
+        setAlunosData([]);
+        setTurmas([]);
+      } finally {
+        if (vivo) setLoading(false);
+      }
+    })();
+
+    return () => {
+      vivo = false;
+    };
+  }, []);
+
+  // -------------------- filtros / grupos --------------------
   const alunosFiltrados = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return alunosData;
@@ -89,21 +150,29 @@ const GestaoDeAlunos = () => {
   }, [query, alunosData]);
 
   const grupos = useMemo(() => {
-    return alunosFiltrados.reduce((acc, a) => {
-      acc[a.turma] = acc[a.turma] || [];
-      acc[a.turma].push(a);
+    const mapa = alunosFiltrados.reduce((acc, a) => {
+      const key = a.turmaNome || a.turma;
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(a);
       return acc;
     }, {});
-  }, [alunosFiltrados]);
 
+    turmas.forEach((t) => {
+      const nome = t.nome || t.codigoacesso || "Turma";
+      if (!mapa[nome]) mapa[nome] = [];
+    });
+
+    return mapa;
+  }, [alunosFiltrados, turmas]);
+
+  // -------------------- estilos de status --------------------
   const statusBg = (s) =>
-    (
-      {
-        Pendente: "bg-red-700",
-        Confirmada: "bg-green-600",
-        Cancelada: "bg-zinc-600",
-      }[s] || "bg-zinc-500"
-    );
+    ({
+      Pendente: "bg-red-700",
+      Confirmada: "bg-green-600",
+      Cancelada: "bg-zinc-600",
+      "Sem reserva": "bg-gray-500",
+    }[s] || "bg-gray-500");
 
   const InitialAvatar = ({ name }) => {
     const initials = name
@@ -119,7 +188,7 @@ const GestaoDeAlunos = () => {
     );
   };
 
-  // Carrossel por turma com barra de progresso
+  // -------------------- carrossel por turma --------------------
   const GroupCarousel = ({ turma, items }) => {
     const ref = useRef(null);
     const [pct, setPct] = useState(0);
@@ -148,14 +217,16 @@ const GestaoDeAlunos = () => {
           ref={ref}
           className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-2 scroll-smooth no-scrollbar"
         >
-          {items.map((a) => (
+          {items.length === 0 ? (
+            <div className="text-sm text-gray-500 dark:text-gray-400 py-4">
+              Nenhum aluno nesta turma.
+            </div>
+          ) : (
+            items.map((a) => (
             <div
               key={a.id}
               className="group relative snap-start flex-shrink-0 w-96 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-black shadow-sm transition-all duration-200 overflow-hidden hover:shadow-lg hover:scale-[1.02]"
             >
-              {/* Overlay do card */}
-              <div className="pointer-events-none absolute inset-0 bg-black/5 dark:bg-white/10 opacity-0 transition-opacity duration-200 group-hover:opacity-100" />
-
               <div className="p-7 sm:p-8 relative z-10 flex flex-col items-center text-center gap-4 sm:gap-5">
                 <InitialAvatar name={a.nome} />
 
@@ -172,18 +243,16 @@ const GestaoDeAlunos = () => {
                 </div>
 
                 <div className="w-full space-y-2 text-sm">
-                  <div className="flex items-center justify-between text-gray-900 dark:text-white">
-                    <span className="truncate">
-                      Email:{" "}
-                      <span className="text-gray-500 dark:text-gray-400">
-                        {a.email}
-                      </span>
+                  <div className="text-gray-900 dark:text-white">
+                    Email:{" "}
+                    <span className="text-gray-500 dark:text-gray-400">
+                      {a.email || "-"}
                     </span>
-                    <span>
-                      Status:{" "}
-                      <span className="text-gray-500 dark:text-gray-400">
-                        {a.statusAluno}
-                      </span>
+                  </div>
+                  <div className="text-gray-900 dark:text-white">
+                    Status:{" "}
+                    <span className="text-gray-500 dark:text-gray-400">
+                      {a.statusAluno}
                     </span>
                   </div>
                   <div className="text-gray-900 dark:text-white">
@@ -194,22 +263,17 @@ const GestaoDeAlunos = () => {
                   </div>
                 </div>
 
-                <div className="w-full">
-                  <button
-                    type="button"
-                    className="group relative overflow-hidden w-[150px] h-[30px] px-5 py-0 flex items-center justify-center rounded-md bg-gray-100 dark:bg-zinc-900 text-gray-800 dark:text-gray-100 border border-gray-300 dark:border-zinc-700 transition-transform duration-200 ease-out hover:scale-[1.05] mx-auto"
-                    onClick={() => alert(`Editar ${a.nome}`)}
-                  >
-                    {/* Overlay do botão */}
-                    <span className="pointer-events-none absolute inset-0 bg-black/5 dark:bg-white/10 opacity-0 transition-opacity duration-200 group-hover:opacity-100 rounded-md" />
-                    <span className="relative -translate-y-[1px]">
-                      Editar
-                    </span>
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  className="w-[150px] h-[30px] mt-2 px-5 py-0 rounded-md bg-gray-100 dark:bg-zinc-900 text-gray-800 dark:text-gray-100 border border-gray-300 dark:border-zinc-700 transition-transform duration-200 ease-out hover:scale-[1.05]"
+                  onClick={() => navigate(`/editarAluno/${a.id}`)}
+                >
+                  Editar
+                </button>
               </div>
             </div>
-          ))}
+          ))
+          )}
         </div>
 
         {/* Barra de progresso */}
@@ -225,45 +289,30 @@ const GestaoDeAlunos = () => {
     );
   };
 
+  // -------------------- render --------------------
   return (
-    <div className="min-h-screen flex flex-col bg-white dark:bg-black text-gray-900 dark:text-white transition-colors duration-300">
-      {/* Header global, com tema e menu centralizados */}
+    <div className="min-h-screen flex flex-col bg-white dark:bg-black text-gray-900 dark:text-white overflow-x-hidden transition-colors duration-300">
       <Header />
 
-      {/* Main */}
       <main className="flex-1 flex flex-col">
-        {/* Onda da Landing Page */}
-        <div className="w-full overflow-hidden mt-10 bg-white dark:bg-black">
-          <img
-            src={OndaLandingpage}
-            alt="Onda decorativa"
-            className="w-full h-auto block"
-            draggable={false}
-          />
+        <div className="w-full overflow-hidden mt-10">
+          <img src={OndaLandingpage} alt="Onda" className="w-full" />
         </div>
 
-        {/* Hero */}
-        <section className="flex-1 bg-red-700 text-white px-4 sm:px-8 py-12 sm:py-16 lg:py-20 text-center flex items-center justify-center mt-10">
+        <section className="flex-1 bg-red-700 text-white px-4 sm:px-8 py-12 text-center flex items-center justify-center mt-10">
           <div className="max-w-2xl mx-auto">
-            <h1 className="text-2xl sm:text-3xl font-semibold mb-6 tracking-tight text-center">
+            <h1 className="text-2xl sm:text-3xl font-semibold mb-4">
               Gestão de alunos
             </h1>
-            <p className="text-base sm:text-lg font-normal leading-relaxed mb-3 text-center md:transform md:-translate-y-1 md:-translate-x-9 whitespace-normal md:whitespace-nowrap">
-              Aqui você pode acompanhar e organizar as informações dos alunos
-              com facilidade!
-            </p>
-            <p className="text-base sm:text-lg font-normal leading-relaxed text-center">
-              Mantenha tudo em dia de um jeito simples e rápido.
+            <p className="text-base sm:text-lg">
+              Acompanhe as informações e status das reservas de cada turma!
             </p>
           </div>
         </section>
 
-        {/* Lista e gestão de alunos */}
         <section className="w-full px-4 sm:px-6 lg:px-10 py-8">
           <div className="max-w-7xl mx-auto space-y-8">
-            {/* Busca */}
-            <div className="w-full">
-              <div className="relative w-full max-w-sm">
+            <div className="relative w-full max-w-sm">
                 <input
                   type="text"
                   value={query}
@@ -286,33 +335,52 @@ const GestaoDeAlunos = () => {
                   />
                 </svg>
               </div>
-            </div>
 
-            {/* Grupos por turma */}
             <div className="space-y-10">
-              {Object.keys(grupos).length === 0 && (
-                <p className="text-gray-500 dark:text-gray-400">
-                  Nenhum resultado encontrado.
+              {loading && (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-700 mx-auto"></div>
+                  <p className="mt-4 text-gray-500 dark:text-gray-400">
+                    Carregando alunos...
+                  </p>
+                </div>
+              )}
+
+              {erro && (
+                <p className="text-red-600 dark:text-red-400 text-center">
+                  {erro}
                 </p>
               )}
-              {Object.entries(grupos).map(([turma, items]) => (
-                <GroupCarousel key={turma} turma={turma} items={items} />
-              ))}
+
+              {!loading &&
+                !erro &&
+                Object.keys(grupos).length === 0 && (
+                  <p className="text-gray-500 dark:text-gray-400 text-center">
+                    Nenhum aluno encontrado.
+                  </p>
+                )}
+
+              {!loading &&
+                !erro &&
+                Object.entries(grupos).map(([turmaNome, items]) => (
+                  <GroupCarousel
+                    key={turmaNome}
+                    turma={turmaNome}
+                    items={items}
+                  />
+                ))}
             </div>
           </div>
         </section>
       </main>
 
-      {/* Footer */}
       <footer className="w-full bg-white dark:bg-black">
-        <div className="w-full overflow-hidden">
-          <img
-            src={OndaGestao}
-            alt="Onda Gestão de Alunos"
-            className="w-full h-auto block"
-            draggable={false}
-          />
-        </div>
+        <img
+          src={OndaGestao}
+          alt="Onda Gestão de Alunos"
+          className="w-full h-auto block"
+          draggable={false}
+        />
       </footer>
     </div>
   );

@@ -5,11 +5,8 @@ import { api } from "../../service/api";
 
 const COR = "#AE0000";
 
-// 🔹 Lista de cargos com ID igual ao banco
+// Lista de cargos - apenas Estudante para alunos
 const CARGOS = [
-  { value: "admin", label: "Administrador", roleId: 1 },
-  { value: "coord", label: "Coordenador", roleId: 2 },
-  { value: "prof", label: "Professor", roleId: 3 },
   { value: "aluno", label: "Estudante", roleId: 4 },
 ];
 
@@ -25,7 +22,7 @@ export default function EditarAluno() {
     email: "",
     senha: "",
     status: "ATIVO",
-    cargo: "", // 🔹 novo campo para controle do select
+    cargo: "", // novo campo para controle do select
     rolesIds: [4], // padrão: estudante
   });
 
@@ -33,7 +30,7 @@ export default function EditarAluno() {
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState({ type: "", message: "" });
 
-  // 🔹 Carrega dados do aluno
+  // Carrega dados do aluno
   useEffect(() => {
     if (alunoState) {
       const cargoEncontrado = CARGOS.find((c) =>
@@ -87,7 +84,7 @@ export default function EditarAluno() {
     if (feedback.type) setFeedback({ type: "", message: "" });
   };
 
-  // 🔹 Atualiza role quando muda o cargo
+  // Atualiza role quando muda o cargo
   const atualizarCargo = (value) => {
     const cargoObj = CARGOS.find((c) => c.value === value);
     setForm((prev) => ({
@@ -97,7 +94,7 @@ export default function EditarAluno() {
     }));
   };
 
-  // 🔹 Salvar alterações
+  // Salvar alterações
   const salvar = async (e) => {
     e.preventDefault();
     if (!form.nome.trim() || !form.email.trim()) {
@@ -143,9 +140,9 @@ export default function EditarAluno() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5] flex flex-col">
+    <div className="min-h-screen bg-[#F5F5F5] dark:bg-[#0f0f10] flex flex-col">
       {/* HEADER */}
-      <header className="w-full border-b border-[#960000] bg-[#AE0000] text-white">
+      <header className="w-full border-b border-[#960000] bg-[#AE0000] dark:bg-[#8a0303] text-white">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
           <button
             onClick={() => navigate(-1)}
@@ -164,19 +161,19 @@ export default function EditarAluno() {
           <div className="text-center text-sm text-gray-700">Carregando...</div>
         ) : (
           <div className="w-full max-w-xl">
-            <div className="bg-white rounded-2xl shadow-md border border-gray-200 px-6 py-6 md:px-8 md:py-8">
-              <h2 className="text-lg font-semibold text-gray-900 mb-1">
+            <div className="bg-white dark:bg-[#18181b] rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 px-6 py-6 md:px-8 md:py-8">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
                 Informações do aluno
               </h2>
-              <p className="text-xs text-gray-500 mb-4">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
                 Atualize os dados cadastrais e o cargo do aluno.
               </p>
 
               {feedback.message && (
                 <div
-                  className={`mb-4 rounded-lg px-4 py-2 text-sm ${feedback.type === "success"
-                    ? "bg-green-100 text-green-800 border border-green-200"
-                    : "bg-red-100 text-red-800 border border-red-200"
+                    className={`mb-4 rounded-lg px-4 py-2 text-sm ${feedback.type === "success"
+                    ? "bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-300 border border-green-200 dark:border-green-700"
+                    : "bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-700"
                     }`}
                 >
                   {feedback.message}
@@ -197,7 +194,7 @@ export default function EditarAluno() {
                     type="text"
                     value={form.nome}
                     onChange={(e) => atualizarCampo("nome", e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 bg-[#EEEEEE] px-3 py-2.5 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-[#AE0000] focus:border-[#AE0000]"
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-[#EEEEEE] dark:bg-[#222] px-3 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-[#AE0000] focus:border-[#AE0000]"
                     placeholder="Nome completo do aluno"
                   />
                 </div>
@@ -215,7 +212,7 @@ export default function EditarAluno() {
                     type="email"
                     value={form.email}
                     onChange={(e) => atualizarCampo("email", e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 bg-[#EEEEEE] px-3 py-2.5 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-[#AE0000] focus:border-[#AE0000]"
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-[#EEEEEE] dark:bg-[#222] px-3 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-[#AE0000] focus:border-[#AE0000]"
                     placeholder="email@exemplo.com"
                   />
                 </div>
@@ -233,7 +230,7 @@ export default function EditarAluno() {
                     type="password"
                     value={form.senha}
                     onChange={(e) => atualizarCampo("senha", e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 bg-[#EEEEEE] px-3 py-2.5 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-[#AE0000] focus:border-[#AE0000]"
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-[#EEEEEE] dark:bg-[#222] px-3 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-[#AE0000] focus:border-[#AE0000]"
                     placeholder="Nova senha (opcional)"
                   />
                   <p className="mt-1 text-[11px] text-gray-500">
@@ -253,14 +250,14 @@ export default function EditarAluno() {
                     id="status"
                     value={form.status}
                     onChange={(e) => atualizarCampo("status", e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 bg-[#EEEEEE] px-3 py-2.5 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-[#AE0000] focus:border-[#AE0000]"
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-[#EEEEEE] dark:bg-[#222] px-3 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:ring-2 focus:ring-[#AE0000] focus:border-[#AE0000]"
                   >
                     <option value="ATIVO">ATIVO</option>
                     <option value="BLOQUEADO">BLOQUEADO</option>
                   </select>
                 </div>
 
-                {/* CARGO */}
+                {/* CARGO - Fixo como Estudante */}
                 <div>
                   <label
                     htmlFor="cargo"
@@ -268,18 +265,9 @@ export default function EditarAluno() {
                   >
                     Cargo
                   </label>
-                  <select
-                    id="cargo"
-                    value={form.cargo}
-                    onChange={(e) => atualizarCargo(e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 bg-[#EEEEEE] px-3 py-2.5 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-[#AE0000] focus:border-[#AE0000]"
-                  >
-                    {CARGOS.map((c) => (
-                      <option key={c.value} value={c.value}>
-                        {c.label}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-[#2a2a2e] px-3 py-2.5 text-sm text-gray-700 dark:text-gray-300">
+                    Estudante
+                  </div>
                 </div>
 
                 {/* BOTÕES */}
@@ -287,7 +275,7 @@ export default function EditarAluno() {
                   <button
                     type="button"
                     onClick={() => navigate(-1)}
-                    className="px-4 py-2 text-sm rounded-md border border-gray-300 bg-gray-200 text-gray-800 hover:bg-gray-300 transition"
+                    className="px-4 py-2 text-sm rounded-md border border-gray-300 dark:border-gray-700 bg-gray-200 dark:bg-[#222] text-gray-800 dark:text-white hover:bg-gray-300 dark:hover:bg-[#2a2a2e] transition"
                   >
                     Cancelar
                   </button>

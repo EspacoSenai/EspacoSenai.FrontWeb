@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ adicionado
+import { useNavigate } from "react-router-dom"; // adicionado
 
 import sucessoIcon from "../../assets/sucesso.svg";
 
@@ -100,7 +100,7 @@ function gerarSlotsComPasso15(faixas) {
 }
 
 export default function AgendamentoPS5() {
-  const navigate = useNavigate(); // ✅
+  const navigate = useNavigate(); // navegação
   const [semanaSelecionada, setSemanaSelecionada] = useState("essa");
   const [diaSelecionado, setDiaSelecionado] = useState(0);
   const [horaInicio, setHoraInicio] = useState(null);
@@ -110,7 +110,7 @@ export default function AgendamentoPS5() {
   const [horaTerminoFiltro, setHoraTerminoFiltro] = useState("");
   const [catalogoPS5, setCatalogoPS5] = useState([]);
   const [ambienteId, setAmbienteId] = useState(null);
-  const [loading, setLoading] = useState(false); // ✅
+  const [loading, setLoading] = useState(false); // loading
 
   const [modal, setModal] = useState({
     aberto: false,
@@ -248,7 +248,7 @@ export default function AgendamentoPS5() {
     horariosTerminoDisponiveis.length > 0;
 
   function cancelar() {
-    navigate(-1); // ✅ volta pra tela anterior
+    navigate(-1); // volta pra tela anterior
   }
 
   async function confirmar() {
@@ -355,7 +355,7 @@ export default function AgendamentoPS5() {
             type="button"
             onClick={cancelar}
             disabled={loading}
-            className={`px-6 py-3 rounded-md bg-[#EDEDED] text-[#1E1E1E] ${
+            className={`px-6 py-3 rounded-md bg-[#EDEDED] dark:bg-[#1a1a1a] text-[#1E1E1E] dark:text-white ${
               loading
                 ? "opacity-60 cursor-not-allowed"
                 : "hover:bg-[#AE0000] hover:text-white"

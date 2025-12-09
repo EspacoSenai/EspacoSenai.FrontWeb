@@ -139,7 +139,7 @@ function gerarSlotsComPasso15(faixas) {
 }
 
 export default function AgendamentoComputadores() {
-  const navigate = useNavigate(); // ✅ navegação
+  const navigate = useNavigate(); // navegação
   const [semanaSelecionada, setSemanaSelecionada] = useState("essa");
   const [diaSelecionado, setDiaSelecionado] = useState(0);
 
@@ -154,7 +154,7 @@ export default function AgendamentoComputadores() {
   const [catalogoComputadores, setCatalogoComputadores] = useState([]);
   const [carregandoCatalogos, setCarregandoCatalogos] = useState(false);
 
-  const [loading, setLoading] = useState(false); // ✅ loading
+  const [loading, setLoading] = useState(false); // loading
 
   const [modal, setModal] = useState({
     aberto: false,
@@ -224,7 +224,7 @@ export default function AgendamentoComputadores() {
   }
 
   function cancelar() {
-    navigate(-1); // ✅ volta pra tela anterior
+    navigate(-1); // volta pra tela anterior
   }
 
   useEffect(() => {
@@ -350,7 +350,7 @@ export default function AgendamentoComputadores() {
 
   async function confirmar() {
     if (loading) return;
-    setLoading(true); // ✅ começa loading
+    setLoading(true); // começa loading
 
     try {
       if (!horaInicio || !computadorSelecionado) {
@@ -458,7 +458,7 @@ export default function AgendamentoComputadores() {
         `Erro ao comunicar com o servidor. [${err?.status || ""}]`;
       abrirModal("error", "Falha ao reservar", msg);
     } finally {
-      setLoading(false); // ✅ termina loading
+      setLoading(false); // termina loading
     }
   }
 
@@ -604,7 +604,7 @@ export default function AgendamentoComputadores() {
             type="button"
             onClick={cancelar}
             disabled={loading}
-            className={`px-6 py-3 rounded-md bg-[#EDEDED] text-[#1E1E1E] ${
+            className={`px-6 py-3 rounded-md bg-[#EDEDED] dark:bg-[#1a1a1a] text-[#1E1E1E] dark:text-white ${
               loading
                 ? "opacity-60 cursor-not-allowed"
                 : "hover:bg-[#AE0000] hover:text-white"

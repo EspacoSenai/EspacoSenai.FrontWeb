@@ -72,7 +72,7 @@ export default function Header() {
               aria-label="Fechar menu"
               className="w-9 h-9 inline-flex items-center justify-center rounded-md hover:bg-black/5 transition bg-transparent group"
             >
-              <span className="text-black">
+              <span className="text-black dark:text-white">
                 <svg
                   viewBox="0 0 24 24"
                   fill="currentColor"

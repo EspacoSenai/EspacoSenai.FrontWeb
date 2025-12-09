@@ -1,6 +1,7 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { api } from "../../service/api";
+import { buscarCoordenadores } from "../../service/usuario";
 import setinha from "../../assets/sairdomodal.svg";
 
 const FONT_BASE = "font-poppins";
@@ -23,14 +24,34 @@ export default function CriarSala() {
   // Campos do back
   const [nome, setNome] = useState("");
   const [descricao, setDescricao] = useState("");
-  const [disponibilidade, setDisponibilidade] = useState(""); // DISPONIVEL / INDISPONIVEL
+  const [disponibilidade, setDisponibilidade] = useState(""); 
   const [aprovacao, setAprovacao] = useState(""); // AUTOMATICA / MANUAL
   const [responsavelId, setResponsavelId] = useState("");
   const [qtdPessoas, setQtdPessoas] = useState("");
+  const [recurso, setRecurso] = useState("false"); 
 
+  const [coordenadores, setCoordenadores] = useState([]);
+  const [loadingCoords, setLoadingCoords] = useState(true);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState("");
+
+  // Buscar coordenadores ao carregar
+  useEffect(() => {
+    async function carregarCoordenadores() {
+      try {
+        setLoadingCoords(true);
+        const data = await buscarCoordenadores();
+        setCoordenadores(Array.isArray(data) ? data : []);
+      } catch (e) {
+        console.error("[CriarSala] Erro ao buscar coordenadores:", e);
+        setCoordenadores([]);
+      } finally {
+        setLoadingCoords(false);
+      }
+    }
+    carregarCoordenadores();
+  }, []);
 
   const formValido = useMemo(() => {
     if (!nome.trim()) return false;
@@ -58,17 +79,6 @@ export default function CriarSala() {
     setQtdPessoas(clamp(Math.floor(n), 1, 500));
   }
 
-  function handleResponsavel(e) {
-    const raw = e.target.value;
-    if (raw === "") {
-      setResponsavelId("");
-      return;
-    }
-    const n = Number(raw);
-    if (Number.isNaN(n)) return;
-    setResponsavelId(clamp(Math.floor(n), 1, 999999));
-  }
-
   async function criar(e) {
     e.preventDefault();
     if (!formValido || loading) return;
@@ -84,6 +94,7 @@ export default function CriarSala() {
       aprovacao,       // "AUTOMATICA" | "MANUAL"
       responsaveisIds: Number(responsavelId), // igual seu JSON de exemplo
       qtdPessoas: Number(qtdPessoas),
+      recurso: recurso === "true", // converte string para boolean
     };
 
     console.log("[CriarSala] payload:", payload);
@@ -101,6 +112,7 @@ export default function CriarSala() {
       setAprovacao("");
       setResponsavelId("");
       setQtdPessoas("");
+      setRecurso("false");
     } catch (err) {
       console.error("[CriarSala] erro ao criar ambiente:", err);
 
@@ -202,19 +214,52 @@ export default function CriarSala() {
                 </div>
               </div>
 
-              {/* Responsável */}
+              {/* Coordenador Responsável */}
               <div className="space-y-2 text-left w-full">
-                <label className={TXT_LABEL}>ID do responsável:</label>
-                <input
-                  type="number"
-                  min={1}
-                  className={CL_INPUT}
-                  value={responsavelId}
-                  onChange={handleResponsavel}
-                  placeholder="Ex.: 2"
-                />
+                <label className={TXT_LABEL}>Coordenador responsável:</label>
+                {loadingCoords ? (
+                  <p className="text-xs text-gray-500">Carregando coordenadores...</p>
+                ) : (
+                  <select
+                    className={CL_INPUT}
+                    value={responsavelId}
+                    onChange={(e) => setResponsavelId(e.target.value)}
+                  >
+                    <option value="">-- Selecione um coordenador --</option>
+                    {coordenadores.map((coord) => (
+                      <option key={coord.id} value={coord.id}>
+                        {coord.nome} (ID: {coord.id})
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              {/* Recurso */}
+              <div className="space-y-2 text-left w-full">
+                <p className={TXT_LABEL}>Recurso:</p>
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setRecurso("true")}
+                    className={`${CL_TAG} ${
+                      recurso === "true" ? CL_TAG_ON : CL_TAG_OFF
+                    }`}
+                  >
+                    True
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setRecurso("false")}
+                    className={`${CL_TAG} ${
+                      recurso === "false" ? CL_TAG_ON : CL_TAG_OFF
+                    }`}
+                  >
+                    False
+                  </button>
+                </div>
                 <p className="text-xs text-gray-500 mt-1">
-                  Use o ID do usuário responsável pelo ambiente.
+                  {recurso === "true" ? "É um recurso, tipo: bola de basquete, pc, mouse, raquete..." : "É uma sala"}
                 </p>
               </div>
             </div>

@@ -346,7 +346,7 @@ export default function AgendamentoQuadra() {
             onChange={setSemanaSelecionada}
           />
           <div className="hidden md:block" />
-          <div className="flex md:justify-end items-center gap-2 text-black dark:text:white">
+          <div className="flex md:justify-end items-center gap-2 text-black dark:text-white">
             <span className="font-medium mr-1">Data:</span>
             <SeletorDia
               dias={diasDaSemana}
@@ -391,7 +391,7 @@ export default function AgendamentoQuadra() {
             type="button"
             onClick={cancelar}
             disabled={loading}
-            className={`px-6 py-3 rounded-md bg-[#EDEDED] text-[#1E1E1E] ${
+            className={`px-6 py-3 rounded-md bg-[#EDEDED] dark:bg-[#1a1a1a] text-[#1E1E1E] dark:text-white ${
               loading
                 ? "opacity-60 cursor-not-allowed"
                 : "hover:bg-[#AE0000] hover:text-white"
