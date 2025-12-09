@@ -81,62 +81,154 @@ function formatDateBr(iso) {
   return `${d}/${m}/${y}`;
 }
 
-function TurmaCard({ turma }) {
-  const { id, titulo, duracao, datas, tipo, nome } = turma;
+function TurmaCardAdmin({ turma }) {
+  const {
+    id,
+    titulo,
+    duracao,
+    dataInicio,
+    dataTermino,
+    datas,
+    tipo,
+    nome,
+    curso,
+    capacidade,
+  } = turma || {};
+
+  const codigo =
+    turma?.codigoAcesso || turma?.codigo || turma?.codigoTurma || "—";
+  const tituloExib = titulo || nome || turma?.nomeTurma || `Turma #${id}`;
+  const inicioExib = dataInicio || dataInicio === 0 ? dataInicio : datas || "";
+  const terminoExib = dataTermino || turma?.dataTermino || "";
+  const cursoNome = curso?.nome || curso || turma?.cursoNome || "";
+  const capacidadeExib = capacidade || turma?.capacidade || turma?.capacidadeAlunos;
 
   return (
-    <div className="rounded-2xl border border-black/10 dark:border-white/10 bg-white dark:bg-[#151515] shadow-sm overflow-hidden h-full flex flex-col">
-      <div className="px-5 py-3 border-b border-black/10 dark:border-white/10 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <span
-            className="inline-block w-1.5 h-6 rounded-full"
-            style={{ background: COR }}
-          />
-          <h4 className="font-semibold text-[18px] text-[#1E1E1E] dark:text-white">
-            {titulo || "Módulo"}
-          </h4>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link to={`/editar-versala/${id}`}>
-            <button
-              type="button"
-              className="px-3 h-9 rounded-md text-sm font-semibold text-white hover:opacity-95 active:scale-[.99]"
-              style={{ background: COR }}
-            >
-              Editar
-            </button>
-          </Link>
-        </div>
+    <div className="w-full max-w-[520px] mx-auto rounded-2xl border border-neutral-200 overflow-hidden bg-white shadow-sm">
+      <div
+        className="relative rounded-t-lg px-6 py-3 text-white text-center"
+        style={{ backgroundColor: COR }}
+      >
+        <div className="font-semibold text-[18px]">{tituloExib}</div>
+        <div className="mt-1 text-[13px] opacity-95">Código: <span className="font-medium">{codigo}</span></div>
+
+        <Link to={`/editar-versala/${id}`} className="absolute right-3 top-3">
+          <button
+            type="button"
+            title="Editar turma"
+            className="w-9 h-9 rounded-md bg-black/80 text-white flex items-center justify-center shadow-sm hover:brightness-[.95]"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+            </svg>
+          </button>
+        </Link>
       </div>
 
-      <div className="p-5 grid grid-cols-2 sm:grid-cols-3 gap-4 flex-1">
+      <div className="p-5 grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <Lbl>Duração</Lbl>
-          <Input value={duracao} placeholder="Ex: 40 alunos" readOnly={true} />
+          <Input value={duracao || ""} placeholder="Ex: 40 alunos" readOnly={true} />
         </div>
+
         <div>
           <Lbl>Data de início</Lbl>
-          <Input
-            value={datas}
-            placeholder="Ex: 20/11/2025"
-            readOnly={true}
-          />
+          <Input value={inicioExib || ""} placeholder="Ex: 20/11/2025" readOnly={true} />
         </div>
+
         <div>
           <Lbl>Tipo</Lbl>
-          <Input
-            value={tipo}
-            placeholder="Ex: FIC"
-            readOnly={true}
-            className="uppercase"
-          />
+          <Input value={tipo || ""} placeholder="Ex: FIC" readOnly={true} className="uppercase" />
+        </div>
+
+        <div className="md:col-span-3">
+          <Lbl>Curso</Lbl>
+          <Input value={cursoNome || ""} placeholder="Nome do curso" readOnly={true} />
         </div>
       </div>
 
-      <div className="px-5 pb-5">
-        <Input value={nome} placeholder="Nome da Turma" readOnly={true} />
+      <div className="text-center text-[14px] bg-neutral-100 px-4 py-3 text-black">
+        {capacidadeExib ? `Capacidade: ${capacidadeExib} alunos` : "Capacidade não informada"}
       </div>
     </div>
+  );
+}
+function TurmaCardItem({ id, nome, codigo, curso, modalidade, dataInicio, dataTermino, capacidade, onEditar }) {
+  return (
+    <div className="w-full max-w-[520px] mx-auto">
+      <div className="rounded-xl border border-black/10 dark:border-white/10 bg-[#0F0F0F] dark:bg-[#121212] p-4 flex flex-col gap-2 shadow-sm">
+        <div className="relative flex items-start justify-between">
+          <div className="flex items-center gap-3">
+            <span className="inline-block w-1.5 h-6 rounded-full" style={{ background: COR }} />
+            <h4 className="text-sm font-semibold text-white">{nome || "Turma sem nome"}</h4>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-mono px-2 py-[3px] rounded-full text-white bg-red-600">{codigo || "—"}</span>
+            <Link to={`/editar-versala/${id}`}>
+              <button className="px-3 h-9 rounded-md text-sm font-semibold text-white bg-red-600 hover:brightness-[.95]">
+                Editar
+              </button>
+            </Link>
+          </div>
+        </div>
+
+      {/* tabela */}
+      <div className="border-x border-b rounded-b-lg border-neutral-200 overflow-hidden bg-white">
+        {/* cabeçalho */}
+        <div className="grid grid-cols-3 text-center text-[14px] font-semibold bg-white text-black">
+          <div className="p-3 border-r border-neutral-200">Duração</div>
+          <div className="p-3 border-r border-neutral-200">Curso</div>
+          <div className="p-3">Modalidade</div>
+        </div>
+
+        {/* linha de dados */}
+        <div className="grid grid-cols-3 text-[13px] bg-white text-black">
+          {/* duração */}
+          <div className="border-t border-r border-neutral-200 p-3 text-left">
+            <p>Início:</p>
+            <span className="inline-block mt-1 px-3 py-1 rounded-sm bg-neutral-100 border border-neutral-300 text-black">
+              {dataInicio || "—"}
+            </span>
+            <p className="mt-3">Fim:</p>
+            <span className="inline-block mt-1 px-3 py-1 rounded-sm bg-neutral-100 border border-neutral-300 text-black">
+              {dataTermino || "—"}
+            </span>
+          
+          {codigo && (
+            <span
+              className="text-[11px] font-mono px-2 py-[3px] rounded-full text-white"
+              style={{ backgroundColor: COR }}
+              title="Código de acesso da turma"
+            >
+              {codigo}
+            </span>
+          )}
+
+          </div>
+
+          <div className="border-t border-r border-neutral-200 p-3 flex items-center justify-center">
+            <span className="inline-block px-4 py-1 rounded-sm bg-neutral-100 border border-neutral-300 text-center text-black">
+              {curso || "—"}
+            </span>
+          </div>
+
+          {/* modalidade */}
+          <div className="border-t border-neutral-200 p-3 flex items-center justify-center">
+            <span className="inline-block px-4 py-1 rounded-sm bg-neutral-100 border border-neutral-300 text-black">
+              {modalidade || "—"}
+            </span>
+          </div>
+        </div>
+
+        {/* footer capacidade */}
+        <div className="text-center text-[14px] bg-neutral-100 px-4 py-3 text-black">
+          {capacidade
+            ? `Capacidade: ${capacidade} alunos`
+            : "Capacidade não informada"}
+        </div>
+      </div>
+    </div>
+  </div>
   );
 }
 
@@ -211,16 +303,7 @@ export default function SalasProfessores() {
         const data = await buscarTurmas();
         console.log("[SalasProfessores] turmas do back:", data);
 
-        const mapped = (data || []).map((t) => ({
-          id: t.id,
-          titulo: t.curso || "Módulo",
-          duracao: t.capacidade ? `${t.capacidade} alunos` : "—",
-          datas: formatDateBr(t.dataInicio),
-          tipo: t.modalidade || "—",
-          nome: t.nome || "",
-        }));
-
-        setTurmas(mapped);
+        setTurmas(Array.isArray(data) ? data : []);
       } catch (e) {
         console.error("[SalasProfessores] Erro ao buscar turmas:", e);
       }
@@ -352,9 +435,11 @@ export default function SalasProfessores() {
 
         <section className="max-w-6xl mx-auto px-5 sm:px-6 md:px-8 lg:px-10 mt-4">
           {list.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 auto-rows-fr">
+            <div className="flex flex-col gap-6 items-center">
               {list.map((t) => (
-                <TurmaCard key={t.id} turma={t} />
+                <div key={t.id || t.nome} className="w-full max-w-[720px]">
+                  <TurmaCardAdmin turma={t} />
+                </div>
               ))}
             </div>
           ) : (

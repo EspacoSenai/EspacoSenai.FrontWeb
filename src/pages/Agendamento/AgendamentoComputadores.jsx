@@ -8,6 +8,7 @@ import TrocaSemana from "../../components/ComponentsDeAgendamento/TrocaSemana";
 import SeletorDia from "../../components/ComponentsDeAgendamento/SeletorDia";
 import GradeHorarios from "../../components/ComponentsDeAgendamento/GradeHorarios";
 import SeletorComputadores from "../../components/ComponentsDeAgendamento/SeletorComputadores";
+import SeletorCatalogo from "../../components/ComponentsDeAgendamento/SeletorCatalogo";
 import ModalDeAgendamento from "../../components/ComponentsDeAgendamento/ModalDeAgendamento";
 
 import {
@@ -153,6 +154,7 @@ export default function AgendamentoComputadores() {
 
   const [catalogoComputadores, setCatalogoComputadores] = useState([]);
   const [carregandoCatalogos, setCarregandoCatalogos] = useState(false);
+  const [selectedCatalogo, setSelectedCatalogo] = useState(null);
 
   const [loading, setLoading] = useState(false); // ✅ loading
 
@@ -315,6 +317,11 @@ export default function AgendamentoComputadores() {
     };
   }, [computadorSelecionado]);
 
+  useEffect(() => {
+    // Limpar seleção de catálogo quando o computador/ambiente muda
+    setSelectedCatalogo(null);
+  }, [computadorSelecionado]);
+
   const diaSemanaBackSelecionado = useMemo(() => {
     const dia = diasDaSemana[diaSelecionado]?.dataCompleta;
     if (!dia) return null;
@@ -323,6 +330,11 @@ export default function AgendamentoComputadores() {
 
   const faixasDoDia = useMemo(() => {
     if (!diaSemanaBackSelecionado) return [];
+    if (selectedCatalogo) {
+      // selectedCatalogo pode vir do seletor como item original (dia/hora) ou já normalizado
+      const normalized = normalizarCatalogo(selectedCatalogo) || selectedCatalogo;
+      return normalized.diaSemana === diaSemanaBackSelecionado ? [normalized] : [];
+    }
     const faixas = catalogoComputadores.filter(
       (c) => c.diaSemana === diaSemanaBackSelecionado
     );
@@ -505,6 +517,16 @@ export default function AgendamentoComputadores() {
             Nenhum computador foi encontrado no cadastro de ambientes. Peça a um administrador para revisar os ambientes PC1–PC5.
           </div>
         )}
+
+        {/* Seletor de catálogo: mover para fora do bloco de horários para garantir visibilidade */}
+        <div className="mb-6">
+          <SeletorCatalogo
+            ambienteId={computadorSelecionado}
+            diaSemana={diaSemanaBackSelecionado}
+            selectedCatalogo={selectedCatalogo}
+            onSelect={(c) => setSelectedCatalogo(c ? normalizarCatalogo(c) : null)}
+          />
+        </div>
 
         {carregandoCatalogos ? (
           <div className="mt-6 bg-[#F5F5F5] dark:bg-[#111111] rounded-md px-4 py-8 flex items-center justify-center text-gray-600 dark:text-gray-300 text-sm md:text-base gap-3">

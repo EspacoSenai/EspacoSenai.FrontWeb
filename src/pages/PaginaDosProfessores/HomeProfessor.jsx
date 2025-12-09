@@ -216,7 +216,7 @@ export default function HomeProfessor() {
 
               <div className="mx-auto mt-6 w-[300px] sm:w-[320px] rounded-[10px] bg-black/10 dark:bg-white/10 p-4 shadow-sm">
                 <Link
-                  to="/pre-cadastrar"
+                  to="/professores/pre-cadastrar"
                   className="inline-flex items-center justify-center w-full h-11 rounded-md
                      bg-[#AE0000] text-white font-semibold shadow-sm
                      hover:brightness-95 active:scale-[.99] transition"

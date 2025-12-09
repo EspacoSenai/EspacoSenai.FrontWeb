@@ -1,7 +1,7 @@
 // src/pages/Salas/EditarVersala.jsx
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { buscarTurmaPorId, atualizarTurma } from "../../service/turma";
+import { buscarTurmaPorId, atualizarTurma, gerarNovoCodigo } from "../../service/turma";
 import setaLeft from "../../assets/setaleft.svg";
 
 // cor padrão do projeto
@@ -43,6 +43,7 @@ export default function EditarVersala() {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState("");
+  const [turmaObj, setTurmaObj] = useState(null);
 
   const formularioValido = () =>
     materia && nomeTurma && inicio && fim && tipo;
@@ -67,6 +68,7 @@ export default function EditarVersala() {
         if (!alive) return;
 
         console.log("[EditarVersala] turma carregada:", data);
+        setTurmaObj(data || null);
 
         setMateria(data?.curso || "");
         setNomeTurma(data?.nome || "");
@@ -204,6 +206,43 @@ export default function EditarVersala() {
             <p className="text-center text-sm md:text-base text-green-700 mb-4">
               {sucesso}
             </p>
+          )}
+
+          {/* Código de acesso e botão de gerar novo código */}
+          {turmaObj && (
+            <div className="text-center mb-4">
+              <div className="inline-flex items-center gap-3">
+                <div className="text-sm text-gray-700">Código atual:</div>
+                <div className="text-sm font-medium px-3 py-1 bg-gray-100 rounded">{turmaObj.codigoAcesso || turmaObj.codigo || "—"}</div>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!confirm("Gerar um novo código substituirá o atual. Confirma?")) return;
+                    try {
+                      setCarregando(true);
+                      const res = await gerarNovoCodigo(id);
+                      // backend pode retornar novo código no payload; atualize turmaObj
+                      const novo = res?.codigo || res?.codigoAcesso || (res && typeof res === 'string' ? res : null);
+                      if (novo) {
+                        setTurmaObj((t) => ({ ...(t || {}), codigoAcesso: novo }));
+                        setSucesso("Novo código gerado com sucesso.");
+                      } else {
+                        setSucesso("Novo código gerado. Atualize a página para ver o valor.");
+                      }
+                    } catch (e) {
+                      console.error("Erro ao gerar novo código:", e);
+                      setErro("Não foi possível gerar novo código. Tente novamente.");
+                    } finally {
+                      setCarregando(false);
+                      setTimeout(() => setSucesso(""), 3000);
+                    }
+                  }}
+                  className="ml-2 inline-flex items-center gap-2 px-3 py-1 rounded bg-[#AE0000] text-white text-sm"
+                >
+                  Gerar novo código
+                </button>
+              </div>
+            </div>
           )}
 
           {/* Formulário */}

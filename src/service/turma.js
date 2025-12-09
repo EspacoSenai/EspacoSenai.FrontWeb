@@ -132,6 +132,16 @@ export async function buscarTurmaPorId(id) {
 }
 
 /**
+ * Gerar novo código de acesso para a turma (endpoint do back)
+ * POST /turma/gerar-novo-codigo/:turmaId
+ */
+export async function gerarNovoCodigo(turmaId) {
+  if (!turmaId) throw new Error("ID da turma obrigatório para gerar novo código.");
+  const resp = await api.post(`/turma/gerar-novo-codigo/${turmaId}`, {});
+  return resp?.data ?? resp;
+}
+
+/**
  * Atualizar turma existente.
  * Recebe um objeto vindo da tela:
  * {

@@ -7,6 +7,7 @@ import TrocaSemana from "../../components/ComponentsDeAgendamento/TrocaSemana";
 import SeletorDia from "../../components/ComponentsDeAgendamento/SeletorDia";
 import GradeHorarios from "../../components/ComponentsDeAgendamento/GradeHorarios";
 import ModalDeAgendamento from "../../components/ComponentsDeAgendamento/ModalDeAgendamento";
+import SeletorCatalogo from "../../components/ComponentsDeAgendamento/SeletorCatalogo";
 
 import {
   COR_VERMELHO,
@@ -110,6 +111,7 @@ export default function AgendamentoPS5() {
   const [horaTerminoFiltro, setHoraTerminoFiltro] = useState("");
   const [catalogoPS5, setCatalogoPS5] = useState([]);
   const [ambienteId, setAmbienteId] = useState(null);
+  const [selectedCatalogo, setSelectedCatalogo] = useState(null);
   const [loading, setLoading] = useState(false); // ✅
 
   const [modal, setModal] = useState({
@@ -220,6 +222,11 @@ export default function AgendamentoPS5() {
     };
   }, []);
 
+  useEffect(() => {
+    // limpar seleção de catálogo quando o ambiente (PS5) ou data muda
+    setSelectedCatalogo(null);
+  }, [ambienteId]);
+
   const diaSemanaBackSelecionado = useMemo(() => {
     const dia = diasDaSemana[diaSelecionado]?.dataCompleta;
     if (!dia) return null;
@@ -228,8 +235,19 @@ export default function AgendamentoPS5() {
 
   const faixasDoDia = useMemo(() => {
     if (!diaSemanaBackSelecionado) return [];
+    if (selectedCatalogo) {
+      // Se o catálogo selecionado estiver marcado como indisponível, bloquear horários
+      if (selectedCatalogo.isDisponivel === false) return [];
+      const normalized = {
+        id: selectedCatalogo.id,
+        diaSemana: String(selectedCatalogo.diaSemana || selectedCatalogo.dia || "").trim().toUpperCase(),
+        horaInicio: toHHMM(selectedCatalogo.horaInicio),
+        horaFim: toHHMM(selectedCatalogo.horaFim),
+      };
+      return normalized.diaSemana === diaSemanaBackSelecionado ? [normalized] : [];
+    }
     return catalogoPS5.filter((c) => c.diaSemana === diaSemanaBackSelecionado);
-  }, [catalogoPS5, diaSemanaBackSelecionado]);
+  }, [catalogoPS5, diaSemanaBackSelecionado, selectedCatalogo]);
 
   useEffect(() => {
     setHoraInicio(null);
@@ -255,6 +273,10 @@ export default function AgendamentoPS5() {
     if (loading) return;
     setLoading(true);
     try {
+      if (selectedCatalogo && selectedCatalogo.isDisponivel === false) {
+        abrirModal("error", "Catálogo indisponível", "O catálogo selecionado está indisponível e não aceita reservas.");
+        return;
+      }
       const hostId = getUserIdFromToken();
       const dia = diasDaSemana[diaSelecionado];
       const faixa = faixasDoDia.find(
@@ -318,6 +340,15 @@ export default function AgendamentoPS5() {
               onSelect={setDiaSelecionado}
             />
           </div>
+        </div>
+
+        <div className="mb-4">
+          <SeletorCatalogo
+            ambienteId={ambienteId}
+            diaSemana={diaSemanaBackSelecionado}
+            selectedCatalogo={selectedCatalogo}
+            onSelect={(c) => setSelectedCatalogo(c ? c : null)}
+          />
         </div>
 
         {temHorariosParaDia ? (

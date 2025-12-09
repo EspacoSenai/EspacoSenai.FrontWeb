@@ -7,6 +7,7 @@ import TrocaSemana from "../../components/ComponentsDeAgendamento/TrocaSemana";
 import SeletorDia from "../../components/ComponentsDeAgendamento/SeletorDia";
 import GradeHorarios from "../../components/ComponentsDeAgendamento/GradeHorarios";
 import ModalDeAgendamento from "../../components/ComponentsDeAgendamento/ModalDeAgendamento";
+import SeletorCatalogo from "../../components/ComponentsDeAgendamento/SeletorCatalogo";
 
 import {
   COR_VERMELHO,
@@ -117,6 +118,7 @@ export default function AgendamentoQuadra() {
   const [horaInicioFiltro, setHoraInicioFiltro] = useState("");
   const [horaTerminoFiltro, setHoraTerminoFiltro] = useState("");
   const [catalogoQuadra, setCatalogoQuadra] = useState([]);
+  const [selectedCatalogo, setSelectedCatalogo] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const [modal, setModal] = useState({
@@ -240,6 +242,10 @@ export default function AgendamentoQuadra() {
     };
   }, []);
 
+  useEffect(() => {
+    setSelectedCatalogo(null);
+  }, [catalogoQuadra]);
+
   const diaSemanaBackSelecionado = useMemo(() => {
     const dia = diasDaSemana[diaSelecionado]?.dataCompleta;
     if (!dia) return null;
@@ -248,10 +254,18 @@ export default function AgendamentoQuadra() {
 
   const faixasDoDia = useMemo(() => {
     if (!diaSemanaBackSelecionado) return [];
-    return catalogoQuadra.filter(
-      (c) => c.diaSemana === diaSemanaBackSelecionado
-    );
-  }, [catalogoQuadra, diaSemanaBackSelecionado]);
+    if (selectedCatalogo) {
+      if (selectedCatalogo.isDisponivel === false) return [];
+      const normalized = {
+        id: selectedCatalogo.id,
+        diaSemana: String(selectedCatalogo.diaSemana || selectedCatalogo.dia || "").trim().toUpperCase(),
+        horaInicio: toHHMM(selectedCatalogo.horaInicio),
+        horaFim: toHHMM(selectedCatalogo.horaFim),
+      };
+      return normalized.diaSemana === diaSemanaBackSelecionado ? [normalized] : [];
+    }
+    return catalogoQuadra.filter((c) => c.diaSemana === diaSemanaBackSelecionado);
+  }, [catalogoQuadra, diaSemanaBackSelecionado, selectedCatalogo]);
 
   useEffect(() => {
     setHoraInicio(null);
@@ -285,13 +299,17 @@ export default function AgendamentoQuadra() {
     if (loading) return;
     setLoading(true);
     try {
+      if (selectedCatalogo && selectedCatalogo.isDisponivel === false) {
+        abrirModal("error", "Catálogo indisponível", "O catálogo selecionado está indisponível e não aceita reservas.");
+        return;
+      }
       const hostId = getUserIdFromToken();
       if (!hostId) throw new Error("Usuário não identificado.");
 
       const dia = diasDaSemana[diaSelecionado];
       if (!dia) throw new Error("Selecione um dia válido.");
 
-      const catalogoSelecionado = catalogoQuadra.find(
+      const catalogoSelecionado = selectedCatalogo ?? catalogoQuadra.find(
         (c) => c.diaSemana === diaSemanaBackSelecionado
       );
       const catalogoId =
@@ -354,6 +372,15 @@ export default function AgendamentoQuadra() {
               onSelect={setDiaSelecionado}
             />
           </div>
+        </div>
+
+        <div className="mb-4">
+            <SeletorCatalogo
+              ambienteId={QUADRA_AMBIENTE_ID}
+              diaSemana={diaSemanaBackSelecionado}
+              selectedCatalogo={selectedCatalogo}
+              onSelect={(c) => setSelectedCatalogo(c ? normalizarCatalogo(c) : null)}
+            />
         </div>
 
         {temHorariosParaDia ? (

@@ -142,6 +142,7 @@ export default function App() {
           <Route path="/HomeProfessor" element={<PrivateRoute allowedRoles={["PROFESSOR", "ADMIN"]}><PageTransition><HomeProfessor /></PageTransition></PrivateRoute>} />
           <Route path="/salas-professores" element={<PrivateRoute allowedRoles={["PROFESSOR", "ADMIN"]}><PageTransition><SalasProfessores /></PageTransition></PrivateRoute>} />
           <Route path="/professores/turmas/nova" element={<PrivateRoute allowedRoles={["PROFESSOR", "ADMIN"]}><PageTransition><NovaTurma /></PageTransition></PrivateRoute>} />
+          <Route path="/professores/pre-cadastrar" element={<PrivateRoute allowedRoles={["PROFESSOR", "ADMIN"]}><PageTransition><PreCadastrarUsuario /></PageTransition></PrivateRoute>} />
 
           <Route path="/HomeCoordenador" element={<PrivateRoute allowedRoles={["COORDENADOR", "ADMIN"]}><PageTransition><HomeCoordenador /></PageTransition></PrivateRoute>} />
           <Route path="/salas-coordenadores" element={<PrivateRoute allowedRoles={["COORDENADOR", "ADMIN"]}><PageTransition><SalasCoordenadores /></PageTransition></PrivateRoute>} />

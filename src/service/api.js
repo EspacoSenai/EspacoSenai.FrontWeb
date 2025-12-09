@@ -130,8 +130,11 @@ async function request(path, options = {}) {
   if (!response.ok) {
     const status = response.status;
 
-    // se for 401/403 fora das rotas públicas de auth → auto logout + redirect
-    if ((status === 401 || status === 403) && !isPublicAuthPath(path)) {
+    // se for 401 (não autorizado) fora das rotas públicas de auth → auto logout + redirect
+    // NOTA: não tratamos 403 (forbidden) como falha de autenticação, porque o backend
+    // pode usar 403 para regras de negócio (por ex. "já possui reserva") e não queremos
+    // desconectar o usuário nesses casos.
+    if (status === 401 && !isPublicAuthPath(path)) {
       handleAuthError();
     }
 
@@ -176,7 +179,7 @@ async function requestRaw(path, options = {}) {
   if (!response.ok) {
     const status = response.status;
 
-    if ((status === 401 || status === 403) && !isPublicAuthPath(path)) {
+    if (status === 401 && !isPublicAuthPath(path)) {
       handleAuthError();
     }
 

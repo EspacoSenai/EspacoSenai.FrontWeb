@@ -8,6 +8,7 @@ import SeletorDia from "../../components/ComponentsDeAgendamento/SeletorDia";
 import GradeHorarios from "../../components/ComponentsDeAgendamento/GradeHorarios";
 import ModalDeAgendamento from "../../components/ComponentsDeAgendamento/ModalDeAgendamento";
 import SeletorImpressoras from "../../components/ComponentsDeAgendamento/SeletorImpressoras";
+import SeletorCatalogo from "../../components/ComponentsDeAgendamento/SeletorCatalogo";
 
 import {
   COR_VERMELHO,
@@ -104,6 +105,7 @@ export default function AgendamentoImpressoras() {
   const [impressorasSelecionadas, setImpressorasSelecionadas] = useState([]);
 
   const [catalogoImpressoras, setCatalogoImpressoras] = useState([]);
+  const [selectedCatalogo, setSelectedCatalogo] = useState(null);
 
   const [loading, setLoading] = useState(false); // ✅
 
@@ -264,10 +266,19 @@ export default function AgendamentoImpressoras() {
 
   const faixasDoDia = useMemo(() => {
     if (!diaSemanaBackSelecionado) return [];
-    return catalogoImpressoras.filter(
-      (c) => c.diaSemana === diaSemanaBackSelecionado
-    );
-  }, [catalogoImpressoras, diaSemanaBackSelecionado]);
+    if (selectedCatalogo) {
+      if (selectedCatalogo.isDisponivel === false) return [];
+      const normalized = {
+        id: selectedCatalogo.id,
+        diaSemana: String(selectedCatalogo.diaSemana || selectedCatalogo.dia || "").trim().toUpperCase(),
+        horaInicio: toHHMM(selectedCatalogo.horaInicio),
+        horaFim: toHHMM(selectedCatalogo.horaFim),
+      };
+      return normalized.diaSemana === diaSemanaBackSelecionado ? [normalized] : [];
+    }
+    const faixas = catalogoImpressoras.filter((c) => c.diaSemana === diaSemanaBackSelecionado);
+    return faixas;
+  }, [catalogoImpressoras, diaSemanaBackSelecionado, selectedCatalogo]);
 
   const horariosInicioDisponiveis = useMemo(() => {
     const inicioCat = gerarSlotsPorFaixas(faixasDoDia, 15);
@@ -289,6 +300,10 @@ export default function AgendamentoImpressoras() {
     if (loading) return;
     setLoading(true); // ✅ inicia o loading
     try {
+      if (selectedCatalogo && selectedCatalogo.isDisponivel === false) {
+        abrirModal("error", "Catálogo indisponível", "O catálogo selecionado está indisponível e não aceita reservas.");
+        return;
+      }
       const dia = diasDaSemana[diaSelecionado];
       const hostId = getUserIdFromToken();
       if (!hostId) throw new Error("Sessão inválida.");
@@ -366,6 +381,14 @@ export default function AgendamentoImpressoras() {
           </div>
         </div>
 
+        <div className="mb-4">
+              <SeletorCatalogo
+                ambienteId={IMPRESSORA_AMBIENTE_ID}
+                diaSemana={diaSemanaBackSelecionado}
+                selectedCatalogo={selectedCatalogo}
+                onSelect={(c) => setSelectedCatalogo(c ? c : null)}
+              />
+        </div>
         {temHorariosParaDia ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
             <div>
@@ -401,6 +424,7 @@ export default function AgendamentoImpressoras() {
                 onChange={setImpressorasSelecionadas}
                 quantidade={6}
               />
+              
             </div>
           </div>
         ) : (

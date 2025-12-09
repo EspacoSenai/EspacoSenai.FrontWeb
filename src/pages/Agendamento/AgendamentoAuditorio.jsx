@@ -7,6 +7,7 @@ import TrocaSemana from "../../components/ComponentsDeAgendamento/TrocaSemana";
 import SeletorDia from "../../components/ComponentsDeAgendamento/SeletorDia";
 import GradeHorarios from "../../components/ComponentsDeAgendamento/GradeHorarios";
 import ModalDeAgendamento from "../../components/ComponentsDeAgendamento/ModalDeAgendamento";
+import SeletorCatalogo from "../../components/ComponentsDeAgendamento/SeletorCatalogo";
 
 import {
   COR_VERMELHO,
@@ -140,6 +141,8 @@ export default function AgendamentoAuditorio() {
   const [ambienteId, setAmbienteId] = useState(null);
   const [loadingAmbiente, setLoadingAmbiente] = useState(true);
 
+  const [selectedCatalogo, setSelectedCatalogo] = useState(null);
+
   const [modal, setModal] = useState({
     aberto: false,
     tipo: "success",
@@ -255,6 +258,7 @@ export default function AgendamentoAuditorio() {
     setHoraInicioFiltro("");
     setHoraTerminoFiltro("");
     setTurma("");
+    setSelectedCatalogo(null);
   }
 
   useEffect(() => {
@@ -353,16 +357,18 @@ export default function AgendamentoAuditorio() {
 
   const faixasDoDia = useMemo(() => {
     if (!diaSemanaBackSelecionado) return [];
-    const faixas = catalogoAuditorio.filter(
-      (c) => c.diaSemana === diaSemanaBackSelecionado
-    );
-    console.log(
-      "[AgendamentoAuditorio] faixasDoDia para",
-      diaSemanaBackSelecionado,
-      faixas
-    );
-    return faixas;
-  }, [catalogoAuditorio, diaSemanaBackSelecionado]);
+    if (selectedCatalogo) {
+      // Bloqueia se catálogo selecionado estiver indisponível
+      if (selectedCatalogo.isDisponivel === false) return [];
+      // Se catálogo selecionado, usar apenas ele se for do dia
+      return selectedCatalogo.diaSemana === diaSemanaBackSelecionado ? [selectedCatalogo] : [];
+    } else {
+      // Caso contrário, usar todos do dia
+      const faixas = catalogoAuditorio.filter((c) => c.diaSemana === diaSemanaBackSelecionado);
+      console.log("[AgendamentoAuditorio] faixasDoDia para", diaSemanaBackSelecionado, faixas);
+      return faixas;
+    }
+  }, [catalogoAuditorio, diaSemanaBackSelecionado, selectedCatalogo]);
 
   const horariosInicioDisponiveis = useMemo(
     () => gerarIniciosPorFaixas(faixasDoDia, 15),
@@ -383,6 +389,11 @@ export default function AgendamentoAuditorio() {
 
   async function confirmar() {
     const dia = diasDaSemana[diaSelecionado];
+
+    if (selectedCatalogo && selectedCatalogo.isDisponivel === false) {
+      abrirModal("error", "Catálogo indisponível", "O catálogo selecionado está indisponível e não aceita reservas.");
+      return;
+    }
 
     if (!turma.trim()) {
       abrirModal(
@@ -456,32 +467,16 @@ export default function AgendamentoAuditorio() {
       return;
     }
 
-    const iniMin = timeToMin(horaInicio);
-    const fimMin = timeToMin(horaTermino);
+    const catalogoId = selectedCatalogo?.id;
 
-    const catalogoSelecionado = faixasDoDia.find((c) => {
-      const cIni = timeToMin(c.horaInicio);
-      const cFim = timeToMin(c.horaFim);
-      return iniMin >= cIni && fimMin <= cFim;
-    });
-
-    if (!catalogoSelecionado?.id) {
-      console.error(
-        "[AgendamentoAuditorio] Não encontrou catálogo para",
-        diaSemanaBackSelecionado,
-        horaInicio,
-        horaTermino,
-        faixasDoDia
-      );
+    if (!catalogoId) {
       abrirModal(
         "error",
-        "Configuração inválida",
-        "Não foi possível localizar o catálogo correspondente para esse horário. Avise o coordenador."
+        "Catálogo não selecionado",
+        "Selecione um catálogo para continuar."
       );
       return;
     }
-
-    const catalogoId = catalogoSelecionado.id;
 
     const msgUsuario = `Reserva do Auditório para a turma ${turma.trim()}.`;
 
@@ -571,6 +566,13 @@ export default function AgendamentoAuditorio() {
             />
           </div>
         </div>
+
+        <SeletorCatalogo
+          ambienteId={ambienteId}
+          diaSemana={diaSemanaBackSelecionado}
+          selectedCatalogo={selectedCatalogo}
+          onSelect={setSelectedCatalogo}
+        />
 
         {temHorariosParaDia ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
