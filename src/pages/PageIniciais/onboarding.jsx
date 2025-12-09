@@ -69,7 +69,7 @@ const BackArrowIcon = () => (
     strokeWidth="2"
     strokeLinecap="round"
     strokeLinejoin="round"
-    className="w-10 h-10 sm:w-12 sm:h-12 text-gray-700 hover:text-red-600 transition-colors"
+    className="w-10 h-10 sm:w-12 sm:h-12 text-gray-700 dark:text-gray-200 hover:text-red-600 dark:hover:text-red-500 transition-colors"
   >
     <circle cx="12" cy="12" r="10" fill="none" />
     <polyline points="12 8 8 12 12 16" />

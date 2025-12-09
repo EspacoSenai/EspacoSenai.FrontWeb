@@ -42,9 +42,27 @@ export default function Notificacoes() {
   const arrastandoIdRef = useRef(null);
   const ponteiroAbaixadoRef = useRef(false);
   const deslocamentoMinimoDragRef = useRef(5);
-  const foiDragRef = useRef({}); 
+  const foiDragRef = useRef({});
+  const ultimoSucessoRef = useRef(null);
 
-  /* ==================== CARREGAR DA API ==================== */
+  /* ==================== FUNÇÃO DE REQUISIÇÃO SEGURA ==================== */
+  async function buscarComProtecao() {
+    try {
+      const data = await buscarMinhasNotificacoes();
+      if (!data || !Array.isArray(data)) return [];
+      return data;
+    } catch (error) {
+      const status = error?.status || error?.response?.status;
+      // 🔥 ignora 401/403 aqui — não desloga o usuário
+      if (status === 401 || status === 403) {
+        console.warn("Ignorando erro de autenticação temporário no /notificacao/minhas");
+        return ultimoSucessoRef.current || [];
+      }
+      throw error;
+    }
+  }
+
+  /* ==================== CARREGAR NOTIFICAÇÕES ==================== */
   useEffect(() => {
     let cancelado = false;
 
@@ -53,84 +71,49 @@ export default function Notificacoes() {
         setCarregando(true);
         setErro(null);
 
-        const data = await buscarMinhasNotificacoes();
+        const data = await buscarComProtecao();
 
         if (cancelado) return;
 
-        const mapeadas = (data || []).map((n) => ({
+        const mapeadas = data.map((n) => ({
           id: n.id,
           title: n.titulo || n.title || "Notificação",
           body: n.mensagem || n.body || "",
           lida: n.lida ?? false,
           tipo: n.tipo || "INFO",
-          dataCriacao: n.dataCriacao || null,
+          dataCriacao: n.dataCriacao || n.data || new Date().toISOString(),
         }));
 
         setNotificacoes(mapeadas);
+        ultimoSucessoRef.current = mapeadas;
       } catch (error) {
         if (cancelado) return;
-
-        const status = error?.status;
-
-        if (status === 401 || status === 403) {
-          signOut?.();
-          return;
-        }
-
-        if (status === 404) {
-          setNotificacoes([]);
-          setErro(null);
-        } else {
-          console.error("Erro ao carregar notificações", error);
-          setErro("Não foi possível carregar suas notificações.");
-        }
+        console.error("Erro ao carregar notificações:", error);
+        setErro("Não foi possível carregar suas notificações.");
       } finally {
-        if (!cancelado) {
-          setCarregando(false);
-        }
+        if (!cancelado) setCarregando(false);
       }
     }
 
     carregar();
 
+    // ⚠️ opcional: recarrega a cada 60s sem travar a tela
+    const intervalo = setInterval(carregar, 60000);
+
     return () => {
       cancelado = true;
+      clearInterval(intervalo);
     };
   }, []);
 
   /* ==================== AÇÕES ==================== */
-
   const removerNotificacaoLocalEBack = async (id) => {
     setNotificacoes((prev) => prev.filter((n) => n.id !== id));
-
-    const copia = { ...deslocamentosRef.current };
-    delete copia[id];
-    deslocamentosRef.current = copia;
 
     try {
       await deletarNotificacao(id);
     } catch (error) {
-      const status = error?.status;
-
-      if (status === 401 || status === 403) {
-        signOut?.();
-        return;
-      }
-
-      try {
-        const data = await buscarMinhasNotificacoes();
-        const mapeadas = (data || []).map((n) => ({
-          id: n.id,
-          title: n.titulo || n.title || "Notificação",
-          body: n.mensagem || n.body || "",
-          lida: n.lida ?? false,
-          tipo: n.tipo || "INFO",
-          dataCriacao: n.dataCriacao || null,
-        }));
-        setNotificacoes(mapeadas);
-      } catch (e2) {
-        console.error("Erro ao recarregar notificações após delete", e2);
-      }
+      console.warn("Erro ao deletar notificação:", error);
     }
   };
 
@@ -141,27 +124,21 @@ export default function Notificacoes() {
     try {
       await marcarNotificacaoComoLida(id);
     } catch (error) {
-      const status = error?.status;
-      if (status === 401 || status === 403) {
-        signOut?.();
-      } else {
-        console.error("Erro ao marcar como lida", error);
-      }
+      console.warn("Erro ao marcar como lida:", error);
     }
   };
 
   /* ==================== SWIPE ==================== */
-
   const setarDeslocamento = (id, x) => {
     deslocamentosRef.current = { ...deslocamentosRef.current, [id]: x };
-    setNotificacoes((prev) => [...prev]);  
+    setNotificacoes((prev) => [...prev]);
   };
 
   const aoPressionarPonteiro = (e, id) => {
     ponteiroAbaixadoRef.current = true;
     arrastandoIdRef.current = id;
     inicioXRef.current = e.clientX;
-    foiDragRef.current[id] = false;  
+    foiDragRef.current[id] = false;
     e.currentTarget.setPointerCapture?.(e.pointerId);
   };
 
@@ -170,10 +147,10 @@ export default function Notificacoes() {
     const id = arrastandoIdRef.current;
     if (id == null) return;
     const dx = e.clientX - inicioXRef.current;
-     
+
     if (Math.abs(dx) > deslocamentoMinimoDragRef.current) {
-      foiDragRef.current[id] = true;  
-      const translateX = Math.min(0, dx);  
+      foiDragRef.current[id] = true;
+      const translateX = Math.min(0, dx);
       setarDeslocamento(id, translateX);
     }
   };
@@ -193,23 +170,18 @@ export default function Notificacoes() {
     setarDeslocamento(id, 0);
   };
 
-   
   const aoClicarNotificacao = (id, lida) => {
-     
     if (lida || foiDragRef.current[id]) return;
-    
-    
     marcarComoLidaLocal(id);
   };
 
   /* ==================== RENDER ==================== */
-
   return (
     <div className="min-h-screen bg-white text-[#111] font-sans">
       {/* Topbar */}
       <header className="w-full bg-white border-b relative">
         <button
-          onClick={() => window.history.back()}
+          onClick={() => navigate(-1)}
           className="absolute left-2 top-1/2 -translate-y-1/2 p-1 z-10
                      rounded-md bg-white border border-gray-300 shadow-sm
                      hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#AE0000]"
@@ -239,8 +211,7 @@ export default function Notificacoes() {
                 : "Nenhuma nova notificação no momento"}
             </h2>
             <p className="text-sm mt-2">
-              Confira as atualizações mais recentes para ficar sempre
-              atualizado.
+              Confira as atualizações mais recentes para ficar sempre atualizado.
             </p>
           </div>
         </div>
@@ -257,17 +228,12 @@ export default function Notificacoes() {
         )}
 
         {carregando ? (
-           
           <div className="max-w-3xl mx-auto space-y-4">
             {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="w-full h-20 bg-gray-100 rounded-md animate-pulse"
-              />
+              <div key={i} className="w-full h-20 bg-gray-100 rounded-md animate-pulse" />
             ))}
           </div>
         ) : notificacoes.length === 0 ? (
-          // ===== ESTADO VAZIO =====
           <div className="flex-1 w-full flex items-center justify-center p-5 pb-10">
             <div className="w-full max-w-[720px] mx-auto flex flex-col items-center">
               <div className="flex items-center justify-center mt-10 mb-9 w-full">
@@ -278,7 +244,6 @@ export default function Notificacoes() {
                   style={{ width: "min(50vw, 320px)", height: "auto" }}
                 />
               </div>
-
               <div className="text-center w-full px-4">
                 <h2
                   className="font-semibold text-[#222] mb-6"
@@ -286,24 +251,19 @@ export default function Notificacoes() {
                 >
                   Tudo tranquilo por aqui!
                 </h2>
-                <div
-                  className="font-medium text-[#222] mb-3"
-                  style={{ fontSize: "1rem" }}
-                >
+                <div className="font-medium text-[#222] mb-3" style={{ fontSize: "1rem" }}>
                   Parece que você não tem nenhuma notificação no momento.
                 </div>
                 <div
                   className="font-normal text-[#222] whitespace-normal break-words leading-relaxed"
                   style={{ fontSize: "clamp(0.95rem, 2vw, 1rem)" }}
                 >
-                  Avisaremos por aqui assim que houver novidades ou novos
-                  agendamentos!
+                  Avisaremos por aqui assim que houver novidades ou novos agendamentos!
                 </div>
               </div>
             </div>
           </div>
         ) : (
-          // ===== LISTA NORMAL =====
           <ul className="space-y-4 max-w-3xl mx-auto">
             {notificacoes.map((n) => {
               const tx = deslocamentosRef.current[n.id] || 0;
@@ -328,16 +288,9 @@ export default function Notificacoes() {
                     onPointerCancel={aoSoltarPonteiro}
                     className="w-full flex items-start gap-4 p-5 transition-transform duration-150"
                   >
-                    {/* ícone */}
                     <div className="flex-shrink-0 text-[#AE0000] mt-1">
-                      <img
-                        src={lembrete}
-                        alt="lembrete"
-                        className="w-6 h-6"
-                      />
+                      <img src={lembrete} alt="lembrete" className="w-6 h-6" />
                     </div>
-
-                    {/* texto principal */}
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center justify-between gap-2 mb-1">
                         <h3
@@ -347,7 +300,6 @@ export default function Notificacoes() {
                         >
                           {n.title}
                         </h3>
-
                         <div className="flex items-center gap-2 text-xs">
                           {!lida && (
                             <span className="inline-flex items-center gap-1 rounded-full bg-[#E35151]/10 text-[#E35151] px-2 py-0.5 font-medium">
@@ -355,14 +307,9 @@ export default function Notificacoes() {
                               Nova
                             </span>
                           )}
-                          {textoData && (
-                            <span className="text-gray-500">
-                              {textoData}
-                            </span>
-                          )}
+                          {textoData && <span className="text-gray-500">{textoData}</span>}
                         </div>
                       </div>
-
                       <p
                         className={`text-sm text-gray-700 mt-1 leading-relaxed text-left ${
                           lida ? "opacity-75" : ""
@@ -371,43 +318,22 @@ export default function Notificacoes() {
                         {n.body}
                       </p>
                     </div>
-
-                    {/* ações */}
                     <div className="flex flex-col items-end gap-2 flex-shrink-0 ml-4">
                       {!lida && (
                         <button
                           onClick={() => marcarComoLidaLocal(n.id)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1 text-[11px] font-medium rounded-full border border-gray-300 bg-white
-                                     hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#7c0c15]/30"
+                          className="inline-flex items-center gap-1.5 px-3 py-1 text-[11px] font-medium rounded-full border border-gray-300 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#7c0c15]/30"
                         >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="w-3.5 h-3.5"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path d="M20 6L9 17l-5-5" />
-                          </svg>
-                          Marcar como lida
+                          ✓ Marcar como lida
                         </button>
                       )}
-
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          e.preventDefault();
                           removerNotificacaoLocalEBack(n.id);
                         }}
-                        onPointerDown={(e) => e.stopPropagation()}
-                        onPointerUp={(e) => e.stopPropagation()}
-                        className="p-2 rounded-lg bg-white border border-red-300 shadow-sm
-                                   hover:bg-red-50 hover:border-red-400 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-red-300 transition-all"
+                        className="p-2 rounded-lg bg-white border border-red-300 shadow-sm hover:bg-red-50 hover:border-red-400 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-red-300 transition-all"
                         aria-label="Remover notificação"
-                        title="Remover notificação"
                       >
                         <img src={lixeira} alt="remover" className="w-4 h-4" />
                       </button>

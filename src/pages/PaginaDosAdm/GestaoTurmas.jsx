@@ -1,7 +1,7 @@
-// src/pages/Administrador/GestaoTurmas.jsx
 import React, { useEffect, useState } from "react";
 import { buscarTurmas, criarTurma } from "../../service/turma";
 import { api } from "../../service/api";
+import { buscarProfessores } from "../../service/usuario";
 
 const COR = "#AE0000";
 
@@ -33,7 +33,7 @@ function TurmaCard({
         {/* Botão de editar */}
         <button
           onClick={() => onEditar({ id, nome, codigo, curso, modalidade, dataInicio, dataTermino, capacidade })}
-          className="absolute right-3 top-1/2 -translate-y-1/2 p-2 hover:bg-white/20 rounded-lg transition"
+          className="absolute right-3 top-1/2 -translate-y-1/2 p-2 hover:bg-white/20 rounded-lg transition text-black dark:text-white"
           title="Editar turma"
         >
           <svg
@@ -106,6 +106,8 @@ export default function GestaoTurmas({ cor = COR }) {
   const [turmaEditando, setTurmaEditando] = useState(null);
   const [salvandoTurma, setSalvandoTurma] = useState(false);
   const [erroForm, setErroForm] = useState("");
+  const [professores, setProfessores] = useState([]);
+  const [loadingProfs, setLoadingProfs] = useState(false);
 
   const [form, setForm] = useState({
     nome: "",
@@ -115,7 +117,6 @@ export default function GestaoTurmas({ cor = COR }) {
     dataTermino: "",
     capacidade: "",
     professorId: "",
-    estudantesIdsTexto: "",
   });
 
   const CLASSES_INPUT =
@@ -126,7 +127,17 @@ export default function GestaoTurmas({ cor = COR }) {
       setLoading(true);
       setErro("");
       const arr = await buscarTurmas();
-      setTurmas(Array.isArray(arr) ? arr : []);
+      const lista = Array.isArray(arr) ? arr : [];
+      // Normaliza e garante exibição correta no card
+      const normalizada = lista.map((t) => ({
+        ...t,
+        curso: t.curso || "",
+        capacidade: t.capacidade ?? null,
+        dataInicio: t.dataInicio || "",
+        dataTermino: t.dataTermino || "",
+        modalidade: t.modalidade || "",
+      }));
+      setTurmas(normalizada);
     } catch (err) {
       console.error("[GestaoTurmas] erro ao buscar turmas:", err);
       setErro(
@@ -140,6 +151,22 @@ export default function GestaoTurmas({ cor = COR }) {
 
   useEffect(() => {
     carregarTurmas();
+
+    // Recarrega ao retornar da edição
+    const onFocus = () => carregarTurmas();
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") {
+        carregarTurmas();
+      }
+    };
+
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVisibility);
+
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
   }, []);
 
   const formValido = () =>
@@ -147,9 +174,10 @@ export default function GestaoTurmas({ cor = COR }) {
     form.curso.trim() &&
     form.modalidade.trim() &&
     form.dataInicio.trim() &&
-    form.dataTermino.trim();
+    form.dataTermino.trim() &&
+    form.professorId.trim();
 
-  function abrirModal() {
+  async function abrirModal() {
     setErroForm("");
     setForm({
       nome: "",
@@ -159,9 +187,20 @@ export default function GestaoTurmas({ cor = COR }) {
       dataTermino: "",
       capacidade: "",
       professorId: "",
-      estudantesIdsTexto: "",
     });
     setModalAberto(true);
+    
+    // Carregar professores
+    try {
+      setLoadingProfs(true);
+      const data = await buscarProfessores();
+      setProfessores(Array.isArray(data) ? data : []);
+    } catch (e) {
+      console.error("[GestaoTurmas] Erro ao buscar professores:", e);
+      setProfessores([]);
+    } finally {
+      setLoadingProfs(false);
+    }
   }
 
   function fecharModal() {
@@ -170,7 +209,7 @@ export default function GestaoTurmas({ cor = COR }) {
     setErroForm("");
   }
 
-  function abrirModalEditar(turma) {
+  async function abrirModalEditar(turma) {
     setTurmaEditando(turma);
     setForm({
       nome: turma.nome || "",
@@ -180,9 +219,20 @@ export default function GestaoTurmas({ cor = COR }) {
       dataTermino: turma.dataTermino || "",
       capacidade: turma.capacidade || "",
       professorId: "",
-      estudantesIdsTexto: "",
     });
     setModalEditarAberto(true);
+    
+    // Carregar professores
+    try {
+      setLoadingProfs(true);
+      const data = await buscarProfessores();
+      setProfessores(Array.isArray(data) ? data : []);
+    } catch (e) {
+      console.error("[GestaoTurmas] Erro ao buscar professores:", e);
+      setProfessores([]);
+    } finally {
+      setLoadingProfs(false);
+    }
   }
 
   function fecharModalEditar() {
@@ -240,8 +290,11 @@ export default function GestaoTurmas({ cor = COR }) {
       //Usa o endpoint de atualização
       await api.put(`/turma/atualizar/${turmaEditando.id}`, form);
 
-      // Fecha modal e recarrega dados
+      // Fecha modal
       fecharModalEditar();
+      
+      // Aguarda processamento do backend e recarrega
+      await new Promise(resolve => setTimeout(resolve, 300));
       await carregarTurmas();
 
       // Feedback de sucesso
@@ -379,48 +432,40 @@ export default function GestaoTurmas({ cor = COR }) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-neutral-700 mb-1">
-                    Capacidade (opcional)
-                  </label>
-                  <input
-                    type="number"
-                    className={CLASSES_INPUT}
-                    value={form.capacidade}
-                    onChange={(e) => onChange("capacidade", e.target.value)}
-                    placeholder="Ex.: 40"
-                    min={0}
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-neutral-700 mb-1">
-                    ID do professor (opcional)
-                  </label>
-                  <input
-                    type="number"
-                    className={CLASSES_INPUT}
-                    value={form.professorId}
-                    onChange={(e) => onChange("professorId", e.target.value)}
-                    placeholder="Ex.: 7"
-                    min={0}
-                  />
-                </div>
+              <div>
+                <label className="block text-xs font-medium text-neutral-700 mb-1">
+                  Capacidade (opcional)
+                </label>
+                <input
+                  type="number"
+                  className={CLASSES_INPUT}
+                  value={form.capacidade}
+                  onChange={(e) => onChange("capacidade", e.target.value)}
+                  placeholder="Ex.: 40"
+                  min={0}
+                />
               </div>
 
               <div>
                 <label className="block text-xs font-medium text-neutral-700 mb-1">
-                  IDs de estudantes (separados por vírgula)
+                  Professor responsável *
                 </label>
-                <input
-                  type="text"
-                  className={CLASSES_INPUT}
-                  value={form.estudantesIdsTexto}
-                  onChange={(e) =>
-                    onChange("estudantesIdsTexto", e.target.value)
-                  }
-                  placeholder="Ex.: 1, 2, 5, 9"
-                />
+                {loadingProfs ? (
+                  <p className="text-xs text-neutral-500">Carregando professores...</p>
+                ) : (
+                  <select
+                    className={CLASSES_INPUT}
+                    value={form.professorId}
+                    onChange={(e) => onChange("professorId", e.target.value)}
+                  >
+                    <option value="">-- Selecione um professor --</option>
+                    {professores.map((prof) => (
+                      <option key={prof.id} value={prof.id}>
+                        {prof.nome} (ID: {prof.id})
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
 
               {erroForm && (
@@ -539,6 +584,28 @@ export default function GestaoTurmas({ cor = COR }) {
                   placeholder="Ex.: 40"
                   min={0}
                 />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-neutral-700 mb-1">
+                  Professor responsável *
+                </label>
+                {loadingProfs ? (
+                  <p className="text-xs text-neutral-500">Carregando professores...</p>
+                ) : (
+                  <select
+                    className={CLASSES_INPUT}
+                    value={form.professorId}
+                    onChange={(e) => onChange("professorId", e.target.value)}
+                  >
+                    <option value="">-- Selecione um professor --</option>
+                    {professores.map((prof) => (
+                      <option key={prof.id} value={prof.id}>
+                        {prof.nome} (ID: {prof.id})
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
 
               {erroForm && (

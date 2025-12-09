@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { confirmarConta } from "../../service/authService";
 import SetaLeft from "../../assets/setaleft.svg";
+import setawhiteleft from "../../assets/setawhiteleft.svg";
 
 const COR = "#AE0000";
 
@@ -103,7 +104,7 @@ export default function ModalCodigoVerificacao({
           onClick={() => !loading && onClose?.()}
           className="bg-white focus:outline-none"
         >
-          <img src={SetaLeft} alt="Voltar" className="block" style={{ width: 25, height: 35 }} />
+          <img src={document.documentElement.classList.contains('dark') ? setawhiteleft : SetaLeft} alt="Voltar" className="block" style={{ width: 25, height: 35 }} />
         </button>
 
         <h2 className="text-2xl md:text-3xl font-extrabold text-center text-neutral-900">Verificação</h2>

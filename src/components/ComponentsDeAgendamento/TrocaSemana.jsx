@@ -3,7 +3,7 @@ export default function TrocaSemana({ value, onChange }) {
     "px-5 py-3 rounded-md text-sm md:text-base select-none transition-colors duration-150 outline-none " +
     "focus-visible:ring-2 focus-visible:ring-[#AE0000] whitespace-nowrap text-center";
   const ativo = "bg-[#AE0000] text-white";
-  const inativo = "bg-[#F6F6F6] text-gray-700 hover:bg-[#AE0000] hover:text-white";
+  const inativo = "bg-[#F6F6F6] dark:bg-[#1a1a1a] text-gray-700 dark:text-gray-200 hover:bg-[#AE0000] hover:text-white";
 
   // setas do teclado (↑/← = essa, ↓/→ = próxima)
   const handleKeyDown = (e) => {

@@ -1,7 +1,7 @@
 // src/components/Lembretes/LembretesReservas.jsx
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
-import { buscarMinhasReservas, cancelarReserva } from "../../service/reserva";
+import { buscarMinhasReservas, deletarReserva } from "../../service/reserva";
 
 import LembreteImgComputadores from "../../assets/Computadores.svg";
 import LembreteImgQuadra from "../../assets/FotoQuadra.svg";
@@ -140,7 +140,7 @@ const Kebab = ({ onClick, ariaControls, ariaExpanded }) => (
     aria-expanded={ariaExpanded}
     onMouseDown={(e) => e.preventDefault()}
     onClick={onClick}
-    className="h-10 w-10 grid place-items-center rounded-xl bg-transparent text-neutral-700 hover:bg-black/5 transition outline-none"
+    className="h-10 w-10 grid place-items-center rounded-xl bg-transparent text-neutral-700 dark:text-white hover:bg-black/5 transition outline-none"
     style={{
       WebkitTapHighlightColor: "transparent",
       border: "none",
@@ -270,46 +270,73 @@ export default function LembretesReservas({
   const [cancelando, setCancelando] = useState(null);
   const [loadingCancelamento, setLoadingCancelamento] = useState(false);
 
+  // Função para carregar/recarregar reservas
+  const carregarReservas = useCallback(async (primeiraVez = false) => {
+    try {
+      if (primeiraVez) {
+        setLoadingLembretes(true);
+      }
+      setErroLembretes("");
+
+      const reservas = await buscarMinhasReservas();
+
+      const ativos = (reservas || []).filter((r) => {
+        const status = String(r?.status || r?.statusReserva || r?.situacao || "").toUpperCase();
+        // Exibir apenas reservas ativas ou pendentes; ocultar canceladas/negadas/concluídas
+        return status === "APROVADA" || status === "PENDENTE" || status === "ATIVA" || status === "EM_ANDAMENTO" || status === "";
+      });
+
+      const mapped = ativos
+        .map(mapReservaParaLembrete)
+        .filter(Boolean);
+
+      mapped.sort((a, b) => {
+        if (a.data === "—" || b.data === "—") return 0;
+        const [da, ma] = a.data.split("/").map(Number);
+        const [db, mb] = b.data.split("/").map(Number);
+        if (ma === mb) return da - db;
+        return ma - mb;
+      });
+
+      setLembretes(mapped);
+    } catch (err) {
+      console.error("[LembretesReservas] Erro ao buscar reservas:", err);
+      setErroLembretes("Não foi possível carregar suas reservas.");
+      setLembretes([]);
+    } finally {
+      if (primeiraVez) {
+        setLoadingLembretes(false);
+      }
+    }
+  }, []);
+
+  // Carregar reservas na montagem e configurar polling
   useEffect(() => {
     let alive = true;
+    let intervaloId = null;
 
-    (async () => {
-      setLoadingLembretes(true);
-      setErroLembretes("");
-      setFeedback({ type: "", message: "" });
-
-      try {
-        const reservas = await buscarMinhasReservas();
-        if (!alive) return;
-
-        const mapped = (reservas || [])
-          .map(mapReservaParaLembrete)
-          .filter(Boolean);
-
-        mapped.sort((a, b) => {
-          if (a.data === "—" || b.data === "—") return 0;
-          const [da, ma] = a.data.split("/").map(Number);
-          const [db, mb] = b.data.split("/").map(Number);
-          if (ma === mb) return da - db;
-          return ma - mb;
-        });
-
-        setLembretes(mapped);
-      } catch (err) {
-        console.error("[LembretesReservas] Erro ao buscar reservas:", err);
-        if (alive) {
-          setErroLembretes("Não foi possível carregar suas reservas.");
-          setLembretes([]);
-        }
-      } finally {
-        if (alive) setLoadingLembretes(false);
+    const init = async () => {
+      if (alive) {
+        await carregarReservas(true);
       }
-    })();
+    };
+
+    init();
+
+    // Atualização automática a cada 30 segundos
+    intervaloId = setInterval(() => {
+      if (alive) {
+        carregarReservas(false);
+      }
+    }, 30000);
 
     return () => {
       alive = false;
+      if (intervaloId) {
+        clearInterval(intervaloId);
+      }
     };
-  }, []);
+  }, [carregarReservas]);
 
   async function confirmarCancelamento() {
     if (!cancelando) return;
@@ -317,9 +344,9 @@ export default function LembretesReservas({
       setLoadingCancelamento(true);
       setFeedback({ type: "", message: "" });
 
-      await cancelarReserva(cancelando.id, "Cancelada pelo aluno.");
+      await deletarReserva(cancelando.id);
 
-      // tira da lista
+      // Remove da lista imediatamente
       setLembretes((prev) => prev.filter((l) => l.id !== cancelando.id));
       setCancelando(null);
 
@@ -327,12 +354,38 @@ export default function LembretesReservas({
         type: "success",
         message: "Reserva cancelada com sucesso.",
       });
+
+      // Recarrega a lista do backend para garantir sincronização
+      setTimeout(() => {
+        carregarReservas(false);
+      }, 1000);
     } catch (e) {
       console.error("[LembretesReservas] erro ao cancelar reserva:", e);
-      setFeedback({
-        type: "error",
-        message: "Não foi possível cancelar a reserva. Tente novamente.",
-      });
+
+      // Verifica se a reserva já foi cancelada (não é erro, apenas estado já atualizado)
+      const errorMessage = e.message || "";
+      if (errorMessage.includes("já foi cancelada") || errorMessage.includes("Esta reserva já foi cancelada") || errorMessage.includes("No Content")) {
+        // Remove da lista local mesmo assim, pois o backend já está correto
+        setLembretes((prev) => prev.filter((l) => l.id !== cancelando.id));
+        setCancelando(null);
+
+        setFeedback({
+          type: "success",
+          message: "Reserva cancelada com sucesso.",
+        });
+
+        // Recarrega para sincronizar
+        setTimeout(() => {
+          carregarReservas(false);
+        }, 1000);
+      } else {
+        setFeedback({
+          type: "error",
+          message: "Não foi possível cancelar a reserva. Tente novamente.",
+        });
+        // Em caso de erro, recarrega a lista para garantir estado correto
+        carregarReservas(false);
+      }
     } finally {
       setLoadingCancelamento(false);
     }
@@ -398,16 +451,16 @@ export default function LembretesReservas({
       {/* modal de confirmação de cancelamento */}
       {cancelando && (
         <div className="fixed inset-0 z-[9998] flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md px-6 py-6 border border-neutral-200">
-            <h4 className="text-lg font-semibold text-neutral-900 mb-1">
+          <div className="bg-white dark:bg-[#1E1E1E] rounded-2xl shadow-2xl w-full max-w-md px-6 py-6 border border-neutral-200 dark:border-neutral-700">
+            <h4 className="text-lg font-semibold text-neutral-900 dark:text-white mb-1">
               Cancelar reserva
             </h4>
-            <p className="text-sm text-neutral-600 mb-4">
+            <p className="text-sm text-neutral-600 dark:text-gray-300 mb-4">
               Tem certeza que deseja cancelar a reserva de{" "}
-              <span className="font-semibold">{cancelando.titulo}</span>?
+              <span className="font-semibold text-neutral-900 dark:text-white">{cancelando.titulo}</span>?
             </p>
 
-            <div className="flex flex-col gap-2 text-sm bg-neutral-50 border border-neutral-200 rounded-xl px-4 py-3 mb-5">
+            <div className="flex flex-col gap-2 text-sm bg-neutral-50 dark:bg-[#2A2A2A] border border-neutral-200 dark:border-neutral-700 rounded-xl px-4 py-3 mb-5 text-neutral-900 dark:text-white">
               <div className="flex items-center gap-2">
                 <Dot />
                 <span className="font-semibold">Data:</span>
@@ -430,7 +483,7 @@ export default function LembretesReservas({
                 type="button"
                 onClick={() => setCancelando(null)}
                 disabled={loadingCancelamento}
-                className="px-4 py-2 rounded-lg border border-neutral-300 bg-white text-sm font-medium text-neutral-800 hover:bg-neutral-100 disabled:opacity-60"
+                className="px-4 py-2 rounded-lg border border-neutral-300 dark:border-neutral-600 bg-white dark:bg-[#2A2A2A] text-sm font-medium text-neutral-800 dark:text-white hover:bg-neutral-100 dark:hover:bg-[#333] disabled:opacity-60"
               >
                 Voltar
               </button>

@@ -11,10 +11,10 @@ export default function SeletorDia({ dias, selectedIndex, onSelect }) {
         const base =
           "flex flex-col items-center justify-center w-12 h-12 rounded-md text-xs outline-none focus:ring-0 transition-colors duration-150 shrink-0";
         const classe = d.desabilitado
-          ? "bg-[#E5E5E5] text-gray-400 cursor-not-allowed opacity-70"
+          ? "bg-[#E5E5E5] dark:bg-[#2a2a2a] text-gray-400 dark:text-gray-600 cursor-not-allowed opacity-70"
           : selectedIndex === idx
           ? "bg-[#AE0000] text-white"
-          : "bg-[#F6F6F6] text-gray-700 hover:bg-[#AE0000] hover:text-white";
+          : "bg-[#F6F6F6] dark:bg-[#1a1a1a] text-gray-700 dark:text-gray-200 hover:bg-[#AE0000] hover:text-white";
 
         return (
           <button

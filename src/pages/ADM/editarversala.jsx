@@ -1,16 +1,15 @@
-// src/pages/Salas/EditarVersala.jsx
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { buscarTurmaPorId, atualizarTurma, gerarNovoCodigo } from "../../service/turma";
 import setaLeft from "../../assets/setaleft.svg";
+import setawhiteleft from "../../assets/setawhiteleft.svg";
 
-// cor padrão do projeto
 const COR = "#AE0000";
 
 // helper pra mostrar data BR quando o input está em modo texto
 const formatDateBr = (iso) => {
   if (!iso) return "";
-  if (iso.includes("/")) return iso; // se já vier formatado
+  if (iso.includes("/")) return iso; 
   const [y, m, d] = String(iso).split("-");
   if (!y || !m || !d) return iso;
   return `${d}/${m}/${y}`;
@@ -31,11 +30,10 @@ export default function EditarVersala() {
 
   const [materia, setMateria] = useState("");
   const [nomeTurma, setNomeTurma] = useState("");
-  const [inicio, setInicio] = useState(""); // yyyy-MM-dd
-  const [fim, setFim] = useState(""); // yyyy-MM-dd
+  const [inicio, setInicio] = useState("");  
+  const [fim, setFim] = useState("");  
   const [tipo, setTipo] = useState("");
-  const [capacidade, setCapacidade] = useState(""); // continua existindo só pra mandar pro back
-
+  const [capacidade, setCapacidade] = useState(""); 
   const [inicioType, setInicioType] = useState("text");
   const [fimType, setFimType] = useState("text");
 
@@ -165,7 +163,7 @@ export default function EditarVersala() {
             className="flex items-center justify-center w-10 h-10 md:w-11 md:h-11 p-0 border-none bg-transparent"
             aria-label="Voltar"
           >
-            <img src={setaLeft} alt="" className="w-6 h-6" />
+            <img src={document.documentElement.classList.contains('dark') ? setawhiteleft : setaLeft} alt="" className="w-6 h-6" />
           </button>
 
           <div className="flex-1 flex justify-center">

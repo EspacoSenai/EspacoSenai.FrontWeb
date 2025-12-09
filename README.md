@@ -5,7 +5,7 @@ O foco do projeto é oferecer uma experiência simples e acessível para alunos,
 
 ---
 ````
-## ✨ Funcionalidades
+## Funcionalidades
 
 - **Autenticação** via JWT (token salvo no `localStorage`).
 - **Perfil do usuário**
@@ -34,7 +34,7 @@ O foco do projeto é oferecer uma experiência simples e acessível para alunos,
 ````
 ---
 
-## 🧰 Tecnologias utilizadas
+## Tecnologias utilizadas
 
 - React
 - React Router DOM
@@ -45,7 +45,7 @@ O foco do projeto é oferecer uma experiência simples e acessível para alunos,
 
 ---
 
-## 📦 Dependências principais
+## Dependências principais
 
 Algumas libs que provavelmente estão no `package.json`:
 
@@ -62,7 +62,7 @@ Algumas libs que provavelmente estão no `package.json`:
 
 ---
 
-## 📁 Estrutura (resumo)
+## Estrutura (resumo)
 
 Algumas pastas importantes do projeto:
 
@@ -99,7 +99,7 @@ src/
 
 ---
 
-## 🔧 Pré-requisitos
+## Pré-requisitos
 
 - Node.js **>= 18**
 - NPM ou Yarn
@@ -107,7 +107,7 @@ src/
 
 ---
 
-## 🚀 Como instalar e rodar o projeto
+## Como instalar e rodar o projeto
 
 1. Clonar o repositório:
 
@@ -136,7 +136,7 @@ Se estiver usando outro bundler (Create React App, etc.), basta ajustar o comand
 
 ---
 
-## 🌐 Configuração de API
+## Configuração de API
 
 O frontend se comunica com o backend via Axios.  
 Normalmente, a URL base é configurada em `src/service/api.js`.
@@ -164,7 +164,7 @@ Se o backend estiver em outro domínio/porta (Azure, Render, etc.), atualize o `
 
 ---
 
-## 🔐 Autenticação
+## Autenticação
 
 - O token JWT é salvo no `localStorage` com a chave `access_token`.
 - Algumas telas (como os agendamentos) dependem desse token para:
@@ -178,7 +178,7 @@ Se o token estiver ausente ou inválido, as telas exibem mensagens como:
 
 ---
 
-## 🧭 Fluxo principal do usuário (aluno)
+## Fluxo principal do usuário (aluno)
 
 1. Faz **login** no sistema.
 2. Acessa a **Home do aluno**.
@@ -194,7 +194,7 @@ Se o token estiver ausente ou inválido, as telas exibem mensagens como:
 
 ---
 
-## ♿ Acessibilidade & UX
+## Acessibilidade & UX
 
 - Botões com `aria-pressed`, `aria-disabled` e foco bem definido;
 - Navegação por teclado nos horários (Enter/espaço seleciona);

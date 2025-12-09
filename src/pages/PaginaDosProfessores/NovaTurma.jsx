@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { criarTurma } from "../../service/turma";
+import { buscarProfessores } from "../../service/usuario";
 
 const COR = "#AE0000";
 
@@ -40,27 +41,55 @@ export default function NovaTurma() {
     dataInicio: "",
     dataTermino: "",
     professorId: "",
-    estudantesIdsTexto: "",
   });
 
+  const [professores, setProfessores] = useState([]);
+  const [loadingProfs, setLoadingProfs] = useState(true);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  // já preenche o id do professor a partir do token
+  // Detectar perfil e agir de acordo
   useEffect(() => {
     const token = getToken();
-    if (!token) return;
+    const role = (localStorage.getItem("role") || "").toUpperCase();
+    const isAdministrador = role.includes("ADMIN") || role.includes("ADMINISTRADOR");
+    setIsAdmin(isAdministrador);
 
-    const payload = parseJwt(token) || {};
-    const id =
-      payload.id ||
-      payload.userId ||
-      payload.usuarioId ||
-      payload.sub ||
-      payload.uid;
+    if (isAdministrador) {
+      // Admin: buscar todos os professores para selecionar
+      async function carregarProfessores() {
+        try {
+          setLoadingProfs(true);
+          const data = await buscarProfessores();
+          setProfessores(Array.isArray(data) ? data : []);
+        } catch (e) {
+          console.error("[NovaTurma] Erro ao buscar professores:", e);
+          setProfessores([]);
+        } finally {
+          setLoadingProfs(false);
+        }
+      }
+      carregarProfessores();
+    } else {
+      // Professor: preencher automaticamente com seu próprio ID
+      if (!token) {
+        setLoadingProfs(false);
+        return;
+      }
 
-    if (id) {
-      setValues((s) => ({ ...s, professorId: id }));
+      const payload = parseJwt(token) || {};
+      const id =
+        payload.id ||
+        payload.userId ||
+        payload.usuarioId ||
+        payload.sub ||
+        payload.uid;
+
+      if (id) {
+        setValues((s) => ({ ...s, professorId: id }));
+      }
+      setLoadingProfs(false);
     }
   }, []);
 
@@ -262,25 +291,33 @@ export default function NovaTurma() {
             </div>
           </div>
 
-          {/* Estudantes */}
-          <div className="md:col-span-2">
-            <label className="block text-[14px] font-semibold text-[#1E1E1E] dark:text-gray-100">
-              Estudantes da turma
-            </label>
-            <input
-              className="mt-2 w-full h-12 px-3 rounded-md border border-black/10 dark:border-white/10
-                         bg-[#F7F7F7] dark:bg-[#2A2A2A] text-[#111] dark:text-white outline-none
-                         focus:ring-2 focus:ring-[var(--cor, #AE0000)]"
-              style={{ "--cor": COR }}
-              placeholder="Digite os IDs separados por vírgula. Ex: 1, 2, 5"
-              value={values.estudantesIdsTexto}
-              onChange={(e) => update("estudantesIdsTexto", e.target.value)}
-            />
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-              Esse campo será enviado como <code>estudantesIds</code> no corpo
-              da requisição.
-            </p>
-          </div>
+          {/* Professor responsável - apenas para ADMIN */}
+          {isAdmin && (
+            <div className="md:col-span-2">
+              <label className="block text-[14px] font-semibold text-[#1E1E1E] dark:text-gray-100">
+                Professor responsável
+              </label>
+              {loadingProfs ? (
+                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">Carregando professores...</p>
+              ) : (
+                <select
+                  className="mt-2 w-full h-12 px-3 rounded-md border border-black/10 dark:border-white/10
+                             bg-[#F7F7F7] dark:bg-[#2A2A2A] text-[#111] dark:text-white outline-none
+                             focus:ring-2 focus:ring-[var(--cor, #AE0000)] appearance-none"
+                  style={{ "--cor": COR }}
+                  value={values.professorId}
+                  onChange={(e) => update("professorId", e.target.value)}
+                >
+                  <option value="">-- Selecione um professor --</option>
+                  {professores.map((prof) => (
+                    <option key={prof.id} value={prof.id}>
+                      {prof.nome} (ID: {prof.id})
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+          )}
         </div>
 
         {/* ações */}

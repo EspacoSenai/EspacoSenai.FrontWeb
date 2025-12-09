@@ -4,6 +4,7 @@ import { api } from "../../service/api";
 import { buscarMeuPerfil } from "../../service/usuario";
 
 import setaLeft from "../../assets/setaleft.svg";
+import setawhiteleft from "../../assets/setawhiteleft.svg";
 import avatarImg from "../../assets/avatar.svg";
 import iconeEditar from "../../assets/editarperfil.svg";
 import lapis from "../../assets/lápis.svg";
@@ -29,6 +30,7 @@ function parseJwtLocal(token) {
 }
 
 export default function EditarPerfil() {
+  const isDark = document.documentElement.classList.contains('dark');
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
@@ -161,7 +163,7 @@ export default function EditarPerfil() {
           className="absolute left-3 top-0 bg-white rounded-md border border-gray-300 shadow-sm p-1 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#AE0000]"
           aria-label="Voltar"
         >
-          <img src={setaLeft} alt="Voltar" className="w-9 h-8" />
+          <img src={isDark ? setawhiteleft : setaLeft} alt="Voltar" className="w-9 h-8" />
         </button>
 
         <h1 className="text-lg font-medium w-full text-center pointer-events-none text-black">
