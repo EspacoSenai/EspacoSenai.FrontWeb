@@ -284,7 +284,7 @@ export function buscarMinhasNotificacoes() {
 
 
 export function marcarNotificacaoComoLida(id) {
-  return api.put(`/notificacao/ler/${id}`, {});
+  return api.patch(`/notificacao/ler/${id}`, {});
 }
 
 
